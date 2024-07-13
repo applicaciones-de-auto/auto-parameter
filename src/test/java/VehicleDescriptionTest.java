@@ -213,16 +213,16 @@ public class VehicleDescriptionTest {
             System.exit(1);
         }
         
-//        json = model.saveRecord();
-//        System.err.println((String) json.get("message"));
-//        
-//        if (!"success".equals((String) json.get("result"))){
-//            System.err.println((String) json.get("message"));
-//            System.exit(1);
-//        } else {
-//            System.out.println((String) json.get("message"));
-//            System.exit(0);
-//        }
+        json = model.saveRecord();
+        System.err.println((String) json.get("message"));
+        
+        if (!"success".equals((String) json.get("result"))){
+            System.err.println((String) json.get("message"));
+            System.exit(1);
+        } else {
+            System.out.println((String) json.get("message"));
+            System.exit(0);
+        }
 
 
 //        System.out.println("--------------------------------------------------------------------");

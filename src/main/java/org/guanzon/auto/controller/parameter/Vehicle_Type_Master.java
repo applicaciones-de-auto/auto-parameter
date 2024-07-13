@@ -176,6 +176,10 @@ public class Vehicle_Type_Master implements GRecord {
             }
 
             poJSON = poModel.saveRecord();
+            if ("success".equals((String) poJSON.get("result"))) {
+                poJSON.put("result", "success");
+                poJSON.put("message", "Deactivation success.");
+            }
         } else {
             poJSON = new JSONObject();
             poJSON.put("result", "error");
@@ -196,6 +200,10 @@ public class Vehicle_Type_Master implements GRecord {
             }
 
             poJSON = poModel.saveRecord();
+            if ("success".equals((String) poJSON.get("result"))) {
+                poJSON.put("result", "success");
+                poJSON.put("message", "Activation success.");
+            }
         } else {
             poJSON = new JSONObject();
             poJSON.put("result", "error");
@@ -241,7 +249,10 @@ public class Vehicle_Type_Master implements GRecord {
                 1);
 
         if (poJSON != null) {
+            poJSON.put("result", "success");
+            poJSON.put("message", "New selected record.");
         } else {
+            poJSON = new JSONObject();
             poJSON.put("result", "error");
             poJSON.put("message", "No record loaded to update.");
             return poJSON;
@@ -313,7 +324,8 @@ public class Vehicle_Type_Master implements GRecord {
                     + "FROM vehicle_master a "                                     
                     + "LEFT JOIN vehicle_type b ON b.sTypeIDxx = a.sTypeIDxx ";
             if(poModel.getRecdStat().equals("0")){
-                lsSQL = MiscUtil.addCondition(lsSQL, " a.sTypeIDxx = " + SQLUtil.toSQL(poModel.getTypeID())) ;
+                lsSQL = MiscUtil.addCondition(lsSQL, " a.sTypeIDxx = " + SQLUtil.toSQL(poModel.getTypeID()) +
+                                                        " AND a.cRecdStat = '1' ") ;
                 System.out.println("EXISTING USAGE OF VEHICLE TYPE: " + lsSQL);
                 loRS = poGRider.executeQuery(lsSQL);
 
@@ -325,7 +337,7 @@ public class Vehicle_Type_Master implements GRecord {
                         MiscUtil.close(loRS);
 
                         jObj.put("result", "error");
-                        jObj.put("message", "Existing Vehicle Type Usage.\n\nVehicle ID: " + lsVehicleID + "\n Deactivation aborted.");
+                        jObj.put("message", "Existing Vehicle Type Usage.\n\nVehicle ID: " + lsVehicleID + "\nDeactivation aborted.");
                         return jObj;
                 }
             }
@@ -340,23 +352,23 @@ public class Vehicle_Type_Master implements GRecord {
                     + "FROM vehicle_master a "                                     
                     + "LEFT JOIN vehicle_type b ON b.sTypeIDxx = a.sTypeIDxx ";
             if(poModel.getRecdStat().equals("0")){
-                lsSQL = MiscUtil.addCondition(lsSQL, " a.sTypeIDxx = " + SQLUtil.toSQL(poModel.getTypeID())) ;
+                lsSQL = MiscUtil.addCondition(lsSQL, " a.sTypeIDxx = " + SQLUtil.toSQL(poModel.getTypeID()) 
+                                                        + " AND REPLACE(b.sTypeDesc, ' ','') <> " + SQLUtil.toSQL(poModel.getTypeDesc().replace(" ", ""))   
+                                                        //+ " AND a.cRecdStat = '1' "
+                                                        ) ;
                 System.out.println("EXISTING USAGE OF VEHICLE TYPE: " + lsSQL);
                 loRS = poGRider.executeQuery(lsSQL);
 
                 if (MiscUtil.RecordCount(loRS) > 0){
                         while(loRS.next()){
                             lsVehicleID = loRS.getString("sVhclIDxx");
-                            lsTypeDesc = loRS.getString("sModelDsc");
                         }
 
                         MiscUtil.close(loRS);
                         
-                        if(!lsTypeDesc.equals(poModel.getMakeDesc())){
-                            jObj.put("result", "error");
-                            jObj.put("message", "Existing Vehicle Type Usage.\n\nVehicle ID: " + lsVehicleID + "\n changing of type description aborted.");
-                            return jObj;
-                        }
+                        jObj.put("result", "error");
+                        jObj.put("message", "Existing Vehicle Type Usage.\n\nVehicle ID: " + lsVehicleID + "\nChanging of type description aborted.");
+                        return jObj;
                 }
             }
         
@@ -372,7 +384,7 @@ public class Vehicle_Type_Master implements GRecord {
     * Loads a list of type format records into the 'poTypeFormat' CachedRowSet based on the provided value.
     * @return True if the list is successfully loaded, false if there are errors, the application driver is not set, or no records are found.
     */
-    public JSONObject loadTypeFormat() {
+    public JSONObject loadFormatType() {
         JSONObject jObj = new JSONObject();
         try {
             if(poModel.getMakeID() != null){
@@ -389,46 +401,51 @@ public class Vehicle_Type_Master implements GRecord {
 
             String lsFormula1 = "";
             String lsFormula2 = "";
-            String lsDefaultx = "sVhclSize +' '+ sVarianta +' '+ sVariantb";
+            String lsMakeDesc = "";
+            String lsDefaultx = "ENGINE_SIZE + VARIANT_A + VARIANT_B";
             String lsSQL =  "  SELECT" + 
                             "  sMakeIDxx" +
-                            "  sMakeDesc" +
+                            ",  sMakeDesc" +
                             ", IFNULL(sFormula1, '') sFormula1" + 
                             ", IFNULL(sFormula2, '') sFormula2" + 
                             " FROM vehicle_make " ;
             lsSQL = MiscUtil.addCondition(lsSQL, " sMakeIDxx = " + SQLUtil.toSQL(poModel.getMakeID()));
+            
+            System.out.println(lsSQL);
             ResultSet loRS = poGRider.executeQuery(lsSQL);
 
             if (MiscUtil.RecordCount(loRS) > 0){
                 while(loRS.next()){
                     lsFormula1 = loRS.getString("sFormula1");
                     lsFormula2 = loRS.getString("sFormula2");
+                    lsMakeDesc = loRS.getString("sMakeDesc");
                 }
                 
-                if(lsFormula1 != null && lsFormula2 != null){
-                    if(lsFormula1.isEmpty() && lsFormula2.isEmpty()){
-                        jObj.put("result", "error");
-                        jObj.put("result", "Please notify System Administrator to config Vehicle Make " + loRS.getString("sMakeDesc").toUpperCase() + " type format.");
-                        return jObj;
-                    }
-                } else {
-                    jObj.put("result", "error");
-                    jObj.put("result", "Please notify System Administrator to config Vehicle Make " + loRS.getString("sMakeDesc").toUpperCase() + " type format.");
-                    return jObj;
-                }
+//                if(lsFormula1 != null && lsFormula2 != null){
+//                    if(lsFormula1.isEmpty() && lsFormula2.isEmpty()){
+//                        jObj.put("result", "error");
+//                        jObj.put("message", "Please notify System Administrator to config Vehicle Make " + lsMakeDesc.toUpperCase() + " type format.");
+//                        return jObj;
+//                    }
+//                } else {
+//                    jObj.put("result", "error");
+//                    jObj.put("message", "Please notify System Administrator to config Vehicle Make " + loRS.getString("sMakeDesc").toUpperCase() + " type format.");
+//                    return jObj;
+//                }
                 
                 MiscUtil.close(loRS);
-                if(!lsDefaultx.trim().toLowerCase().equals(lsFormula1.trim().toCharArray()) && !lsDefaultx.trim().equals(lsFormula2.trim().toLowerCase())){
-                    jObj.put("sDefaultx", lsDefaultx);  
-                }
+//                if(lsDefaultx.trim().toLowerCase().equals(lsFormula1.trim().toCharArray()) && lsDefaultx.trim().equals(lsFormula2.trim().toLowerCase())){
+//                    lsDefaultx = "";  
+//                }
+                jObj.put("sDefaultx", lsDefaultx);
                 jObj.put("sFormula1", lsFormula1);
-                jObj.put("sFormula1", lsFormula2);
-                return jObj;
+                jObj.put("sFormula2", lsFormula2);
             } 
         
         } catch (SQLException ex) {
             Logger.getLogger(Vehicle_Type_Master.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
         jObj.put("result", "success");
         jObj.put("message", "Vehicle Make Type Format load successfully.");
         return jObj;
@@ -439,10 +456,10 @@ public class Vehicle_Type_Master implements GRecord {
     * @param fsValue The value to search for, used as a partial match for the 'sVhclSize' field.
     * @return True if a matching record is found, and the 'sVhclSize' field is set accordingly; false if no record is found.
     */
-    public JSONObject searchTypeEngine(String fsValue){
+    public JSONObject searchEngineSize(String fsValue){
         JSONObject loJSON ;
         String lsSQL =  " SELECT " +
-                        " IFNULL(sVhclSize, '') sVhclSize " +   
+                        " sVhclSize " +   
                         " FROM vehicle_type_engine ";
         lsSQL = MiscUtil.addCondition(lsSQL, " sVhclSize LIKE " + SQLUtil.toSQL(fsValue + "%"));
         
@@ -474,29 +491,41 @@ public class Vehicle_Type_Master implements GRecord {
     * @param fsVarGrp The variant group to filter the search results. set A for sVariantx_a, Otherwise set B for sVariantx_b
     * @return True if a matching record is found, and the 'sVariantx_a' and 'sVariantx_b' fields are set accordingly; false if no record is found.
     */
-    public JSONObject searchTypeVariant(String fsValue, String fsVarGrp){
+    public JSONObject searchVariantType(String fsValue, String fsVarGrp){
         JSONObject loJSON ;
+        
+        if(fsVarGrp.isEmpty()){
+            loJSON  = new JSONObject();  
+            loJSON.put("result", "error");
+            loJSON.put("message", "Variant Group cannot be empty.");
+            return loJSON;
+        }
+        
         String lsSQL =  "  SELECT" +
-                        "  IFNULL(sVariantx, '') sVariantx " +   
-                        ", IFNULL(sVariantG, '') sVariantG " +   
+                        "  sVariantx " +   
+                        ", sVariantG " +   
                         "  FROM vehicle_type_variant ";
         
         lsSQL = MiscUtil.addCondition(lsSQL, " sVariantx LIKE " + SQLUtil.toSQL(fsValue + "%") +
-                                                " AND sVariantG LIKE " + SQLUtil.toSQL(fsVarGrp)
+                                                " AND UPPER(sVariantG) LIKE " + SQLUtil.toSQL(fsVarGrp.toUpperCase())
                                     );       
         loJSON = ShowDialogFX.Search(poGRider, 
                             lsSQL, 
                             fsValue,
-                            "Engine Size", 
-                            "sVhclSize",
-                            "sVhclSize",
+                            "Variant»Variant Group", 
+                            "sVariantx»sVariantG",
+                            "sVariantx»sVariantG",
                             0);
             
         if (loJSON != null) {
-            poModel.setVhclSize((String) loJSON.get("sVhclSize"));
+            if(fsVarGrp.toUpperCase().equals("A")){
+                poModel.setVarianta((String) loJSON.get("sVariantx"));
+            } else {
+                poModel.setVariantb((String) loJSON.get("sVariantx"));
+            }
 
             loJSON.put("result", "success");
-            loJSON.put("message", "Search spouse success.");
+            loJSON.put("message", "Search record success.");
             return loJSON;
         }else {
             loJSON  = new JSONObject();  

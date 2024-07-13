@@ -75,7 +75,7 @@ public class Vehicle_Type implements GRecord{
     public Object getMaster(String fsCol) {
         return poController.getMaster(fsCol);
     }
-
+    
     @Override
     public JSONObject newRecord() {
         poJSON = new JSONObject();
@@ -157,32 +157,49 @@ public class Vehicle_Type implements GRecord{
         return poController;
     }
     
-    public JSONObject searchMake(String fsValue, boolean fbByCode) {
+    public JSONObject searchMake(String fsValue, boolean fbByActive) {
         poJSON = new JSONObject();  
-        poJSON = poMake.searchRecord(fsValue, fbByCode);
+        poJSON = poMake.searchRecord(fsValue, fbByActive);
         if(!"error".equals(poJSON.get("result"))){
             poController.setMaster("sMakeIDxx", poJSON.get("sMakeIDxx"));
             poController.setMaster("sMakeDesc", poJSON.get("sMakeDesc"));
+            
+            System.out.println(poController.getMaster("sMakeDesc"));
         }
         
         return poJSON;
     }
     
-    public JSONObject loadTypeFormat() {
+    /**
+    * Loads a list of type format records;
+    * @return True if the list is successfully loaded, false if there are errors, the application driver is not set, or no records are found.
+    */
+    public JSONObject loadFormatType() {
         poJSON = new JSONObject();  
-        poJSON = poController.loadTypeFormat();
+        poJSON = poController.loadFormatType();
         return poJSON;
     }
     
-    public JSONObject searchTypeEngine(String fsValue) {
+    /**
+    * Searches for a vehicle type engine record based on the provided criteria.
+    * @param fsValue The value to search for, used as a partial match for the 'sVhclSize' field.
+    * @return True if a matching record is found, and the 'sVhclSize' field is set accordingly; false if no record is found.
+    */
+    public JSONObject searchEngineSize(String fsValue) {
         poJSON = new JSONObject();  
-        poJSON = poController.searchTypeEngine(fsValue);
+        poJSON = poController.searchEngineSize(fsValue);
         return poJSON;
     }
     
-    public JSONObject loadTypeFormat(String fsValue, String fsVarGrp) {
+    /**
+    * Searches for a vehicle type variant record based on the provided criteria.
+    * @param fsValue  The value to search for, used as a partial match for the 'sVariantx' field.
+    * @param fsVarGrp The variant group to filter the search results. set A for sVariantx_a, Otherwise set B for sVariantx_b
+    * @return True if a matching record is found, and the 'sVariantx_a' and 'sVariantx_b' fields are set accordingly; false if no record is found.
+    */
+    public JSONObject searchVariantType(String fsValue, String fsVarGrp) {
         poJSON = new JSONObject();  
-        poJSON = poController.searchTypeVariant(fsValue, fsVarGrp);
+        poJSON = poController.searchVariantType(fsValue, fsVarGrp);
         return poJSON;
     }
     

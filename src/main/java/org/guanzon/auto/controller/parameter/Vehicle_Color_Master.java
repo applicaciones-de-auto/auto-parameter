@@ -175,6 +175,10 @@ public class Vehicle_Color_Master implements GRecord {
             }
 
             poJSON = poModel.saveRecord();
+            if ("success".equals((String) poJSON.get("result"))) {
+                poJSON.put("result", "success");
+                poJSON.put("message", "Deactivation success.");
+            }
         } else {
             poJSON = new JSONObject();
             poJSON.put("result", "error");
@@ -199,6 +203,10 @@ public class Vehicle_Color_Master implements GRecord {
             }
             
             poJSON = poModel.saveRecord();
+            if ("success".equals((String) poJSON.get("result"))) {
+                poJSON.put("result", "success");
+                poJSON.put("message", "Activation success.");
+            }
         } else {
             poJSON = new JSONObject();
             poJSON.put("result", "error");
@@ -243,7 +251,10 @@ public class Vehicle_Color_Master implements GRecord {
                 1);
 
         if (poJSON != null) {
+            poJSON.put("result", "success");
+            poJSON.put("message", "New selected record.");
         } else {
+            poJSON = new JSONObject();
             poJSON.put("result", "error");
             poJSON.put("message", "No record loaded to update.");
             return poJSON;
@@ -305,8 +316,9 @@ public class Vehicle_Color_Master implements GRecord {
             }
             
             //Deactivation Validation
+            //Do not allow deactivation when already connected thru vehicle master that is active or inactive.
+            String lsVehicleID = "";
             if(poModel.getRecdStat().equals("0")){
-                String lsVehicleID = "";
                 lsSQL =   "  SELECT "                                                
                         + "  a.sColorIDx "                                           
                         + ", b.sColorDsc "                                           
@@ -316,7 +328,9 @@ public class Vehicle_Color_Master implements GRecord {
                         + "FROM vehicle_master a "                                     
                         + "LEFT JOIN vehicle_color b ON b.sColorIDx = a.sColorIDx ";
 
-                lsSQL = MiscUtil.addCondition(lsSQL, " a.sColorIDx = " + SQLUtil.toSQL(poModel.getColorID())) ;
+                lsSQL = MiscUtil.addCondition(lsSQL, " a.sColorIDx = " + SQLUtil.toSQL(poModel.getColorID())
+                                                        //" AND a.cRecdStat = '1'") ;
+                                                        ) ;
                 System.out.println("EXISTING USAGE OF VEHICLE COLOR: " + lsSQL);
                 loRS = poGRider.executeQuery(lsSQL);
 
@@ -328,7 +342,39 @@ public class Vehicle_Color_Master implements GRecord {
                         MiscUtil.close(loRS);
 
                         jObj.put("result", "error");
-                        jObj.put("message", "Existing Vehicle Color Usage.\n\nVehicle ID: " + lsVehicleID + "\n Deactivation aborted.");
+                        jObj.put("message", "Existing Vehicle Color Usage.\n\nVehicle ID: " + lsVehicleID + "\nDeactivation aborted.");
+                        return jObj;
+                }
+            }
+            
+            
+            //Do not allow modification on description when already connected thru vehicle master that is active or inactive.
+            lsVehicleID = "";
+            lsSQL =   "  SELECT "                                                
+                    + "  a.sColorIDx "                                           
+                    + ", b.sColorDsc "                                           
+                    + ", b.sColorCde "                                           
+                    + ", b.cRecdStat "                                           
+                    + ", a.sVhclIDxx "                                           
+                    + "FROM vehicle_master a "                                     
+                    + "LEFT JOIN vehicle_color b ON b.sColorIDx = a.sColorIDx ";
+            if(pnEditMode == EditMode.UPDATE){
+                lsSQL = MiscUtil.addCondition(lsSQL, " a.sColorIDx = " + SQLUtil.toSQL(poModel.getColorID()) 
+                                                        + " AND REPLACE(b.sColorDsc, ' ', '') <> " + SQLUtil.toSQL(poModel.getColorDsc().replace(" ", "")) 
+                                                        //+ " AND a.cRecdStat = '1'"
+                                                        ) ;
+                System.out.println("EXISTING USAGE OF VEHICLE COLOR: " + lsSQL);
+                loRS = poGRider.executeQuery(lsSQL);
+
+                if (MiscUtil.RecordCount(loRS) > 0){
+                        while(loRS.next()){
+                            lsVehicleID = loRS.getString("sVhclIDxx");
+                        }
+
+                        MiscUtil.close(loRS);
+
+                        jObj.put("result", "error");
+                        jObj.put("message", "Existing Vehicle Color Usage.\n\nVehicle ID: " + lsVehicleID + "\nChanging of color description aborted.");
                         return jObj;
                 }
             }

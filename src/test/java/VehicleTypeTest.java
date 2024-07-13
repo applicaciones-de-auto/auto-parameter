@@ -59,6 +59,23 @@ public class VehicleTypeTest {
             System.exit(1);
         }
         
+//        json = model.setMaster("sMakeIDxx","1");
+//        if ("error".equals((String) json.get("result"))){
+//            System.err.println((String) json.get("message"));
+//            System.exit(1);
+//        }
+//        
+//        System.out.println((String) model.getMaster("sMakeIDxx"));
+        
+        json = model.setMaster("sMakeDesc","test");
+        if ("error".equals((String) json.get("result"))){
+            System.err.println((String) json.get("message"));
+            System.exit(1);
+        }
+        
+        
+        System.out.println((String) model.getMaster("sMakeDesc"));
+        
 //        System.out.println("--------------------------------------------------------------------");
 //        System.out.println("------------------------------NEW RECORD SAVING--------------------------------------");
 //        System.out.println("--------------------------------------------------------------------");

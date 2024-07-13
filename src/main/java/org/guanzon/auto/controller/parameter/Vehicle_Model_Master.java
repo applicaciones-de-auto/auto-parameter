@@ -176,6 +176,10 @@ public class Vehicle_Model_Master implements GRecord {
             }
 
             poJSON = poModel.saveRecord();
+            if ("success".equals((String) poJSON.get("result"))) {
+                poJSON.put("result", "success");
+                poJSON.put("message", "Deactivation success.");
+            }
         } else {
             poJSON = new JSONObject();
             poJSON.put("result", "error");
@@ -200,6 +204,10 @@ public class Vehicle_Model_Master implements GRecord {
             }
             
             poJSON = poModel.saveRecord();
+            if ("success".equals((String) poJSON.get("result"))) {
+                poJSON.put("result", "success");
+                poJSON.put("message", "Activation success.");
+            }
         } else {
             poJSON = new JSONObject();
             poJSON.put("result", "error");
@@ -241,7 +249,10 @@ public class Vehicle_Model_Master implements GRecord {
                 1);
 
         if (poJSON != null) {
+            poJSON.put("result", "success");
+            poJSON.put("message", "New selected record.");
         } else {
+            poJSON = new JSONObject();
             poJSON.put("result", "error");
             poJSON.put("message", "No record loaded to update.");
             return poJSON;
@@ -305,7 +316,7 @@ public class Vehicle_Model_Master implements GRecord {
                     MiscUtil.close(loRS);
                     
                     jObj.put("result", "error");
-                    jObj.put("message", "Existing Model Description Record.\n\nMake ID: " + lsID + "\nDescription: " + lsDesc.toUpperCase() );
+                    jObj.put("message", "Existing Model Description Record.\n\nModel ID: " + lsID + "\nDescription: " + lsDesc.toUpperCase() );
                     return jObj;
             }
             
@@ -320,7 +331,9 @@ public class Vehicle_Model_Master implements GRecord {
                     + "FROM vehicle_master a "                                     
                     + "LEFT JOIN vehicle_model b ON b.sModelIDx = a.sModelIDx ";
             if(poModel.getRecdStat().equals("0")){
-                lsSQL = MiscUtil.addCondition(lsSQL, " a.sModelIDx = " + SQLUtil.toSQL(poModel.getModelID())) ;
+                lsSQL = MiscUtil.addCondition(lsSQL, " a.sModelIDx = " + SQLUtil.toSQL(poModel.getModelID())  
+                                                        // + " AND a.cRecdStat = '1'"
+                                                        ) ;
                 System.out.println("EXISTING USAGE OF VEHICLE MODEL: " + lsSQL);
                 loRS = poGRider.executeQuery(lsSQL);
 
@@ -332,12 +345,11 @@ public class Vehicle_Model_Master implements GRecord {
                         MiscUtil.close(loRS);
 
                         jObj.put("result", "error");
-                        jObj.put("message", "Existing Vehicle Model Usage.\n\nVehicle ID: " + lsVehicleID + "\n Deactivation aborted.");
+                        jObj.put("message", "Existing Vehicle Model Usage.\n\nVehicle ID: " + lsVehicleID + "\nDeactivation aborted.");
                         return jObj;
                 }
             }
             
-            String lsModelDesc = "";
             lsSQL =   "  SELECT "                                                
                     + "  a.sModelIDx "                                           
                     + ", b.sModelDsc "                                           
@@ -347,23 +359,23 @@ public class Vehicle_Model_Master implements GRecord {
                     + "FROM vehicle_master a "                                     
                     + "LEFT JOIN vehicle_model b ON b.sModelIDx = a.sModelIDx ";
             if(pnEditMode == EditMode.UPDATE){
-                lsSQL = MiscUtil.addCondition(lsSQL, " a.sModelIDx = " + SQLUtil.toSQL(poModel.getModelID())) ;
+                lsSQL = MiscUtil.addCondition(lsSQL, " a.sModelIDx = " + SQLUtil.toSQL(poModel.getModelID()) 
+                                                        + " AND REPLACE(b.sModelDsc, ' ','') <> " + SQLUtil.toSQL(poModel.getModelDsc().replace(" ", ""))   
+                                                        //+ " AND a.cRecdStat = '1' "
+                                                        ) ;
                 System.out.println("EXISTING USAGE OF VEHICLE MODEL: " + lsSQL);
                 loRS = poGRider.executeQuery(lsSQL);
 
                 if (MiscUtil.RecordCount(loRS) > 0){
                         while(loRS.next()){
                             lsVehicleID = loRS.getString("sVhclIDxx");
-                            lsModelDesc = loRS.getString("sModelDsc");
                         }
 
                         MiscUtil.close(loRS);
                         
-                        if(!lsModelDesc.equals(poModel.getMakeDesc())){
-                            jObj.put("result", "error");
-                            jObj.put("message", "Existing Vehicle Model Usage.\n\nVehicle ID: " + lsVehicleID + "\n changing of model description aborted.");
-                            return jObj;
-                        }
+                        jObj.put("result", "error");
+                        jObj.put("message", "Existing Vehicle Model Usage.\n\nVehicle ID: " + lsVehicleID + "\nChanging of model description aborted.");
+                        return jObj;
                 }
             }
         
