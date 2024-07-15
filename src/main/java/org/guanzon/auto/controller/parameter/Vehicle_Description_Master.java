@@ -226,22 +226,6 @@ public class Vehicle_Description_Master implements GRecord {
 
     @Override
     public JSONObject searchRecord(String fsValue, boolean fbByActive) {
-//        String lsCondition = "";
-//
-//        if (psRecdStat.length() > 1) {
-//            for (int lnCtr = 0; lnCtr <= psRecdStat.length() - 1; lnCtr++) {
-//                lsCondition += ", " + SQLUtil.toSQL(Character.toString(psRecdStat.charAt(lnCtr)));
-//            }
-//
-//            lsCondition = "cRecdStat IN (" + lsCondition.substring(2) + ")";
-//        } else {
-//            lsCondition = "cRecdStat = " + SQLUtil.toSQL(psRecdStat);
-//        }
-//
-//        
-//        String lsSQL = MiscUtil.addCondition(poModel.makeSelectSQL(), " sDescript LIKE "
-//                + SQLUtil.toSQL(fsValue + "%") + " AND " + lsCondition);
-
         String lsSQL = poModel.getSQL();
         
         if(fbByActive){
@@ -263,6 +247,7 @@ public class Vehicle_Description_Master implements GRecord {
             poJSON.put("result", "success");
             poJSON.put("message", "New selected record.");
         } else {
+            poJSON = new JSONObject();
             poJSON.put("result", "error");
             poJSON.put("message", "No record loaded to update.");
             return poJSON;

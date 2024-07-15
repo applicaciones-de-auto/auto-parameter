@@ -32,6 +32,7 @@ public class Vehicle_ModelEnginePattern implements GRecord{
     
     public Vehicle_ModelEnginePattern(GRider foAppDrver, boolean fbWtParent, String fsBranchCd){
         poController = new Vehicle_ModelEnginePattern_Master(foAppDrver,fbWtParent,fsBranchCd);
+        poMake = new Vehicle_Make_Master(foAppDrver,fbWtParent,fsBranchCd);
         
         poGRider = foAppDrver;
         pbWtParent = fbWtParent;
@@ -100,7 +101,13 @@ public class Vehicle_ModelEnginePattern implements GRecord{
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
-    public JSONObject openRecord(String fsValue, String fnEntryNo) {
+    /**
+     * Open Vehicle Engine Pattern 
+     * @param fsValue set for ModelID
+     * @param fnEntryNo set for EntryNo
+     * @return 
+     */
+    public JSONObject openRecord(String fsValue, Integer fnEntryNo) {
         poJSON = new JSONObject();
         
         poJSON = poController.openRecord(fsValue, fnEntryNo);
@@ -150,7 +157,7 @@ public class Vehicle_ModelEnginePattern implements GRecord{
         poJSON = new JSONObject();  
         poJSON = poController.searchRecord(fsValue, fbByActive);
         if(!"error".equals(poJSON.get("result"))){
-            poJSON = openRecord((String) poJSON.get("sColorIDx"));
+            poJSON = openRecord((String) poJSON.get("sModelIDx"), Integer.parseInt(String.valueOf( poJSON.get("nEntryNox"))));
         }
         return poJSON;
     }

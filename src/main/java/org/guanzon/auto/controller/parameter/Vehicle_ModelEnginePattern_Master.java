@@ -82,6 +82,10 @@ public class Vehicle_ModelEnginePattern_Master implements GRecord {
             org.json.simple.JSONObject obj;
 
             poModel = new Model_Vehicle_Model_Engine_Pattern(poGRider);
+            
+            Connection loConn = null;
+            loConn = setConnection();
+            poModel.setEntryNo(Integer.valueOf(MiscUtil.getNextCode(poModel.getTable(), "nEntryNox", false, loConn, "")));
             poModel.newRecord();
             
             if (poModel == null){
@@ -107,12 +111,12 @@ public class Vehicle_ModelEnginePattern_Master implements GRecord {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
-    public JSONObject openRecord(String fsValue, String fsEntryNo) {
+    public JSONObject openRecord(String fsValue, Integer fnEntryNo) {
         pnEditMode = EditMode.READY;
         poJSON = new JSONObject();
         
         poModel = new Model_Vehicle_Model_Engine_Pattern(poGRider);
-        poJSON = poModel.openRecord(fsValue, fsEntryNo);
+        poJSON = poModel.openRecord(fsValue, fnEntryNo);
         
         if("error".equals(poJSON.get("result"))){
             return poJSON;
@@ -171,7 +175,7 @@ public class Vehicle_ModelEnginePattern_Master implements GRecord {
 
     @Override
     public JSONObject searchRecord(String fsValue, boolean fbByCode) {
-        String lsSQL = MiscUtil.addCondition(poModel.makeSelectSQL(), " sEngnPtrn LIKE "
+        String lsSQL = MiscUtil.addCondition(poModel.getSQL(), " a.sEngnPtrn LIKE "
                 + SQLUtil.toSQL(fsValue + "%") );
         System.out.println("SEARCH ENGINE PATTERN: " + lsSQL);
         poJSON = ShowDialogFX.Search(poGRider,
@@ -180,20 +184,35 @@ public class Vehicle_ModelEnginePattern_Master implements GRecord {
                 "Make»Model»Model Engine Pattern»Length",
                 "sMakeDesc»sModelDsc»sEngnPtrn»nEngnLenx",
                 "c.sMakeDesc»b.sModelDsc»a.sEngnPtrn»a.nEngnLenx",
-                fbByCode ? 0 : 1);
+                2);
 
         if (poJSON != null) {
-            return poModel.openRecord((String) poJSON.get("sEngnPtrn"));
+            poJSON.put("result", "success");
+            poJSON.put("message", "New Selected Record.");
         } else {
+            poJSON = new JSONObject();
             poJSON.put("result", "error");
             poJSON.put("message", "No record loaded to update.");
             return poJSON;
         }
+        
+        return poJSON;
     }
 
     @Override
     public Model_Vehicle_Model_Engine_Pattern getModel() {
         return poModel;
+    }
+    
+    private Connection setConnection(){
+        Connection foConn;
+        
+        if (pbWtParent){
+            foConn = (Connection) poGRider.getConnection();
+            if (foConn == null) foConn = (Connection) poGRider.doConnect();
+        }else foConn = (Connection) poGRider.doConnect();
+        
+        return foConn;
     }
     
     private JSONObject validateEntry(){
@@ -211,12 +230,19 @@ public class Vehicle_ModelEnginePattern_Master implements GRecord {
                 jObj.put("message", "Engine Pattern cannot be Empty.");
                 return jObj;
             }
+            
+            if(poModel.getEngnLen() == null || poModel.getEngnLen() == 0){
+                jObj.put("result", "error");
+                jObj.put("message", "Engine Length cannot be Empty.");
+                return jObj;
+            }
 
             String lsID = "";
             String lsDesc  = "";
             String lsSQL = poModel.getSQL();
-            lsSQL = MiscUtil.addCondition(lsSQL, "REPLACE(sEngnPtrn,' ','') = " + SQLUtil.toSQL(poModel.getEngnPtrn().replace(" ",""))) +
-                                                    " AND sModelIDx = " + SQLUtil.toSQL(poModel.getModelID()) ;
+            lsSQL = MiscUtil.addCondition(lsSQL, "REPLACE(a.sEngnPtrn,' ','') = " + SQLUtil.toSQL(poModel.getEngnPtrn().replace(" ",""))) +
+                                                    " AND a.sModelIDx = " + SQLUtil.toSQL(poModel.getModelID()) +
+                                                    " AND a.nEntryNox <> " + SQLUtil.toSQL(poModel.getEntryNo()) ;
             System.out.println("EXISTING VEHICLE MODEL ENGINE PATTERN CHECK: " + lsSQL);
             ResultSet loRS = poGRider.executeQuery(lsSQL);
 
@@ -233,33 +259,33 @@ public class Vehicle_ModelEnginePattern_Master implements GRecord {
                     return jObj;
             }
             
-            lsID = "";
-            lsSQL =   "  SELECT "           
-                    + "  sSerialID "        
-                    + ", sFrameNox "        
-                    + ", sEngineNo "        
-                    + "FROM vehicle_serial ";
-
-            if(pnEditMode == EditMode.UPDATE){
-                lsSQL = MiscUtil.addCondition(lsSQL, " sEngineNo LIKE " + SQLUtil.toSQL(poModel.getEngnPtrn()+ "%")   
-                                                        //+ " AND a.cRecdStat = '1' "
-                                                        ) ;
-                System.out.println("EXISTING USAGE OF VEHICLE MODEL ENGINE PATTERN: " + lsSQL);
-                loRS = poGRider.executeQuery(lsSQL);
-
-                if (MiscUtil.RecordCount(loRS) > 0){
-                        while(loRS.next()){
-                            lsID = loRS.getString("sSerialID");
-                        }
-
-                        MiscUtil.close(loRS);
-                        
-                        jObj.put("result", "error");
-                        jObj.put("message", "Existing Vehicle Model Engine Pattern Usage.\n\nVehicle ID: " + lsID + "\nChanging of engine pattern aborted.");
-                        return jObj;
-                }
-            }
-        
+//            lsID = "";
+//            lsSQL =   "  SELECT "           
+//                    + "  sSerialID "        
+//                    + ", sFrameNox "        
+//                    + ", sEngineNo "        
+//                    + "FROM vehicle_serial ";
+//
+//            if(pnEditMode == EditMode.UPDATE){
+//                lsSQL = MiscUtil.addCondition(lsSQL, " sEngineNo LIKE " + SQLUtil.toSQL(poModel.getEngnPtrn()+ "%")   
+//                                                        //+ " AND a.cRecdStat = '1' "
+//                                                        ) ;
+//                System.out.println("EXISTING USAGE OF VEHICLE MODEL ENGINE PATTERN: " + lsSQL);
+//                loRS = poGRider.executeQuery(lsSQL);
+//
+//                if (MiscUtil.RecordCount(loRS) > 0){
+//                        while(loRS.next()){
+//                            lsID = loRS.getString("sSerialID");
+//                        }
+//
+//                        MiscUtil.close(loRS);
+//                        
+//                        jObj.put("result", "error");
+//                        jObj.put("message", "Existing Vehicle Model Engine Pattern Usage.\n\nVehicle ID: " + lsID + "\nChanging of engine pattern aborted.");
+//                        return jObj;
+//                }
+//            }
+//        
         } catch (SQLException ex) {
             Logger.getLogger(Vehicle_ModelEnginePattern_Master.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -303,6 +329,7 @@ public class Vehicle_ModelEnginePattern_Master implements GRecord {
             poJSON.put("result", "success");
             poJSON.put("message", "New selected record.");
         } else {
+            poJSON = new JSONObject();
             poJSON.put("result", "error");
             poJSON.put("message", "No record loaded to update.");
             return poJSON;

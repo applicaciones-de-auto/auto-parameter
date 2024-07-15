@@ -37,7 +37,7 @@ public class VehicleModelEnginePattern {
         
         System.setProperty("sys.default.path.metadata", "D:/GGC_Maven_Systems/config/metadata/Model_Vehicle_Model_Engine_Pattern.xml");
         
-        String lsSQL =    "  SELECT "                                               
+        String lsSQL =   "  SELECT "                                               
                         + "  a.sModelIDx "                                          
                         + ", a.nEntryNox "                                          
                         + ", a.sEngnPtrn "                                          
