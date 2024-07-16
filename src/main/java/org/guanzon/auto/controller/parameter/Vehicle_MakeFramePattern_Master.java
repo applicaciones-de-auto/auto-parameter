@@ -175,8 +175,8 @@ public class Vehicle_MakeFramePattern_Master implements GRecord {
 
     @Override
     public JSONObject searchRecord(String fsValue, boolean fbByCode) {
-        String lsSQL = MiscUtil.addCondition(poModel.getSQL(), " a.sFrmePtrn LIKE "
-                + SQLUtil.toSQL(fsValue + "%") );
+        String lsSQL = MiscUtil.addCondition(poModel.getSQL(), " a.sFrmePtrn LIKE " + SQLUtil.toSQL(fsValue + "%") );
+        
         System.out.println("SEARCH MAKE FRAME PATTERN: " + lsSQL);
         poJSON = ShowDialogFX.Search(poGRider,
                 lsSQL,
@@ -187,12 +187,10 @@ public class Vehicle_MakeFramePattern_Master implements GRecord {
                1);
 
         if (poJSON != null) {
-            poJSON.put("result", "success");
-            poJSON.put("message", "New selected record.");
         } else {
             poJSON = new JSONObject();
             poJSON.put("result", "error");
-            poJSON.put("message", "No record loaded to update.");
+            poJSON.put("message", "No record loaded.");
             return poJSON;
         }
         
@@ -219,66 +217,78 @@ public class Vehicle_MakeFramePattern_Master implements GRecord {
         JSONObject jObj = new JSONObject();
         try {
             
-            if(poModel.getMakeID().isEmpty()){
+            if(poModel.getMakeID() == null){
                 jObj.put("result", "error");
-                jObj.put("message", "Make ID cannot be Empty.");
+                jObj.put("message", "Make cannot be Empty.");
                 return jObj;
+            } else {
+                if(poModel.getMakeID().trim().isEmpty()){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Make cannot be Empty.");
+                    return jObj;
+                }
             }
-
-            if(poModel.getFrmePtrn().isEmpty()){
+            
+            if(poModel.getFrmePtrn() == null){
                 jObj.put("result", "error");
                 jObj.put("message", "Make Frame Pattern cannot be Empty.");
                 return jObj;
+            } else {
+                if(poModel.getFrmePtrn().trim().isEmpty() || poModel.getFrmePtrn().replace(" ", "").length() < 3){
+                jObj.put("result", "error");
+                jObj.put("message", "Make Frame Pattern cannot be Empty.");
+                return jObj;
+                }
             }
 
             String lsID = "";
             String lsDesc  = "";
             String lsSQL = poModel.getSQL();
             lsSQL = MiscUtil.addCondition(lsSQL, "REPLACE(a.sFrmePtrn,' ','') = " + SQLUtil.toSQL(poModel.getFrmePtrn().replace(" ",""))) +
-                                                    " AND a.sMakeIDxx <> " + SQLUtil.toSQL(poModel.getMakeID()) +
+                                                    " AND a.sMakeIDxx = " + SQLUtil.toSQL(poModel.getMakeID()) +
                                                     " AND a.nEntryNox <> " + SQLUtil.toSQL(poModel.getEntryNo()) ;
             System.out.println("EXISTING VEHICLE MAKE FRAME PATTERN CHECK: " + lsSQL);
             ResultSet loRS = poGRider.executeQuery(lsSQL);
 
             if (MiscUtil.RecordCount(loRS) > 0){
                     while(loRS.next()){
-                        lsID = loRS.getString("sMakeIDxx");
-                        lsDesc = loRS.getString("sEngnPtrn");
+                        lsID = loRS.getString("sMakeDesc");
+                        lsDesc = loRS.getString("sFrmePtrn");
                     }
                     
                     MiscUtil.close(loRS);
                     
                     jObj.put("result", "error");
-                    jObj.put("message", "Existing Make Frame Pattern Record.\n\nMake ID: " + lsID + "\nMake Frame Pattern: " + lsDesc.toUpperCase() );
+                    jObj.put("message", "Existing Make Frame Pattern Record.\n\nMake: " + lsID + "\nMake Frame Pattern: " + lsDesc.toUpperCase() );
                     return jObj;
             }
             
-            lsID = "";
-            lsSQL =   "  SELECT "           
-                    + "  sSerialID "        
-                    + ", sFrameNox "        
-                    + ", sEngineNo "        
-                    + "FROM vehicle_serial ";
-
-            if(pnEditMode == EditMode.UPDATE){
-                lsSQL = MiscUtil.addCondition(lsSQL, " sFrameNox LIKE " + SQLUtil.toSQL(poModel.getFrmePtrn()+ "%")   
-                                                        //+ " AND a.cRecdStat = '1' "
-                                                        ) ;
-                System.out.println("EXISTING USAGE OF VEHICLE MAKE FRAME PATTERN: " + lsSQL);
-                loRS = poGRider.executeQuery(lsSQL);
-
-                if (MiscUtil.RecordCount(loRS) > 0){
-                        while(loRS.next()){
-                            lsID = loRS.getString("sSerialID");
-                        }
-
-                        MiscUtil.close(loRS);
-                        
-                        jObj.put("result", "error");
-                        jObj.put("message", "Existing Vehicle Make Frame Pattern Usage.\n\nVehicle ID: " + lsID + "\nChanging of frame pattern aborted.");
-                        return jObj;
-                }
-            }
+//            lsID = "";
+//            lsSQL =   "  SELECT "           
+//                    + "  sSerialID "        
+//                    + ", sFrameNox "        
+//                    + ", sEngineNo "        
+//                    + "FROM vehicle_serial ";
+//
+//            if(pnEditMode == EditMode.UPDATE){
+//                lsSQL = MiscUtil.addCondition(lsSQL, " sFrameNox LIKE " + SQLUtil.toSQL(poModel.getFrmePtrn()+ "%")   
+//                                                        //+ " AND a.cRecdStat = '1' "
+//                                                        ) ;
+//                System.out.println("EXISTING USAGE OF VEHICLE MAKE FRAME PATTERN: " + lsSQL);
+//                loRS = poGRider.executeQuery(lsSQL);
+//
+//                if (MiscUtil.RecordCount(loRS) > 0){
+//                        while(loRS.next()){
+//                            lsID = loRS.getString("sSerialID");
+//                        }
+//
+//                        MiscUtil.close(loRS);
+//                        
+//                        jObj.put("result", "error");
+//                        jObj.put("message", "Existing Vehicle Make Frame Pattern Usage.\n\nVehicle ID: " + lsID + "\nChanging of frame pattern aborted.");
+//                        return jObj;
+//                }
+//            }
         
         } catch (SQLException ex) {
             Logger.getLogger(Vehicle_MakeFramePattern_Master.class.getName()).log(Level.SEVERE, null, ex);

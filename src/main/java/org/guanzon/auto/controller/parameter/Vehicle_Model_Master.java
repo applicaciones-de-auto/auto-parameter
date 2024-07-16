@@ -179,6 +179,9 @@ public class Vehicle_Model_Master implements GRecord {
             if ("success".equals((String) poJSON.get("result"))) {
                 poJSON.put("result", "success");
                 poJSON.put("message", "Deactivation success.");
+            } else {
+                poJSON.put("result", "error");
+                poJSON.put("message", "Deactivation failed.");
             }
         } else {
             poJSON = new JSONObject();
@@ -207,6 +210,9 @@ public class Vehicle_Model_Master implements GRecord {
             if ("success".equals((String) poJSON.get("result"))) {
                 poJSON.put("result", "success");
                 poJSON.put("message", "Activation success.");
+            } else {
+                poJSON.put("result", "error");
+                poJSON.put("message", "Activation failed.");
             }
         } else {
             poJSON = new JSONObject();
@@ -218,18 +224,6 @@ public class Vehicle_Model_Master implements GRecord {
 
     @Override
     public JSONObject searchRecord(String fsValue, boolean fbByActive) {
-//        String lsCondition = "";
-//
-//        if (psRecdStat.length() > 1) {
-//            for (int lnCtr = 0; lnCtr <= psRecdStat.length() - 1; lnCtr++) {
-//                lsCondition += ", " + SQLUtil.toSQL(Character.toString(psRecdStat.charAt(lnCtr)));
-//            }
-//
-//            lsCondition = "cRecdStat IN (" + lsCondition.substring(2) + ")";
-//        } else {
-//            lsCondition = "cRecdStat = " + SQLUtil.toSQL(psRecdStat);
-//        }
-
         String lsSQL = poModel.getSQL();
         
         if(fbByActive){
@@ -243,18 +237,16 @@ public class Vehicle_Model_Master implements GRecord {
         poJSON = ShowDialogFX.Search(poGRider,
                 lsSQL,
                 fsValue,
-                "ID»Name",
-                "sModelIDx»sModelDsc",
-                "sModelIDx»sModelDsc",
+                "Model ID»Model Description»Make",
+                "sModelIDx»sModelDsc»sMakeDesc",
+                "a.sModelIDx»a.sModelDsc»b.sMakeDesc",
                 1);
 
         if (poJSON != null) {
-            poJSON.put("result", "success");
-            poJSON.put("message", "New selected record.");
         } else {
             poJSON = new JSONObject();
             poJSON.put("result", "error");
-            poJSON.put("message", "No record loaded to update.");
+            poJSON.put("message", "No record loaded.");
             return poJSON;
         }
         
@@ -281,29 +273,47 @@ public class Vehicle_Model_Master implements GRecord {
         JSONObject jObj = new JSONObject();
         try {
             
-            if(poModel.getModelID().isEmpty()){
+            if(poModel.getMakeID() == null){
                 jObj.put("result", "error");
-                jObj.put("message", "Model ID cannot be Empty.");
+                jObj.put("message", "Make cannot be Empty.");
                 return jObj;
+            } else {
+                if(poModel.getMakeID().trim().isEmpty()){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Make cannot be Empty.");
+                    return jObj;
+                }
             }
-
-            if(poModel.getModelDsc().isEmpty()){
+            
+            if(poModel.getModelID() == null){
+                jObj.put("result", "error");
+                jObj.put("message", "Model cannot be Empty.");
+                return jObj;
+            } else {
+                if(poModel.getModelID().trim().isEmpty()){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Model cannot be Empty.");
+                    return jObj;
+                }
+            }
+            
+            if(poModel.getModelDsc() == null){
                 jObj.put("result", "error");
                 jObj.put("message", "Model Description cannot be Empty.");
                 return jObj;
-            }
-            
-            if(poModel.getMakeID().isEmpty()){
-                jObj.put("result", "error");
-                jObj.put("message", "Make ID cannot be Empty.");
-                return jObj;
+            } else {
+                if(poModel.getModelDsc().trim().isEmpty()){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Model Description cannot be Empty.");
+                    return jObj;
+                }
             }
 
             String lsID = "";
             String lsDesc  = "";
             String lsSQL = poModel.getSQL();
-            lsSQL = MiscUtil.addCondition(lsSQL, "REPLACE(sModelDsc,' ','') = " + SQLUtil.toSQL(poModel.getModelDsc().replace(" ",""))) +
-                                                    " AND sModelIDx <> " + SQLUtil.toSQL(poModel.getModelID()) ;
+            lsSQL = MiscUtil.addCondition(lsSQL, " REPLACE(a.sModelDsc,' ','') = " + SQLUtil.toSQL(poModel.getModelDsc().replace(" ",""))) +
+                                                    " AND a.sModelIDx <> " + SQLUtil.toSQL(poModel.getModelID()) ;
             System.out.println("EXISTING VEHICLE MODEL CHECK: " + lsSQL);
             ResultSet loRS = poGRider.executeQuery(lsSQL);
 

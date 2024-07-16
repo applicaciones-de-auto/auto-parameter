@@ -178,6 +178,9 @@ public class Vehicle_Color_Master implements GRecord {
             if ("success".equals((String) poJSON.get("result"))) {
                 poJSON.put("result", "success");
                 poJSON.put("message", "Deactivation success.");
+            } else {
+                poJSON.put("result", "error");
+                poJSON.put("message", "Deactivation failed.");
             }
         } else {
             poJSON = new JSONObject();
@@ -206,6 +209,9 @@ public class Vehicle_Color_Master implements GRecord {
             if ("success".equals((String) poJSON.get("result"))) {
                 poJSON.put("result", "success");
                 poJSON.put("message", "Activation success.");
+            } else {
+                poJSON.put("result", "error");
+                poJSON.put("message", "Activation failed.");
             }
         } else {
             poJSON = new JSONObject();
@@ -217,21 +223,6 @@ public class Vehicle_Color_Master implements GRecord {
 
     @Override
     public JSONObject searchRecord(String fsValue, boolean fbByActive) {
-//        String lsCondition = "";
-//
-//        if (psRecdStat.length() > 1) {
-//            for (int lnCtr = 0; lnCtr <= psRecdStat.length() - 1; lnCtr++) {
-//                lsCondition += ", " + SQLUtil.toSQL(Character.toString(psRecdStat.charAt(lnCtr)));
-//            }
-//
-//            lsCondition = "cRecdStat IN (" + lsCondition.substring(2) + ")";
-//        } else {
-//            lsCondition = "cRecdStat = " + SQLUtil.toSQL(psRecdStat);
-//        }
-//
-//        String lsSQL = MiscUtil.addCondition(poModel.makeSelectSQL(), " sColorDsc LIKE " + SQLUtil.toSQL(fsValue + "%") 
-//                                                                        + " AND " + lsCondition);
-
         String lsSQL = poModel.getSQL();
         
         if(fbByActive){
@@ -251,12 +242,10 @@ public class Vehicle_Color_Master implements GRecord {
                 1);
 
         if (poJSON != null) {
-            poJSON.put("result", "success");
-            poJSON.put("message", "New selected record.");
         } else {
             poJSON = new JSONObject();
             poJSON.put("result", "error");
-            poJSON.put("message", "No record loaded to update.");
+            poJSON.put("message", "No record loaded.");
             return poJSON;
         }
         
@@ -287,11 +276,17 @@ public class Vehicle_Color_Master implements GRecord {
                 jObj.put("message", "Color ID cannot be Empty.");
                 return jObj;
             }
-
-            if(poModel.getColorDsc().isEmpty()){
-                jObj.put("result", "error");
-                jObj.put("message", "Color Description cannot be Empty.");
-                return jObj;
+            
+            if(poModel.getColorDsc() == null){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Color Description cannot be Empty.");
+                    return jObj;
+            } else {
+                if(poModel.getColorDsc().trim().isEmpty()){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Color Description cannot be Empty.");
+                    return jObj;
+                }
             }
 
             String lsID = "";

@@ -10,8 +10,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.sql.rowset.RowSetFactory;
-import javax.sql.rowset.RowSetProvider;
 import org.guanzon.appdriver.agent.ShowDialogFX;
 import org.guanzon.appdriver.base.GRider;
 import org.guanzon.appdriver.base.MiscUtil;
@@ -179,6 +177,9 @@ public class Vehicle_Type_Master implements GRecord {
             if ("success".equals((String) poJSON.get("result"))) {
                 poJSON.put("result", "success");
                 poJSON.put("message", "Deactivation success.");
+            } else {
+                poJSON.put("result", "error");
+                poJSON.put("message", "Deactivation failed.");
             }
         } else {
             poJSON = new JSONObject();
@@ -203,6 +204,9 @@ public class Vehicle_Type_Master implements GRecord {
             if ("success".equals((String) poJSON.get("result"))) {
                 poJSON.put("result", "success");
                 poJSON.put("message", "Activation success.");
+            } else {
+                poJSON.put("result", "error");
+                poJSON.put("message", "Activation failed.");
             }
         } else {
             poJSON = new JSONObject();
@@ -214,22 +218,6 @@ public class Vehicle_Type_Master implements GRecord {
 
     @Override
     public JSONObject searchRecord(String fsValue, boolean fbByActive) {
-//        String lsCondition = "";
-//
-//        if (psRecdStat.length() > 1) {
-//            for (int lnCtr = 0; lnCtr <= psRecdStat.length() - 1; lnCtr++) {
-//                lsCondition += ", " + SQLUtil.toSQL(Character.toString(psRecdStat.charAt(lnCtr)));
-//            }
-//
-//            lsCondition = "cRecdStat IN (" + lsCondition.substring(2) + ")";
-//        } else {
-//            lsCondition = "cRecdStat = " + SQLUtil.toSQL(psRecdStat);
-//        }
-        
-
-//        String lsSQL = MiscUtil.addCondition(poModel.makeSelectSQL(), " sTypeDesc LIKE "
-//                + SQLUtil.toSQL(fsValue + "%") + " AND " + lsCondition);
-
         String lsSQL = poModel.getSQL();
         
         if(fbByActive){
@@ -243,18 +231,16 @@ public class Vehicle_Type_Master implements GRecord {
         poJSON = ShowDialogFX.Search(poGRider,
                 lsSQL,
                 fsValue,
-                "ID»Name",
+                "ID»Description",
                 "sTypeIDxx»sTypeDesc",
                 "sTypeIDxx»sTypeDesc",
                 1);
 
         if (poJSON != null) {
-            poJSON.put("result", "success");
-            poJSON.put("message", "New selected record.");
         } else {
             poJSON = new JSONObject();
             poJSON.put("result", "error");
-            poJSON.put("message", "No record loaded to update.");
+            poJSON.put("message", "No record loaded.");
             return poJSON;
         }
         return poJSON;
@@ -280,22 +266,34 @@ public class Vehicle_Type_Master implements GRecord {
         JSONObject jObj = new JSONObject();
         try {
             
-            if(poModel.getTypeID().isEmpty()){
+            if(poModel.getTypeID() == null){
                 jObj.put("result", "error");
                 jObj.put("message", "Type ID cannot be Empty.");
                 return jObj;
+            } else {
+                if(poModel.getTypeID().trim().isEmpty()){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Type ID cannot be Empty.");
+                    return jObj;
+                }
             }
-
-            if(poModel.getTypeDesc().isEmpty()){
+            
+            if(poModel.getTypeDesc() == null){
                 jObj.put("result", "error");
                 jObj.put("message", "Type Description cannot be Empty.");
                 return jObj;
+            } else {
+                if(poModel.getTypeDesc().trim().isEmpty()){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Type Description cannot be Empty.");
+                    return jObj;
+                }
             }
-
+            
             String lsID = "";
             String lsDesc  = "";
             String lsSQL = poModel.getSQL();
-            lsSQL = MiscUtil.addCondition(lsSQL, "REPLACE(sTypeDesc,' ','') = " + SQLUtil.toSQL(poModel.getTypeDesc().replace(" ",""))) +
+            lsSQL = MiscUtil.addCondition(lsSQL, " REPLACE(sTypeDesc,' ','') = " + SQLUtil.toSQL(poModel.getTypeDesc().replace(" ",""))) +
                                                     " AND sTypeIDxx <> " + SQLUtil.toSQL(poModel.getTypeID()) ;
             System.out.println("EXISTING VEHICLE TYPE CHECK: " + lsSQL);
             ResultSet loRS = poGRider.executeQuery(lsSQL);
@@ -342,7 +340,6 @@ public class Vehicle_Type_Master implements GRecord {
                 }
             }
             
-            String lsTypeDesc = "";
             lsSQL =   "  SELECT "                                                
                     + "  a.sTypeIDxx "                                           
                     + ", b.sTypeDesc "                                           
@@ -472,17 +469,17 @@ public class Vehicle_Type_Master implements GRecord {
                             0);
             
         if (loJSON != null) {
-            poModel.setVhclSize((String) loJSON.get("sVhclSize"));
-
-            loJSON.put("result", "success");
-            loJSON.put("message", "Search spouse success.");
-            return loJSON;
+            if(!"error".equals(loJSON.get("result"))){
+                poModel.setVhclSize((String) loJSON.get("sVhclSize"));
+            }
         }else {
             loJSON  = new JSONObject();  
             loJSON.put("result", "error");
-            loJSON.put("message", "No record selected.");
+            loJSON.put("message", "No record loaded.");
             return loJSON;
         }
+        
+        return loJSON;
     }
     
     /**
@@ -518,21 +515,23 @@ public class Vehicle_Type_Master implements GRecord {
                             0);
             
         if (loJSON != null) {
-            if(fsVarGrp.toUpperCase().equals("A")){
-                poModel.setVarianta((String) loJSON.get("sVariantx"));
-            } else {
-                poModel.setVariantb((String) loJSON.get("sVariantx"));
+            
+            if(!"error".equals(loJSON.get("result"))){
+                if(fsVarGrp.toUpperCase().equals("A")){
+                    poModel.setVarianta((String) loJSON.get("sVariantx"));
+                } else {
+                    poModel.setVariantb((String) loJSON.get("sVariantx"));
+                }
             }
-
-            loJSON.put("result", "success");
-            loJSON.put("message", "Search record success.");
-            return loJSON;
         }else {
             loJSON  = new JSONObject();  
             loJSON.put("result", "error");
             loJSON.put("message", "No record selected.");
             return loJSON;
         }
+        
+        
+        return loJSON;
     }
 }
 

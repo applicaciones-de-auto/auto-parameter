@@ -180,6 +180,9 @@ public class Vehicle_Make_Master implements GRecord {
             if ("success".equals((String) poJSON.get("result"))) {
                 poJSON.put("result", "success");
                 poJSON.put("message", "Deactivation success.");
+            } else {
+                poJSON.put("result", "error");
+                poJSON.put("message", "Deactivation failed.");
             }
         } else {
             poJSON = new JSONObject();
@@ -208,6 +211,9 @@ public class Vehicle_Make_Master implements GRecord {
             if ("success".equals((String) poJSON.get("result"))) {
                 poJSON.put("result", "success");
                 poJSON.put("message", "Activation success.");
+            } else {
+                poJSON.put("result", "error");
+                poJSON.put("message", "Activation failed.");
             }
         } else {
             poJSON = new JSONObject();
@@ -219,18 +225,6 @@ public class Vehicle_Make_Master implements GRecord {
 
     @Override
     public JSONObject searchRecord(String fsValue, boolean fbByActive) {
-//        String lsCondition = "";
-//
-//        if (psRecdStat.length() > 1) {
-//            for (int lnCtr = 0; lnCtr <= psRecdStat.length() - 1; lnCtr++) {
-//                lsCondition += ", " + SQLUtil.toSQL(Character.toString(psRecdStat.charAt(lnCtr)));
-//            }
-//
-//            lsCondition = "cRecdStat IN (" + lsCondition.substring(2) + ")";
-//        } else {
-//            lsCondition = "cRecdStat = " + SQLUtil.toSQL(psRecdStat);
-//        }
-
         String lsSQL =  "   SELECT "              
                         + "   sMakeIDxx " //1    
                         + ",  sMakeDesc " //2    
@@ -249,18 +243,16 @@ public class Vehicle_Make_Master implements GRecord {
         poJSON = ShowDialogFX.Search(poGRider,
                 lsSQL,
                 fsValue,
-                "ID»Name",
+                "ID»Description",
                 "sMakeIDxx»sMakeDesc",
                 "sMakeIDxx»sMakeDesc",
                 1);
 
         if (poJSON != null) {
-            poJSON.put("result", "success");
-            poJSON.put("message", "New selected record.");
         } else {
             poJSON = new JSONObject();
             poJSON.put("result", "error");
-            poJSON.put("message", "No record loaded to update.");
+            poJSON.put("message", "No record loaded.");
             return poJSON;
         }
         
@@ -286,16 +278,29 @@ public class Vehicle_Make_Master implements GRecord {
     private JSONObject validateEntry(){
         JSONObject jObj = new JSONObject();
         try {
-            if(poModel.getMakeID().isEmpty()){
+            
+            if(poModel.getMakeID() == null){
                 jObj.put("result", "error");
                 jObj.put("message", "Make ID cannot be Empty.");
                 return jObj;
+            } else {
+                if(poModel.getMakeID().trim().isEmpty()){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Make ID cannot be Empty.");
+                    return jObj;
+                }
             }
-
-            if(poModel.getMakeDesc().isEmpty()){
+            
+            if(poModel.getMakeDesc() == null){
                 jObj.put("result", "error");
                 jObj.put("message", "Make Description cannot be Empty.");
                 return jObj;
+            } else {
+                if(poModel.getMakeDesc().trim().isEmpty()){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Make Description cannot be Empty.");
+                    return jObj;
+                }
             }
 
             String lsID = "";

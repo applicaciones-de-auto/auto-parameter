@@ -187,6 +187,9 @@ public class Vehicle_Description_Master implements GRecord {
             if ("success".equals((String) poJSON.get("result"))) {
                 poJSON.put("result", "success");
                 poJSON.put("message", "Deactivation success.");
+            } else {
+                poJSON.put("result", "error");
+                poJSON.put("message", "Deactivation failed.");
             }
         } else {
             poJSON = new JSONObject();
@@ -215,6 +218,9 @@ public class Vehicle_Description_Master implements GRecord {
             if ("success".equals((String) poJSON.get("result"))) {
                 poJSON.put("result", "success");
                 poJSON.put("message", "Activation success.");
+            } else {
+                poJSON.put("result", "error");
+                poJSON.put("message", "Activation failed.");
             }
         } else {
             poJSON = new JSONObject();
@@ -244,12 +250,10 @@ public class Vehicle_Description_Master implements GRecord {
                 1);
 
         if (poJSON != null) {
-            poJSON.put("result", "success");
-            poJSON.put("message", "New selected record.");
         } else {
             poJSON = new JSONObject();
             poJSON.put("result", "error");
-            poJSON.put("message", "No record loaded to update.");
+            poJSON.put("message", "No record loaded.");
             return poJSON;
         }
         return poJSON;
@@ -280,34 +284,64 @@ public class Vehicle_Description_Master implements GRecord {
                 return jObj;
             }
             
-            if(poModel.getMakeID().isEmpty()){
+            if(poModel.getMakeID() == null){
                 jObj.put("result", "error");
                 jObj.put("message", "Make cannot be Empty.");
                 return jObj;
+            } else {
+                if(poModel.getMakeID().trim().isEmpty()){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Make cannot be Empty.");
+                    return jObj;
+                }
             }
             
-            if(poModel.getModelID().isEmpty()){
+            if(poModel.getModelID() == null){
                 jObj.put("result", "error");
                 jObj.put("message", "Model cannot be Empty.");
                 return jObj;
+            } else {
+                if(poModel.getModelID().trim().isEmpty()){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Model cannot be Empty.");
+                    return jObj;
+                }
             }
             
-            if(poModel.getColorID().isEmpty()){
+            if(poModel.getColorID() == null){
                 jObj.put("result", "error");
                 jObj.put("message", "Color cannot be Empty.");
                 return jObj;
+            } else {
+                if(poModel.getColorID().trim().isEmpty()){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Color cannot be Empty.");
+                    return jObj;
+                }
             }
             
-            if(poModel.getTypeID().isEmpty()){
+            if(poModel.getTypeID() == null){
                 jObj.put("result", "error");
                 jObj.put("message", "Type cannot be Empty.");
                 return jObj;
+            } else {
+                if(poModel.getTypeID().trim().isEmpty()){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Type cannot be Empty.");
+                    return jObj;
+                }
             }
             
-            if(poModel.getTransMsn().isEmpty()){
+            if(poModel.getTransMsn() == null){
                 jObj.put("result", "error");
                 jObj.put("message", "Transmission cannot be Empty.");
                 return jObj;
+            } else {
+                if(poModel.getTransMsn().trim().isEmpty()){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Transmission cannot be Empty.");
+                    return jObj;
+                }
             }
             
             if(poModel.getYearModl() == null || poModel.getYearModl() == 0){
@@ -316,10 +350,16 @@ public class Vehicle_Description_Master implements GRecord {
                 return jObj;
             }
             
-            if(poModel.getVhclSize().isEmpty()){
+            if(poModel.getVhclSize() == null){
                 jObj.put("result", "error");
                 jObj.put("message", "Vehicle Size cannot be Empty.");
                 return jObj;
+            } else {
+                if(poModel.getVhclSize().trim().isEmpty()){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Vehicle Size cannot be Empty.");
+                    return jObj;
+                }
             }
 
             String lsID = "";
@@ -431,11 +471,16 @@ public class Vehicle_Description_Master implements GRecord {
     
      public JSONObject searchModel(String fsValue) {
         poJSON = new JSONObject();
-        
-        if(poModel.getMakeID().isEmpty()){
+        if(poModel.getMakeID() == null){
             poJSON.put("result", "error");
             poJSON.put("message", "Make cannot be Empty.");
             return poJSON;
+        } else {
+            if(poModel.getMakeID().trim().isEmpty()){
+                poJSON.put("result", "error");
+                poJSON.put("message", "Make cannot be Empty.");
+                return poJSON;
+            }
         }
          
         String lsSQL =    "  SELECT "                                               
@@ -459,13 +504,12 @@ public class Vehicle_Description_Master implements GRecord {
                 "sModelIDx»sModelDsc",
                 "sModelIDx»sModelDsc",
                 1);
-
+        
         if (poJSON != null) {
-            poJSON.put("result", "success");
-            poJSON.put("message", "New selected record.");
         } else {
+            poJSON = new JSONObject();
             poJSON.put("result", "error");
-            poJSON.put("message", "No record loaded to update.");
+            poJSON.put("message", "No record loaded.");
             return poJSON;
         }
         

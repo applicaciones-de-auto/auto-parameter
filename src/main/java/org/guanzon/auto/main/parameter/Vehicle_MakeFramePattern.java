@@ -131,9 +131,6 @@ public class Vehicle_MakeFramePattern implements GRecord{
     @Override
     public JSONObject saveRecord() {
         poJSON =  poController.saveRecord();
-        if("error".equals(poJSON.get("result"))){
-            return poJSON;
-        }
         return poJSON;
     }
 

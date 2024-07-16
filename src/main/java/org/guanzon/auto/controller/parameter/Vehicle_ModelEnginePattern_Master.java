@@ -187,12 +187,10 @@ public class Vehicle_ModelEnginePattern_Master implements GRecord {
                 2);
 
         if (poJSON != null) {
-            poJSON.put("result", "success");
-            poJSON.put("message", "New Selected Record.");
         } else {
             poJSON = new JSONObject();
             poJSON.put("result", "error");
-            poJSON.put("message", "No record loaded to update.");
+            poJSON.put("message", "No record loaded.");
             return poJSON;
         }
         
@@ -219,22 +217,40 @@ public class Vehicle_ModelEnginePattern_Master implements GRecord {
         JSONObject jObj = new JSONObject();
         try {
             
-            if(poModel.getModelID().isEmpty()){
+            if(poModel.getModelID() == null){
                 jObj.put("result", "error");
-                jObj.put("message", "Model ID cannot be Empty.");
+                jObj.put("message", "Model cannot be Empty.");
                 return jObj;
+            } else {
+                if(poModel.getModelID().trim().isEmpty()){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Model cannot be Empty.");
+                    return jObj;
+                }
             }
-
-            if(poModel.getEngnPtrn().isEmpty()){
+            
+            if(poModel.getEngnPtrn() == null){
                 jObj.put("result", "error");
                 jObj.put("message", "Engine Pattern cannot be Empty.");
                 return jObj;
+            } else {
+                if(poModel.getEngnPtrn().trim().isEmpty() || poModel.getEngnPtrn().replace(" ", "").length() < 3){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Invalid Engine Pattern.");
+                    return jObj;
+                }
             }
             
-            if(poModel.getEngnLen() == null || poModel.getEngnLen() == 0){
+            if(poModel.getEngnLen() == null){
                 jObj.put("result", "error");
                 jObj.put("message", "Engine Length cannot be Empty.");
                 return jObj;
+            } else {
+                if(poModel.getEngnLen() < 3){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Invalid Engine Length.");
+                    return jObj;
+                }
             }
 
             String lsID = "";
@@ -248,14 +264,14 @@ public class Vehicle_ModelEnginePattern_Master implements GRecord {
 
             if (MiscUtil.RecordCount(loRS) > 0){
                     while(loRS.next()){
-                        lsID = loRS.getString("sModelIDx");
+                        lsID = loRS.getString("sModelDsc");
                         lsDesc = loRS.getString("sEngnPtrn");
                     }
                     
                     MiscUtil.close(loRS);
                     
                     jObj.put("result", "error");
-                    jObj.put("message", "Existing Model Engine Pattern Record.\n\nModel ID: " + lsID + "\nEngine Pattern: " + lsDesc.toUpperCase() );
+                    jObj.put("message", "Existing Model Engine Pattern Record.\n\nModel: " + lsID + "\nEngine Pattern: " + lsDesc.toUpperCase() );
                     return jObj;
             }
             
@@ -297,10 +313,16 @@ public class Vehicle_ModelEnginePattern_Master implements GRecord {
     public JSONObject searchModel(String fsValue) {
         poJSON = new JSONObject();
         
-        if(poModel.getMakeID().isEmpty()){
+        if(poModel.getMakeID() == null){
             poJSON.put("result", "error");
             poJSON.put("message", "Make cannot be Empty.");
             return poJSON;
+        } else {
+            if(poModel.getMakeID().trim().isEmpty()){
+                poJSON.put("result", "error");
+                poJSON.put("message", "Make cannot be Empty.");
+                return poJSON;
+            }
         }
          
         String lsSQL =    "  SELECT "                                               
@@ -326,12 +348,10 @@ public class Vehicle_ModelEnginePattern_Master implements GRecord {
                 1);
 
         if (poJSON != null) {
-            poJSON.put("result", "success");
-            poJSON.put("message", "New selected record.");
         } else {
             poJSON = new JSONObject();
             poJSON.put("result", "error");
-            poJSON.put("message", "No record loaded to update.");
+            poJSON.put("message", "No record loaded.");
             return poJSON;
         }
         
