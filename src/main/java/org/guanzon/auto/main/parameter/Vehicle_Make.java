@@ -108,7 +108,7 @@ public class Vehicle_Make implements GRecord{
     }
 
     @Override
-    public JSONObject updateRecord() {
+    public JSONObject updateRecord(){
         poJSON = new JSONObject();  
         poJSON = poController.updateRecord();
         pnEditMode = poController.getEditMode();
@@ -118,9 +118,6 @@ public class Vehicle_Make implements GRecord{
     @Override
     public JSONObject saveRecord() {
         poJSON =  poController.saveRecord();
-        if("error".equals(poJSON.get("result"))){
-            return poJSON;
-        }
         return poJSON;
     }
 

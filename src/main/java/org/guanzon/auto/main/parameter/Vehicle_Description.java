@@ -11,7 +11,6 @@ import org.guanzon.appdriver.iface.GRecord;
 import org.guanzon.auto.controller.parameter.Vehicle_Color_Master;
 import org.guanzon.auto.controller.parameter.Vehicle_Description_Master;
 import org.guanzon.auto.controller.parameter.Vehicle_Make_Master;
-import org.guanzon.auto.controller.parameter.Vehicle_Model_Master;
 import org.guanzon.auto.controller.parameter.Vehicle_Type_Master;
 import org.json.simple.JSONObject;
 
@@ -128,9 +127,6 @@ public class Vehicle_Description implements GRecord{
     @Override
     public JSONObject saveRecord() {
         poJSON =  poController.saveRecord();
-        if("error".equals(poJSON.get("result"))){
-            return poJSON;
-        }
         return poJSON;
     }
 

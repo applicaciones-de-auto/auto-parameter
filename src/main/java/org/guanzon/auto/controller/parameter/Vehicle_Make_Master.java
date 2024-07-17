@@ -177,6 +177,13 @@ public class Vehicle_Make_Master implements GRecord {
             }
 
             poJSON = poModel.saveRecord();
+            if ("success".equals((String) poJSON.get("result"))) {
+                poJSON.put("result", "success");
+                poJSON.put("message", "Deactivation success.");
+            } else {
+                poJSON.put("result", "error");
+                poJSON.put("message", "Deactivation failed.");
+            }
         } else {
             poJSON = new JSONObject();
             poJSON.put("result", "error");
@@ -201,6 +208,13 @@ public class Vehicle_Make_Master implements GRecord {
             }
             
             poJSON = poModel.saveRecord();
+            if ("success".equals((String) poJSON.get("result"))) {
+                poJSON.put("result", "success");
+                poJSON.put("message", "Activation success.");
+            } else {
+                poJSON.put("result", "error");
+                poJSON.put("message", "Activation failed.");
+            }
         } else {
             poJSON = new JSONObject();
             poJSON.put("result", "error");
@@ -211,18 +225,6 @@ public class Vehicle_Make_Master implements GRecord {
 
     @Override
     public JSONObject searchRecord(String fsValue, boolean fbByActive) {
-//        String lsCondition = "";
-//
-//        if (psRecdStat.length() > 1) {
-//            for (int lnCtr = 0; lnCtr <= psRecdStat.length() - 1; lnCtr++) {
-//                lsCondition += ", " + SQLUtil.toSQL(Character.toString(psRecdStat.charAt(lnCtr)));
-//            }
-//
-//            lsCondition = "cRecdStat IN (" + lsCondition.substring(2) + ")";
-//        } else {
-//            lsCondition = "cRecdStat = " + SQLUtil.toSQL(psRecdStat);
-//        }
-
         String lsSQL =  "   SELECT "              
                         + "   sMakeIDxx " //1    
                         + ",  sMakeDesc " //2    
@@ -241,15 +243,16 @@ public class Vehicle_Make_Master implements GRecord {
         poJSON = ShowDialogFX.Search(poGRider,
                 lsSQL,
                 fsValue,
-                "ID»Name",
+                "ID»Description",
                 "sMakeIDxx»sMakeDesc",
                 "sMakeIDxx»sMakeDesc",
                 1);
 
         if (poJSON != null) {
         } else {
+            poJSON = new JSONObject();
             poJSON.put("result", "error");
-            poJSON.put("message", "No record loaded to update.");
+            poJSON.put("message", "No record loaded.");
             return poJSON;
         }
         
@@ -275,16 +278,29 @@ public class Vehicle_Make_Master implements GRecord {
     private JSONObject validateEntry(){
         JSONObject jObj = new JSONObject();
         try {
-            if(poModel.getMakeID().isEmpty()){
+            
+            if(poModel.getMakeID() == null){
                 jObj.put("result", "error");
                 jObj.put("message", "Make ID cannot be Empty.");
                 return jObj;
+            } else {
+                if(poModel.getMakeID().trim().isEmpty()){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Make ID cannot be Empty.");
+                    return jObj;
+                }
             }
-
-            if(poModel.getMakeDesc().isEmpty()){
+            
+            if(poModel.getMakeDesc() == null){
                 jObj.put("result", "error");
                 jObj.put("message", "Make Description cannot be Empty.");
                 return jObj;
+            } else {
+                if(poModel.getMakeDesc().trim().isEmpty()){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Make Description cannot be Empty.");
+                    return jObj;
+                }
             }
 
             String lsID = "";
@@ -308,11 +324,10 @@ public class Vehicle_Make_Master implements GRecord {
                     return jObj;
             }
             
-            String lsVehicleID = "";
+            lsID = "";
             lsSQL =   "  SELECT "                                                
                     + "  a.sMakeIDxx "                                           
                     + ", b.sMakeDesc "                                           
-                    + ", b.sMakeCode "                                           
                     + ", b.cRecdStat "                                           
                     + ", a.sVhclIDxx "                                           
                     + "FROM vehicle_master a "                                     
@@ -325,45 +340,74 @@ public class Vehicle_Make_Master implements GRecord {
 
                 if (MiscUtil.RecordCount(loRS) > 0){
                         while(loRS.next()){
-                            lsVehicleID = loRS.getString("sVhclIDxx");
+                            lsID = loRS.getString("sVhclIDxx");
                         }
 
                         MiscUtil.close(loRS);
 
                         jObj.put("result", "error");
-                        jObj.put("message", "Existing Vehicle Make Usage.\n\nVehicle ID: " + lsVehicleID + "\n Deactivation aborted.");
+                        jObj.put("message", "Existing Vehicle Make Usage.\n\nVehicle ID: " + lsID + "\nDeactivation aborted.");
                         return jObj;
                 }
             }
             
-            String lsMakeDesc = "";
-            lsSQL =   "  SELECT "                                                
+            if(pnEditMode == EditMode.UPDATE){
+                lsID = "";
+                lsSQL =   "  SELECT "                                                
                     + "  a.sMakeIDxx "                                           
                     + ", b.sMakeDesc "                                           
-                    + ", b.sMakeCode "                                           
-                    + ", b.cRecdStat "                                           
-                    + ", a.sVhclIDxx "                                           
-                    + "FROM vehicle_master a "                                     
+                    + ", a.cRecdStat "                                                
+                    + ",  a.sModelIDx "                                           
+                    + "FROM vehicle_model a "                                     
                     + "LEFT JOIN vehicle_make b ON b.sMakeIDxx = a.sMakeIDxx ";
-            if(pnEditMode == EditMode.UPDATE){
-                lsSQL = MiscUtil.addCondition(lsSQL, " a.sMakeIDxx = " + SQLUtil.toSQL(poModel.getMakeID())) ;
-                System.out.println("EXISTING USAGE OF VEHICLE MAKE: " + lsSQL);
+                
+                lsSQL = MiscUtil.addCondition(lsSQL, " a.sMakeIDxx = " + SQLUtil.toSQL(poModel.getMakeID()) 
+                                                        + " AND REPLACE(b.sMakeDesc, ' ','') <> " + SQLUtil.toSQL(poModel.getMakeDesc().replace(" ", ""))  
+                                                        //+ " AND a.cRecdStat = '1'"
+                                                        ) ;
+                System.out.println("VEHICLE MODEL: EXISTING USAGE OF VEHICLE MAKE: " + lsSQL);
                 loRS = poGRider.executeQuery(lsSQL);
 
                 if (MiscUtil.RecordCount(loRS) > 0){
                         while(loRS.next()){
-                            lsVehicleID = loRS.getString("sVhclIDxx");
-                            lsMakeDesc = loRS.getString("sMakeDesc");
+                            lsID = loRS.getString("sModelIDx");
                         }
 
                         MiscUtil.close(loRS);
                         
-                        if(!lsMakeDesc.equals(poModel.getMakeDesc())){
-                            jObj.put("result", "error");
-                            jObj.put("message", "Existing Vehicle Make Usage.\n\nVehicle ID: " + lsVehicleID + "\n changing of make description aborted.");
-                            return jObj;
-                        }
+                        jObj.put("result", "error");
+                        jObj.put("message", "Existing Vehicle Make Usage.\n\nModel ID: " + lsID + "\nChanging of make description aborted.");
+                        return jObj;
                 }
+                
+                lsID = "";
+                lsSQL =   "  SELECT "                                                
+                    + "  a.sMakeIDxx "                                           
+                    + ", b.sMakeDesc "                                             
+                    + ", a.cRecdStat "                                           
+                    + ", a.sVhclIDxx "                                           
+                    + "FROM vehicle_master a "                                     
+                    + "LEFT JOIN vehicle_make b ON b.sMakeIDxx = a.sMakeIDxx ";
+                
+                lsSQL = MiscUtil.addCondition(lsSQL, " a.sMakeIDxx = " + SQLUtil.toSQL(poModel.getMakeID()) 
+                                                        + " AND REPLACE(b.sMakeDesc, ' ','') <> " + SQLUtil.toSQL(poModel.getMakeDesc().replace(" ", ""))  
+                                                        //+ " AND a.cRecdStat = '1'"
+                                                        ) ;
+                System.out.println("VEHICLE MASTER: EXISTING USAGE OF VEHICLE MAKE: " + lsSQL);
+                loRS = poGRider.executeQuery(lsSQL);
+
+                if (MiscUtil.RecordCount(loRS) > 0){
+                        while(loRS.next()){
+                            lsID = loRS.getString("sVhclIDxx");
+                        }
+
+                        MiscUtil.close(loRS);
+                        
+                        jObj.put("result", "error");
+                        jObj.put("message", "Existing Vehicle Make Usage.\n\nVehicle ID: " + lsID + "\nChanging of make description aborted.");
+                        return jObj;
+                }
+                
             }
         
         } catch (SQLException ex) {

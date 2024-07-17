@@ -82,22 +82,22 @@ public class VehicleMakeTest {
         System.out.println("------------------------------NEW RECORD SAVING--------------------------------------");
         System.out.println("--------------------------------------------------------------------");
         
-        json = model.saveRecord();
-        System.err.println((String) json.get("message"));
-        
-        if (!"success".equals((String) json.get("result"))){
-            System.err.println((String) json.get("message"));
-            System.exit(1);
-        } else {
-            System.out.println((String) json.get("message"));
-            System.exit(0);
-        }
+//        json = model.saveRecord();
+//        System.err.println((String) json.get("message"));
+//        
+//        if (!"success".equals((String) json.get("result"))){
+//            System.err.println((String) json.get("message"));
+//            System.exit(1);
+//        } else {
+//            System.out.println((String) json.get("message"));
+//            System.exit(0);
+//        }
         
         System.out.println("--------------------------------------------------------------------");
         System.out.println("------------------------------RETRIEVAL--------------------------------------");
         System.out.println("--------------------------------------------------------------------");
         //retrieval
-        json = model.openRecord("M00100000001");
+        json = model.openRecord("M001MK000001");
         System.err.println((String) json.get("message"));
         
         System.out.println("--------------------------------------------------------------------");
@@ -121,19 +121,7 @@ public class VehicleMakeTest {
 //        json = model.updateRecord();
 //        System.err.println((String) json.get("message"));
 //        
-//        json = model.setMaster("sMakeDesc","GEELY");
-//        if ("error".equals((String) json.get("result"))){
-//            System.err.println((String) json.get("message"));
-//            System.exit(1);
-//        }
-//        
-//        json = model.setMaster("sMakeCode","");
-//        if ("error".equals((String) json.get("result"))){
-//            System.err.println((String) json.get("message"));
-//            System.exit(1);
-//        }
-//    
-//        json = model.setMaster("sFormula1","");
+//        json = model.setMaster("sMakeDesc","MAKING");
 //        if ("error".equals((String) json.get("result"))){
 //            System.err.println((String) json.get("message"));
 //            System.exit(1);
@@ -151,26 +139,26 @@ public class VehicleMakeTest {
 //        }
 
 
-//        System.out.println("--------------------------------------------------------------------");
-//        System.out.println("------------------------------DEACTIVATE RECORD--------------------------------------");
-//        System.out.println("--------------------------------------------------------------------");
-//        
-//        json = model.deactivateRecord("M00100000001");
-//        System.err.println((String) json.get("message"));
-//        
-//        if (!"success".equals((String) json.get("result"))){
-//            System.err.println((String) json.get("message"));
-//            System.exit(1);
-//        } else {
-//            System.out.println((String) json.get("message"));
-//            System.exit(0);
-//        }
+        System.out.println("--------------------------------------------------------------------");
+        System.out.println("------------------------------DEACTIVATE RECORD--------------------------------------");
+        System.out.println("--------------------------------------------------------------------");
+        
+        json = model.deactivateRecord("M001MK000001");
+        System.err.println((String) json.get("message"));
+        
+        if (!"success".equals((String) json.get("result"))){
+            System.err.println((String) json.get("message"));
+            System.exit(1);
+        } else {
+            System.out.println((String) json.get("message"));
+            System.exit(0);
+        }
 
 //        System.out.println("--------------------------------------------------------------------");
 //        System.out.println("------------------------------ACTIVATE RECORD--------------------------------------");
 //        System.out.println("--------------------------------------------------------------------");
 //        
-//        json = model.activateRecord("M00100000001");
+//        json = model.activateRecord("M001MK000001");
 //        System.err.println((String) json.get("message"));
 //        
 //        if (!"success".equals((String) json.get("result"))){

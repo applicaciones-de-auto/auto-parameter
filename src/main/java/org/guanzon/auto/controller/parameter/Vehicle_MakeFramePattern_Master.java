@@ -5,6 +5,11 @@
  */
 package org.guanzon.auto.controller.parameter;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.guanzon.appdriver.agent.ShowDialogFX;
 import org.guanzon.appdriver.base.GRider;
 import org.guanzon.appdriver.base.MiscUtil;
@@ -21,16 +26,19 @@ import org.json.simple.JSONObject;
 public class Vehicle_MakeFramePattern_Master implements GRecord {
 
     GRider poGRider;
-    boolean pbWthParent;
+    boolean pbWtParent;
     int pnEditMode;
+    String psBranchCd;
     String psRecdStat;
 
     Model_Vehicle_Make_Frame_Pattern poModel;
+    
     JSONObject poJSON;
 
-    public Vehicle_MakeFramePattern_Master(GRider foGRider, boolean fbWthParent) {
+    public Vehicle_MakeFramePattern_Master(GRider foGRider, boolean fbWthParent, String fsBranchCd) {
         poGRider = foGRider;
-        pbWthParent = fbWthParent;
+        pbWtParent = fbWthParent;
+        psBranchCd = fsBranchCd.isEmpty() ? foGRider.getBranchCode() : fsBranchCd;
 
         poModel = new Model_Vehicle_Make_Frame_Pattern(foGRider);
         pnEditMode = EditMode.UNKNOWN;
@@ -68,45 +76,85 @@ public class Vehicle_MakeFramePattern_Master implements GRecord {
 
     @Override
     public JSONObject newRecord() {
-        return poModel.newRecord();
+        poJSON = new JSONObject();
+        try{
+            pnEditMode = EditMode.ADDNEW;
+            org.json.simple.JSONObject obj;
+
+            poModel = new Model_Vehicle_Make_Frame_Pattern(poGRider);
+            
+            Connection loConn = null;
+            loConn = setConnection();
+            poModel.setEntryNo(Integer.valueOf(MiscUtil.getNextCode(poModel.getTable(), "nEntryNox", false, loConn, "")));
+            poModel.newRecord();
+            
+            if (poModel == null){
+                poJSON.put("result", "error");
+                poJSON.put("message", "initialized new record failed.");
+                return poJSON;
+            }else{
+                poJSON.put("result", "success");
+                poJSON.put("message", "initialized new record.");
+                pnEditMode = EditMode.ADDNEW;
+            }
+               
+        }catch(NullPointerException e){
+            poJSON.put("result", "error");
+            poJSON.put("message", e.getMessage());
+        }
+        
+        return poJSON;
     }
 
     @Override
     public JSONObject openRecord(String fsValue) {
-        return poModel.openRecord(fsValue);
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    public JSONObject openRecord(String fsValue, Integer fnEntryNo) {
+        pnEditMode = EditMode.READY;
+        poJSON = new JSONObject();
+        
+        poModel = new Model_Vehicle_Make_Frame_Pattern(poGRider);
+        poJSON = poModel.openRecord(fsValue, fnEntryNo);
+        
+        if("error".equals(poJSON.get("result"))){
+            return poJSON;
+        }
+        return poJSON;
     }
 
     @Override
     public JSONObject updateRecord() {
-        JSONObject loJSON = new JSONObject();
-
-        if (poModel.getEditMode() == EditMode.UPDATE) {
-            loJSON.put("result", "success");
-            loJSON.put("message", "Edit mode has changed to update.");
-        } else {
-            loJSON.put("result", "error");
-            loJSON.put("message", "No record loaded to update.");
+        poJSON = new JSONObject();
+        if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE){
+            poJSON.put("result", "error");
+            poJSON.put("message", "Invalid edit mode.");
+            return poJSON;
         }
-        return loJSON;
+        pnEditMode = EditMode.UPDATE;
+        poJSON.put("result", "success");
+        poJSON.put("message", "Update mode success.");
+        return poJSON;
     }
 
     @Override
     public JSONObject saveRecord() {
-        if (!pbWthParent) {
-            poGRider.beginTrans();
+        poJSON = validateEntry();
+        if ("error".equals((String) poJSON.get("result"))) {
+            return poJSON;
         }
-
+        
+        if (!pbWtParent) poGRider.beginTrans();
+        
         poJSON = poModel.saveRecord();
 
         if ("success".equals((String) poJSON.get("result"))) {
-            if (!pbWthParent) {
-                poGRider.commitTrans();
-            }
+            if (!pbWtParent) {poGRider.commitTrans();}
         } else {
-            if (!pbWthParent) {
-                poGRider.rollbackTrans();
-            }
+            if (!pbWtParent) {poGRider.rollbackTrans();}
         }
+        
         return poJSON;
     }
 
@@ -116,40 +164,138 @@ public class Vehicle_MakeFramePattern_Master implements GRecord {
     }
 
     @Override
-    public JSONObject deactivateRecord(String fsValue) {
+    public JSONObject deactivateRecord(String string) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public JSONObject activateRecord(String fsValue) {
+    public JSONObject activateRecord(String string) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public JSONObject searchRecord(String fsValue, boolean fbByCode) {
-        String lsSQL = MiscUtil.addCondition(poModel.makeSelectSQL(), " sFrmePtrn LIKE "
-                + SQLUtil.toSQL(fsValue + "%") );
-
+        String lsSQL = MiscUtil.addCondition(poModel.getSQL(), " a.sFrmePtrn LIKE " + SQLUtil.toSQL(fsValue + "%") );
+        
+        System.out.println("SEARCH MAKE FRAME PATTERN: " + lsSQL);
         poJSON = ShowDialogFX.Search(poGRider,
                 lsSQL,
                 fsValue,
-                "Make»Frame Pattern»Length",
-                "sMakeDesc»sFrmePtrn»nFrmeLenx",
-                "b.sMakeDesc»a.sFrmePtrn»a.nFrmeLenx",
-                fbByCode ? 0 : 1);
+                "Make»Make Frame Pattern",
+                "sMakeDesc»sFrmePtrn",
+                "b.sMakeDesc»a.sFrmePtrn",
+               1);
 
         if (poJSON != null) {
-            return poModel.openRecord((String) poJSON.get("sFrmePtrn"));
         } else {
+            poJSON = new JSONObject();
             poJSON.put("result", "error");
-            poJSON.put("message", "No record loaded to update.");
+            poJSON.put("message", "No record loaded.");
             return poJSON;
         }
+        
+        return poJSON;
     }
 
     @Override
     public Model_Vehicle_Make_Frame_Pattern getModel() {
         return poModel;
+    }
+    
+    private Connection setConnection(){
+        Connection foConn;
+        
+        if (pbWtParent){
+            foConn = (Connection) poGRider.getConnection();
+            if (foConn == null) foConn = (Connection) poGRider.doConnect();
+        }else foConn = (Connection) poGRider.doConnect();
+        
+        return foConn;
+    }
+    
+    private JSONObject validateEntry(){
+        JSONObject jObj = new JSONObject();
+        try {
+            
+            if(poModel.getMakeID() == null){
+                jObj.put("result", "error");
+                jObj.put("message", "Make cannot be Empty.");
+                return jObj;
+            } else {
+                if(poModel.getMakeID().trim().isEmpty()){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Make cannot be Empty.");
+                    return jObj;
+                }
+            }
+            
+            if(poModel.getFrmePtrn() == null){
+                jObj.put("result", "error");
+                jObj.put("message", "Make Frame Pattern cannot be Empty.");
+                return jObj;
+            } else {
+                if(poModel.getFrmePtrn().trim().isEmpty() || poModel.getFrmePtrn().replace(" ", "").length() < 3){
+                jObj.put("result", "error");
+                jObj.put("message", "Make Frame Pattern cannot be Empty.");
+                return jObj;
+                }
+            }
+
+            String lsID = "";
+            String lsDesc  = "";
+            String lsSQL = poModel.getSQL();
+            lsSQL = MiscUtil.addCondition(lsSQL, "REPLACE(a.sFrmePtrn,' ','') = " + SQLUtil.toSQL(poModel.getFrmePtrn().replace(" ",""))) +
+                                                    " AND a.sMakeIDxx = " + SQLUtil.toSQL(poModel.getMakeID()) +
+                                                    " AND a.nEntryNox <> " + SQLUtil.toSQL(poModel.getEntryNo()) ;
+            System.out.println("EXISTING VEHICLE MAKE FRAME PATTERN CHECK: " + lsSQL);
+            ResultSet loRS = poGRider.executeQuery(lsSQL);
+
+            if (MiscUtil.RecordCount(loRS) > 0){
+                    while(loRS.next()){
+                        lsID = loRS.getString("sMakeDesc");
+                        lsDesc = loRS.getString("sFrmePtrn");
+                    }
+                    
+                    MiscUtil.close(loRS);
+                    
+                    jObj.put("result", "error");
+                    jObj.put("message", "Existing Make Frame Pattern Record.\n\nMake: " + lsID + "\nMake Frame Pattern: " + lsDesc.toUpperCase() );
+                    return jObj;
+            }
+            
+//            lsID = "";
+//            lsSQL =   "  SELECT "           
+//                    + "  sSerialID "        
+//                    + ", sFrameNox "        
+//                    + ", sEngineNo "        
+//                    + "FROM vehicle_serial ";
+//
+//            if(pnEditMode == EditMode.UPDATE){
+//                lsSQL = MiscUtil.addCondition(lsSQL, " sFrameNox LIKE " + SQLUtil.toSQL(poModel.getFrmePtrn()+ "%")   
+//                                                        //+ " AND a.cRecdStat = '1' "
+//                                                        ) ;
+//                System.out.println("EXISTING USAGE OF VEHICLE MAKE FRAME PATTERN: " + lsSQL);
+//                loRS = poGRider.executeQuery(lsSQL);
+//
+//                if (MiscUtil.RecordCount(loRS) > 0){
+//                        while(loRS.next()){
+//                            lsID = loRS.getString("sSerialID");
+//                        }
+//
+//                        MiscUtil.close(loRS);
+//                        
+//                        jObj.put("result", "error");
+//                        jObj.put("message", "Existing Vehicle Make Frame Pattern Usage.\n\nVehicle ID: " + lsID + "\nChanging of frame pattern aborted.");
+//                        return jObj;
+//                }
+//            }
+        
+        } catch (SQLException ex) {
+            Logger.getLogger(Vehicle_MakeFramePattern_Master.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        jObj.put("result", "success");
+        jObj.put("message", "Valid Entry");
+        return jObj;
     }
     
 }
