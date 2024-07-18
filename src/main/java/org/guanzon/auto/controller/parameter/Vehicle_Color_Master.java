@@ -236,7 +236,7 @@ public class Vehicle_Color_Master implements GRecord {
         poJSON = ShowDialogFX.Search(poGRider,
                 lsSQL,
                 fsValue,
-                "ID»Name",
+                "ID»Description",
                 "sColorIDx»sColorDsc",
                 "sColorIDx»sColorDsc",
                 1);
