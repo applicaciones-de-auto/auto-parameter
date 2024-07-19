@@ -141,7 +141,7 @@ public class Activity_Source implements GRecord{
         poJSON = new JSONObject();  
         poJSON = poController.searchRecord(fsValue, fbByActive);
         if(!"error".equals(poJSON.get("result"))){
-            poJSON = openRecord((String) poJSON.get("sColorIDx"));
+            poJSON = openRecord((String) poJSON.get("sActTypID"));
         }
         return poJSON;
     }

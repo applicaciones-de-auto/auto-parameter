@@ -327,13 +327,13 @@ public class Activity_Source_Master implements GRecord {
             if(poModel.getRecdStat().equals("0")){
                 lsSQL =   "  SELECT "                                                
                         + "   a.sActTypID "                                          
-                        + " , a.sActTypDs "                                          
-                        + " , a.sEventTyp "                                          
-                        + " , a.cRecdStat "                                           
-                        + " , b.sActvtyID "                                          
-                        + " , b.sActTitle "                                          
-                        + "FROM event_type a "                                       
-                        + "LEFT JOIN activity_master b ON b.sActTypID = a.sActTypID ";
+                        + " , b.sActTypDs "                                          
+                        + " , b.sEventTyp "                                          
+                        + " , b.cRecdStat "                                           
+                        + " , a.sActvtyID "                                          
+                        + " , a.sActTitle "                                          
+                        + "FROM activity_master a "                                       
+                        + "LEFT JOIN event_type b ON b.sActTypID = a.sActTypID ";
 
 
                 lsSQL = MiscUtil.addCondition(lsSQL, " a.sActTypID = " + SQLUtil.toSQL(poModel.getActTypID())
@@ -359,13 +359,13 @@ public class Activity_Source_Master implements GRecord {
             lsID = "";
             lsSQL =   "  SELECT "                                                
                     + "   a.sActTypID "                                          
-                    + " , a.sActTypDs "                                          
-                    + " , a.sEventTyp "                                          
-                    + " , a.cRecdStat "                                           
-                    + " , b.sActvtyID "                                          
-                    + " , b.sActTitle "                                          
-                    + "FROM event_type a "                                       
-                    + "LEFT JOIN activity_master b ON b.sActTypID = a.sActTypID ";
+                    + " , b.sActTypDs "                                          
+                    + " , b.sEventTyp "                                          
+                    + " , b.cRecdStat "                                           
+                    + " , a.sActvtyID "                                          
+                    + " , a.sActTitle "                                          
+                    + "FROM activity_master a "                                       
+                    + "LEFT JOIN event_type b ON b.sActTypID = a.sActTypID ";
             if(pnEditMode == EditMode.UPDATE){
                 lsSQL = MiscUtil.addCondition(lsSQL, " a.sActTypID = " + SQLUtil.toSQL(poModel.getActTypID()) 
                                                         + " AND REPLACE(b.sActTypDs, ' ', '') <> " + SQLUtil.toSQL(poModel.getActTypDs().replace(" ", "")) 
