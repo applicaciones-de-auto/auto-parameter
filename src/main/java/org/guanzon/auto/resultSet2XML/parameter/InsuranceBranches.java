@@ -14,7 +14,7 @@ import org.guanzon.appdriver.base.MiscUtil;
  *
  * @author Arsiela
  */
-public class BankMaster {
+public class InsuranceBranches {
     
     public static void main (String [] args){
         String path;
@@ -35,28 +35,26 @@ public class BankMaster {
 
         System.out.println("Connected");
         
-        System.setProperty("sys.default.path.metadata", "D:/GGC_Maven_Systems/config/metadata/Model_Bank_Master.xml");
+        System.setProperty("sys.default.path.metadata", "D:/GGC_Maven_Systems/config/metadata/Model_Insurance_Branches.xml");
         
-        String lsSQL =    "  SELECT "    
-                        + "   sBankIDxx "
-                        + " , sBankName "
-                        + " , sBankCode "
-                        + " , sBankType "
-                        + " , cRecdStat "
-                        + " , sModified "
-                        + " , dModified "
-                        + "  FROM banks "  
+        String lsSQL =    "  SELECT "       
+                        + "   sBankIDxx "   
+                        + " , sBankName "   
+                        + " , sBankCode "   
+                        + " , cRecdStat "   
+                        + " , sModified "   
+                        + " , dModified "   
+                        + "  FROM banks "   
                         + " WHERE 0=1 ";
         
         //System.out.println(lsSQL);
         ResultSet loRS = instance.executeQuery(lsSQL);
         try {
-            if (MiscUtil.resultSet2XML(instance, loRS, System.getProperty("sys.default.path.metadata"), "banks", "")){
+            if (MiscUtil.resultSet2XML(instance, loRS, System.getProperty("sys.default.path.metadata"), "insurance_company_branches", "")){
                 System.out.println("ResultSet exported.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-    
 }

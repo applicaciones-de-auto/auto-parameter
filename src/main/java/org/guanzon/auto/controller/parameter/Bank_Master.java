@@ -240,7 +240,7 @@ public class Bank_Master implements GRecord {
         poJSON = ShowDialogFX.Search(poGRider,
                 lsSQL,
                 fsValue,
-                "ID»Description",
+                "ID»Bank Name",
                 "sBankIDxx»sBankName",
                 "sBankIDxx»sBankName",
                 1);
@@ -296,6 +296,30 @@ public class Bank_Master implements GRecord {
                 if(poModel.getBankName().trim().isEmpty()){
                     jObj.put("result", "error");
                     jObj.put("message", "Bank Name cannot be Empty.");
+                    return jObj;
+                }
+            }
+            
+            if(poModel.getBankCode() == null){
+                jObj.put("result", "error");
+                jObj.put("message", "Bank Code cannot be Empty.");
+                return jObj;
+            } else {
+                if(poModel.getBankCode().trim().isEmpty()){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Bank Code cannot be Empty.");
+                    return jObj;
+                }
+            }
+            
+            if(poModel.getBankType() == null){
+                jObj.put("result", "error");
+                jObj.put("message", "Bank Type cannot be Empty.");
+                return jObj;
+            } else {
+                if(poModel.getBankType().trim().isEmpty()){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Bank Type cannot be Empty.");
                     return jObj;
                 }
             }

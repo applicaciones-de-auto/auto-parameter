@@ -8,15 +8,15 @@ package org.guanzon.auto.main.parameter;
 import org.guanzon.appdriver.base.GRider;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.iface.GRecord;
-import org.guanzon.auto.controller.parameter.Bank_Branches;
-import org.guanzon.auto.controller.parameter.Bank_Master;
+import org.guanzon.auto.controller.parameter.Insurance_Branches;
+import org.guanzon.auto.controller.parameter.Insurance_Master;
 import org.json.simple.JSONObject;
 
 /**
  *
  * @author Arsiela
  */
-public class BankBranch  implements GRecord{
+public class InsuranceBranch implements GRecord{
     GRider poGRider;
     boolean pbWthParent;
     String psBranchCd;
@@ -27,12 +27,12 @@ public class BankBranch  implements GRecord{
     
     public JSONObject poJSON;
     
-    Bank_Branches poController;
-    Bank_Master poBank;
+    Insurance_Branches poController;
+    Insurance_Master poInsurance;
     
-    public BankBranch(GRider foAppDrver, boolean fbWtParent, String fsBranchCd){
-        poController = new Bank_Branches(foAppDrver,fbWtParent,fsBranchCd);
-        poBank = new Bank_Master(foAppDrver,fbWtParent,fsBranchCd);
+    public InsuranceBranch(GRider foAppDrver, boolean fbWtParent, String fsBranchCd){
+        poController = new Insurance_Branches(foAppDrver,fbWtParent,fsBranchCd);
+        poInsurance = new Insurance_Master(foAppDrver,fbWtParent,fsBranchCd);
         
         poGRider = foAppDrver;
         pbWtParent = fbWtParent;
@@ -144,23 +144,22 @@ public class BankBranch  implements GRecord{
         poJSON = new JSONObject();  
         poJSON = poController.searchRecord(fsValue, fbByActive);
         if(!"error".equals(poJSON.get("result"))){
-            poJSON = openRecord((String) poJSON.get("sBrBankID"));
+            poJSON = openRecord((String) poJSON.get("sBrInsIDx"));
         }
         return poJSON;
     }
 
     @Override
-    public Bank_Branches getModel() {
+    public Insurance_Branches getModel() {
         return poController;
     }
     
-    public JSONObject searchBank(String fsValue, boolean fbByActive) {
+    public JSONObject searchInsurance(String fsValue, boolean fbByActive) {
         poJSON = new JSONObject();  
-        poJSON = poBank.searchRecord(fsValue, fbByActive);
+        poJSON = poInsurance.searchRecord(fsValue, fbByActive);
         if(!"error".equals(poJSON.get("result"))){
-            poController.setMaster("sBankIDxx", poJSON.get("sBankIDxx"));
-            poController.setMaster("sBankName", poJSON.get("sBankName"));
-            poController.setMaster("sBankType", poJSON.get("sBankType"));
+            poController.setMaster("sInsurIDx", poJSON.get("sInsurIDx"));
+            poController.setMaster("sInsurNme", poJSON.get("sInsurNme"));
         }
         
         return poJSON;

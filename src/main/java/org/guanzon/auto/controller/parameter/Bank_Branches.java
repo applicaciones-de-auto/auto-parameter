@@ -253,7 +253,7 @@ public class Bank_Branches implements GRecord {
                 fsValue,
                 "Bank Branch ID»Bank Name»Branch»Address",
                 "sBrBankID»sBankName»sBrBankNm»xAddressx",
-                "sBrBankID»sBankName»sBrBankNm»UPPER(CONCAT(a.sAddressx,' ', c.sTownName, ', ', d.sProvName))",
+                "a.sBrBankID»b.sBankName»a.sBrBankNm»UPPER(CONCAT(a.sAddressx,' ', c.sTownName, ', ', d.sProvName))",
                 1);
 
         if (poJSON != null) {
