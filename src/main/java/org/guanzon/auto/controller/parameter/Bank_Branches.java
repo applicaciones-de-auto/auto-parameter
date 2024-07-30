@@ -535,5 +535,167 @@ public class Bank_Branches implements GRecord {
         return jObj;
     }
     
-    
+    /**
+     * Searches for a province based on the provided value.
+     *
+     * @param fsValue the value used to search for a province
+     * @return true if the province is found and set as the master record, false
+     * otherwise
+     */
+    public JSONObject searchProvince(String fsValue, boolean fbByCode) {
+        JSONObject loJSON = new JSONObject();
+        if (fbByCode){
+            if (fsValue.equals((String) poModel.getProvID())) {
+                loJSON.put("result", "success");
+                loJSON.put("message", "Search province success.");
+                return loJSON;
+            }
+        }else{
+            String lsProvince = String.valueOf(poModel.getValue("sProvName"));
+            
+            if(!lsProvince.isEmpty()){
+                if (fsValue.equals(lsProvince)){
+                    loJSON.put("result", "success");
+                    loJSON.put("message", "Search province success.");
+                    return loJSON;
+                }
+            }
+        }
+        
+       String lsSQL = " SELECT "
+                    + " sProvName "
+                    + ", sProvIDxx "
+                    + " FROM Province  " 
+                    + " WHERE cRecdStat = '1'";
+        
+        if (fbByCode) {
+            lsSQL = MiscUtil.addCondition(lsSQL, "sProvIDxx = " + SQLUtil.toSQL(fsValue));
+        } else {
+            lsSQL = MiscUtil.addCondition(lsSQL, "sProvName LIKE " + SQLUtil.toSQL(fsValue + "%"));
+        }
+        System.out.println(lsSQL);
+        loJSON = ShowDialogFX.Search(poGRider, 
+                            lsSQL, 
+                            fsValue,
+                            "ID»Province", 
+                            "sProvIDxx»sProvName", 
+                            "sProvIDxx»sProvName", 
+                            fbByCode ? 0 : 1);
+            
+        if (loJSON != null) {
+            if("error".equals(loJSON.get("result"))){
+                poModel.setProvID("");
+                poModel.setProvName("");
+                poModel.setTownID("");
+                poModel.setTownName("");
+                poModel.setZippCode("");
+            } else {
+                poModel.setProvID((String) loJSON.get("sProvIDxx"));
+                poModel.setProvName((String) loJSON.get("sProvName"));
+                poModel.setTownID("");
+                poModel.setTownName("");
+                poModel.setZippCode("");
+            }
+        }else {
+            poModel.setProvID("");
+            poModel.setProvName("");
+            poModel.setTownID("");
+            poModel.setTownName("");
+            poModel.setZippCode("");
+            loJSON  = new JSONObject();  
+            loJSON.put("result", "error");
+            loJSON.put("message", "No record selected.");
+            return loJSON;
+        }
+        
+        return loJSON;
+    }
+    /**
+     * Searches for a town based on the provided value.
+     *
+     * @param fsValue the value used to search for a province
+     * @return true if the province is found and set as the master record, false
+     * otherwise
+     */
+    public JSONObject searchTown(String fsValue, boolean fbByCode) {
+        JSONObject loJSON = new JSONObject();
+        
+        if(poModel.getProvID()== null){
+            loJSON.put("result", "error");
+            loJSON.put("message", "Province cannot be empty.");
+            return loJSON;
+        } else {
+            if(poModel.getProvID().trim().isEmpty()){
+                loJSON.put("result", "error");
+                loJSON.put("message", "Province cannot be empty.");
+                return loJSON;
+            }
+        }
+        
+        if (fbByCode){
+            if (fsValue.equals((String) poModel.getTownID())) {
+                loJSON = new JSONObject();
+                loJSON.put("result", "success");
+                loJSON.put("message", "Search town success.");
+                return loJSON;
+            }
+        }else{
+            
+            String townProvince = String.valueOf(poModel.getValue("sTownName"));
+            if(!townProvince.isEmpty()){
+                if (fsValue.equals(townProvince)){
+                    loJSON = new JSONObject();
+                    loJSON.put("result", "success");
+                    loJSON.put("message", "Search town success.");
+                    return loJSON;
+                }
+            }
+        }
+        
+       String lsSQL = "SELECT " +
+                            "  a.sTownIDxx" +
+                            ", a.sTownName" + 
+                            ", a.sZippCode" +
+                            ", b.sProvName" + 
+                            ", b.sProvIDxx" +
+                        " FROM TownCity a" +
+                            ", Province b" +
+                        " WHERE a.sProvIDxx = b.sProvIDxx AND a.cRecdStat = '1'";
+        
+        if (fbByCode) {
+            lsSQL = MiscUtil.addCondition(lsSQL, "a.sProvIDxx = "  + SQLUtil.toSQL(poModel.getProvID()) + " AND a.sTownIDxx = " + SQLUtil.toSQL(fsValue));
+        } else {
+            lsSQL = MiscUtil.addCondition(lsSQL, "a.sProvIDxx = "  + SQLUtil.toSQL(poModel.getProvID()) + " AND a.sTownName LIKE " + SQLUtil.toSQL(fsValue + "%"));
+        }
+        System.out.println(lsSQL);
+        loJSON = ShowDialogFX.Search(poGRider, 
+                            lsSQL, 
+                            fsValue,
+                            "ID»Town»Postal Code»Province", 
+                            "sTownIDxx»sTownName»sZippCode»sProvName", 
+                            "a.sTownIDxx»a.sTownName»a.sZippCode»b.sProvName", 
+                            fbByCode ? 0 : 1);
+            
+            if (loJSON != null) {
+                if("error".equals(loJSON.get("result"))){
+                    poModel.setTownID("");
+                    poModel.setTownName("");
+                    poModel.setZippCode("");
+                } else {
+                    poModel.setTownID((String) loJSON.get("sTownIDxx"));
+                    poModel.setTownName((String) loJSON.get("sTownName"));
+                    poModel.setZippCode((String) loJSON.get("sZippCode"));
+                }
+            }else {
+                poModel.setTownID("");
+                poModel.setTownName("");
+                poModel.setZippCode("");
+                loJSON  = new JSONObject();  
+                loJSON.put("result", "error");
+                loJSON.put("message", "No record selected.");
+                return loJSON;
+            }
+            
+        return loJSON;
+    }
 }

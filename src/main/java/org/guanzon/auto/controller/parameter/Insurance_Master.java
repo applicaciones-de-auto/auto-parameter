@@ -226,7 +226,7 @@ public class Insurance_Master implements GRecord {
                         + "   sInsurIDx " 
                         + " , sInsurNme " 
                         + " , cRecdStat " 
-                        + "  FROM banks " ;
+                        + "  FROM insurance_company " ;
         
         if(fbByActive){
             lsSQL = MiscUtil.addCondition(lsSQL,  " sInsurNme LIKE " + SQLUtil.toSQL(fsValue + "%")

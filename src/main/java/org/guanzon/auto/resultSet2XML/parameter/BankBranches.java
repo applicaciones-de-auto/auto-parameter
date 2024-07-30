@@ -52,13 +52,15 @@ public class BankBranches {
                         + " , a.cRecdStat "                                    
                         + " , a.sModified "                                    
                         + " , a.dModified "                                    
-                        + " , b.sBankName "                                    
+                        + " , b.sBankName "                                      
+                        + " , b.sBankType "                                  
                         + " , c.sTownName "                                    
-                        + " , d.sProvName "                                    
+                        + " , d.sProvName "                                   
+                        + " , d.sProvIDxx "                                     
                         + " FROM banks_branches a "                            
                         + " LEFT JOIN banks b ON b.sBankIDxx = a.sBankIDxx "   
                         + " LEFT JOIN towncity c ON c.sTownIDxx = a.sTownIDxx "
-                        + " LEFT JOIN province d ON d.sProvIDxx = c.sProvIDxx " 
+                        + " LEFT JOIN province d ON d.sProvIDxx = c.sProvIDxx "
                         + " WHERE 0=1 ";
         
         //System.out.println(lsSQL);

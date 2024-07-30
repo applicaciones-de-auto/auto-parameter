@@ -37,14 +37,29 @@ public class InsuranceBranches {
         
         System.setProperty("sys.default.path.metadata", "D:/GGC_Maven_Systems/config/metadata/Model_Insurance_Branches.xml");
         
-        String lsSQL =    "  SELECT "       
-                        + "   sBankIDxx "   
-                        + " , sBankName "   
-                        + " , sBankCode "   
-                        + " , cRecdStat "   
-                        + " , sModified "   
-                        + " , dModified "   
-                        + "  FROM banks "   
+        String lsSQL =    " SELECT "                                                    
+                        + "    a.sBrInsIDx "                                            
+                        + "  , a.sBrInsNme "                                            
+                        + "  , a.sBrInsCde "                                            
+                        + "  , a.sCompnyTp "                                            
+                        + "  , a.sInsurIDx "                                            
+                        + "  , a.sContactP "                                            
+                        + "  , a.sAddressx "                                            
+                        + "  , a.sTownIDxx "                                            
+                        + "  , a.sZippCode "                                            
+                        + "  , a.sTelNoxxx "                                            
+                        + "  , a.sFaxNoxxx "                                            
+                        + "  , a.cRecdStat "                                            
+                        + "  , a.sModified "                                            
+                        + "  , a.dModified "                                            
+                        + "  , b.sInsurNme "                                            
+                        + "  , c.sTownName "                                            
+                        + "  , d.sProvName "                                   
+                        + "  , d.sProvIDxx "                                            
+                        + " FROM insurance_company_branches a "                         
+                        + " LEFT JOIN insurance_company b ON b.sInsurIDx = a.sInsurIDx "
+                        + " LEFT JOIN towncity c ON c.sTownIDxx = a.sTownIDxx "         
+                        + " LEFT JOIN province d ON d.sProvIDxx = c.sProvIDxx " 
                         + " WHERE 0=1 ";
         
         //System.out.println(lsSQL);

@@ -166,4 +166,24 @@ public class BankBranch  implements GRecord{
         return poJSON;
     }
     
+    /**
+     * Search Town
+     * @param fsValue searching for value
+     * @param fbByCode set fbByCode into TRUE if you're searching Town by CODE, otherwise set FALSE.
+     * @return 
+     */
+    public JSONObject searchTown(String fsValue, boolean fbByCode){
+        return poController.searchTown(fsValue, fbByCode);
+    }
+    
+    /**
+     * Search Province
+     * @param fsValue searching for value
+     * @param fbByCode set fbByCode into TRUE if you're searching Province by CODE, otherwise set FALSE.
+     * @return 
+     */
+    public JSONObject searchProvince(String fsValue, boolean fbByCode){
+        return poController.searchProvince(fsValue, fbByCode);
+    }
+    
 }

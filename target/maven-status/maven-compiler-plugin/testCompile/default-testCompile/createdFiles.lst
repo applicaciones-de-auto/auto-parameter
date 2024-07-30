@@ -11,3 +11,4 @@ VehicleMakeTest.class
 ActivitySourceTest.class
 InsuranceTest.class
 VehicleMakeFramePatternTest.class
+InsuranceBranchTest.class

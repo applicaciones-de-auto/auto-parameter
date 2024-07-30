@@ -226,6 +226,7 @@ public class Bank_Master implements GRecord {
                         + "   sBankIDxx " 
                         + " , sBankName " 
                         + " , sBankCode " 
+                        + " , sBankType " 
                         + " , cRecdStat " 
                         + "  FROM banks " ;
         
