@@ -8,14 +8,14 @@ package org.guanzon.auto.main.parameter;
 import org.guanzon.appdriver.base.GRider;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.iface.GRecord;
-import org.guanzon.auto.controller.parameter.Activity_Source_Master;
+import org.guanzon.auto.controller.parameter.Bank_Master;
 import org.json.simple.JSONObject;
 
 /**
  *
  * @author Arsiela
  */
-public class Activity_Source implements GRecord{
+public class Bank implements GRecord{
     GRider poGRider;
     boolean pbWthParent;
     String psBranchCd;
@@ -26,10 +26,10 @@ public class Activity_Source implements GRecord{
     
     public JSONObject poJSON;
     
-    Activity_Source_Master poController;
+    Bank_Master poController;
     
-    public Activity_Source(GRider foAppDrver, boolean fbWtParent, String fsBranchCd){
-        poController = new Activity_Source_Master(foAppDrver,fbWtParent,fsBranchCd);
+    public Bank(GRider foAppDrver, boolean fbWtParent, String fsBranchCd){
+        poController = new Bank_Master(foAppDrver,fbWtParent,fsBranchCd);
         
         poGRider = foAppDrver;
         pbWtParent = fbWtParent;
@@ -108,7 +108,7 @@ public class Activity_Source implements GRecord{
     }
 
     @Override
-    public JSONObject updateRecord() {
+    public JSONObject updateRecord(){
         poJSON = new JSONObject();  
         poJSON = poController.updateRecord();
         pnEditMode = poController.getEditMode();
@@ -141,15 +141,14 @@ public class Activity_Source implements GRecord{
         poJSON = new JSONObject();  
         poJSON = poController.searchRecord(fsValue, fbByActive);
         if(!"error".equals(poJSON.get("result"))){
-            poJSON = openRecord((String) poJSON.get("sActTypID"));
+            poJSON = openRecord((String) poJSON.get("sBankIDxx"));
         }
         return poJSON;
     }
 
     @Override
-    public Activity_Source_Master getModel() {
+    public Bank_Master getModel() {
         return poController;
     }
-
     
 }

@@ -16,14 +16,14 @@ import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.iface.GRecord;
-import org.guanzon.auto.model.parameter.Model_Vehicle_Color;
+import org.guanzon.auto.model.parameter.Model_Bank_Master;
 import org.json.simple.JSONObject;
 
 /**
  *
  * @author Arsiela
  */
-public class Vehicle_Color_Master implements GRecord {
+public class Bank_Master implements GRecord {
 
     GRider poGRider;
     boolean pbWtParent;
@@ -31,15 +31,15 @@ public class Vehicle_Color_Master implements GRecord {
     String psBranchCd;
     String psRecdStat;
 
-    Model_Vehicle_Color poModel;
+    Model_Bank_Master poModel;
     JSONObject poJSON;
-
-    public Vehicle_Color_Master(GRider foGRider, boolean fbWthParent, String fsBranchCd) {
+    
+    public Bank_Master(GRider foGRider, boolean fbWthParent, String fsBranchCd) {
         poGRider = foGRider;
         pbWtParent = fbWthParent;
         psBranchCd = fsBranchCd.isEmpty() ? foGRider.getBranchCode() : fsBranchCd;
 
-        poModel = new Model_Vehicle_Color(foGRider);
+        poModel = new Model_Bank_Master(foGRider);
         pnEditMode = EditMode.UNKNOWN;
     }
 
@@ -80,10 +80,10 @@ public class Vehicle_Color_Master implements GRecord {
             pnEditMode = EditMode.ADDNEW;
             org.json.simple.JSONObject obj;
 
-            poModel = new Model_Vehicle_Color(poGRider);
+            poModel = new Model_Bank_Master(poGRider);
             Connection loConn = null;
             loConn = setConnection();
-            poModel.setColorID(MiscUtil.getNextCode(poModel.getTable(), "sColorIDx", false, loConn, psBranchCd+"CL"));
+            poModel.setBankID(MiscUtil.getNextCode(poModel.getTable(), "sBankIDxx", true, loConn, psBranchCd));
             poModel.newRecord();
             
             if (poModel == null){
@@ -109,12 +109,12 @@ public class Vehicle_Color_Master implements GRecord {
         pnEditMode = EditMode.READY;
         poJSON = new JSONObject();
         
-        poModel = new Model_Vehicle_Color(poGRider);
+        poModel = new Model_Bank_Master(poGRider);
         poJSON = poModel.openRecord(fsValue);
         
         if("error".equals(poJSON.get("result"))){
             return poJSON;
-        }
+        } 
         return poJSON;
     }
 
@@ -134,7 +134,6 @@ public class Vehicle_Color_Master implements GRecord {
 
     @Override
     public JSONObject saveRecord() {
-        
         poJSON = validateEntry();
         if ("error".equals((String) poJSON.get("result"))) {
             return poJSON;
@@ -223,22 +222,28 @@ public class Vehicle_Color_Master implements GRecord {
 
     @Override
     public JSONObject searchRecord(String fsValue, boolean fbByActive) {
-        String lsSQL = poModel.getSQL();
+        String lsSQL =    "  SELECT "     
+                        + "   sBankIDxx " 
+                        + " , sBankName " 
+                        + " , sBankCode " 
+                        + " , sBankType " 
+                        + " , cRecdStat " 
+                        + "  FROM banks " ;
         
         if(fbByActive){
-            lsSQL = MiscUtil.addCondition(lsSQL, " sColorDsc LIKE " + SQLUtil.toSQL(fsValue + "%") 
-                                                + " AND cRecdStat = '1' ");
+            lsSQL = MiscUtil.addCondition(lsSQL,  " sBankName LIKE " + SQLUtil.toSQL(fsValue + "%")
+                                                    + " AND cRecdStat = '1' ");
         } else {
-            lsSQL = MiscUtil.addCondition(lsSQL, " sColorDsc LIKE " + SQLUtil.toSQL(fsValue + "%"));
+            lsSQL = MiscUtil.addCondition(lsSQL,  " sBankName LIKE " + SQLUtil.toSQL(fsValue + "%"));
         }
         
-        System.out.println("SEARCH COLOR: " + lsSQL);
+        System.out.println("SEARCH BANKS: " + lsSQL);
         poJSON = ShowDialogFX.Search(poGRider,
                 lsSQL,
                 fsValue,
-                "ID»Description",
-                "sColorIDx»sColorDsc",
-                "sColorIDx»sColorDsc",
+                "ID»Bank Name",
+                "sBankIDxx»sBankName",
+                "sBankIDxx»sBankName",
                 1);
 
         if (poJSON != null) {
@@ -253,7 +258,7 @@ public class Vehicle_Color_Master implements GRecord {
     }
 
     @Override
-    public Model_Vehicle_Color getModel() {
+    public Model_Bank_Master getModel() {
         return poModel;
     }
     
@@ -271,20 +276,51 @@ public class Vehicle_Color_Master implements GRecord {
     private JSONObject validateEntry(){
         JSONObject jObj = new JSONObject();
         try {
-            if(poModel.getColorID().isEmpty()){
+            
+            if(poModel.getBankID() == null){
                 jObj.put("result", "error");
-                jObj.put("message", "Color ID cannot be Empty.");
+                jObj.put("message", "Bank ID cannot be Empty.");
                 return jObj;
+            } else {
+                if(poModel.getBankID().trim().isEmpty()){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Bank ID cannot be Empty.");
+                    return jObj;
+                }
             }
             
-            if(poModel.getColorDsc() == null){
-                    jObj.put("result", "error");
-                    jObj.put("message", "Color Description cannot be Empty.");
-                    return jObj;
+            if(poModel.getBankName() == null){
+                jObj.put("result", "error");
+                jObj.put("message", "Bank Name cannot be Empty.");
+                return jObj;
             } else {
-                if(poModel.getColorDsc().trim().isEmpty()){
+                if(poModel.getBankName().trim().isEmpty()){
                     jObj.put("result", "error");
-                    jObj.put("message", "Color Description cannot be Empty.");
+                    jObj.put("message", "Bank Name cannot be Empty.");
+                    return jObj;
+                }
+            }
+            
+            if(poModel.getBankCode() == null){
+                jObj.put("result", "error");
+                jObj.put("message", "Bank Code cannot be Empty.");
+                return jObj;
+            } else {
+                if(poModel.getBankCode().trim().isEmpty()){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Bank Code cannot be Empty.");
+                    return jObj;
+                }
+            }
+            
+            if(poModel.getBankType() == null){
+                jObj.put("result", "error");
+                jObj.put("message", "Bank Type cannot be Empty.");
+                return jObj;
+            } else {
+                if(poModel.getBankType().trim().isEmpty()){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Bank Type cannot be Empty.");
                     return jObj;
                 }
             }
@@ -292,90 +328,86 @@ public class Vehicle_Color_Master implements GRecord {
             String lsID = "";
             String lsDesc  = "";
             String lsSQL = poModel.getSQL();
-            lsSQL = MiscUtil.addCondition(lsSQL, "REPLACE(sColorDsc,' ','') = " + SQLUtil.toSQL(poModel.getColorDsc().replace(" ",""))) +
-                                                    " AND sColorIDx <> " + SQLUtil.toSQL(poModel.getColorID()) ;
-            System.out.println("EXISTING VEHICLE COLOR CHECK: " + lsSQL);
+            lsSQL = MiscUtil.addCondition(lsSQL, "REPLACE(sBankName,' ','') = " + SQLUtil.toSQL(poModel.getBankName().replace(" ",""))) +
+                                                    " AND sBankIDxx <> " + SQLUtil.toSQL(poModel.getBankID()) ;
+            System.out.println("EXISTING BANKS CHECK: " + lsSQL);
             ResultSet loRS = poGRider.executeQuery(lsSQL);
 
             if (MiscUtil.RecordCount(loRS) > 0){
                     while(loRS.next()){
-                        lsID = loRS.getString("sColorIDx");
-                        lsDesc = loRS.getString("sColorDsc");
+                        lsID = loRS.getString("sBankIDxx");
+                        lsDesc = loRS.getString("sBankName");
                     }
                     
                     MiscUtil.close(loRS);
                     
                     jObj.put("result", "error");
-                    jObj.put("message", "Existing Color Description Record.\n\nColor ID: " + lsID + "\nDescription: " + lsDesc.toUpperCase() );
+                    jObj.put("message", "Existing Bank Record.\n\nBank ID: " + lsID + "\nBank Name: " + lsDesc.toUpperCase() );
                     return jObj;
             }
             
+            lsID = "";
+            lsSQL =    "  SELECT "       
+                    + "   a.sBrBankID "  
+                    + " , a.sBankIDxx " 
+                    + " , a.sBrBankNm "    
+                    + " , a.cRecdStat "    
+                    + " , b.sBankName "    
+                    + "  FROM banks_branches a"
+                    + " LEFT JOIN banks b ON b.sBankIDxx = a.sBankIDxx"   ;
             //Deactivation Validation
-            //Do not allow deactivation when already connected thru vehicle master that is active or inactive.
-            String lsVehicleID = "";
             if(poModel.getRecdStat().equals("0")){
-                lsSQL =   "  SELECT "                                                
-                        + "  a.sColorIDx "                                           
-                        + ", b.sColorDsc "                                           
-                        + ", b.sColorCde "                                           
-                        + ", b.cRecdStat "                                           
-                        + ", a.sVhclIDxx "                                           
-                        + "FROM vehicle_master a "                                     
-                        + "LEFT JOIN vehicle_color b ON b.sColorIDx = a.sColorIDx ";
-
-                lsSQL = MiscUtil.addCondition(lsSQL, " a.sColorIDx = " + SQLUtil.toSQL(poModel.getColorID())
-                                                        //" AND a.cRecdStat = '1'") ;
-                                                        ) ;
-                System.out.println("EXISTING USAGE OF VEHICLE COLOR: " + lsSQL);
+                lsSQL = MiscUtil.addCondition(lsSQL, " a.sBankIDxx = " + SQLUtil.toSQL(poModel.getBankID())) ;
+                System.out.println("EXISTING USAGE OF BANK: " + lsSQL);
                 loRS = poGRider.executeQuery(lsSQL);
 
                 if (MiscUtil.RecordCount(loRS) > 0){
                         while(loRS.next()){
-                            lsVehicleID = loRS.getString("sVhclIDxx");
+                            lsID = loRS.getString("sBrBankID");
                         }
 
                         MiscUtil.close(loRS);
 
                         jObj.put("result", "error");
-                        jObj.put("message", "Existing Vehicle Color Usage.\n\nVehicle ID: " + lsVehicleID + "\nDeactivation aborted.");
+                        jObj.put("message", "Existing Bank Usage.\n\nBank Branch ID: " + lsID + "\nDeactivation aborted.");
                         return jObj;
                 }
             }
             
-            
-            //Do not allow modification on description when already connected thru vehicle master that is active or inactive.
-            lsVehicleID = "";
-            lsSQL =   "  SELECT "                                                
-                    + "  a.sColorIDx "                                           
-                    + ", b.sColorDsc "                                           
-                    + ", b.sColorCde "                                           
-                    + ", b.cRecdStat "                                           
-                    + ", a.sVhclIDxx "                                           
-                    + "FROM vehicle_master a "                                     
-                    + "LEFT JOIN vehicle_color b ON b.sColorIDx = a.sColorIDx ";
             if(pnEditMode == EditMode.UPDATE){
-                lsSQL = MiscUtil.addCondition(lsSQL, " a.sColorIDx = " + SQLUtil.toSQL(poModel.getColorID()) 
-                                                        + " AND REPLACE(b.sColorDsc, ' ', '') <> " + SQLUtil.toSQL(poModel.getColorDsc().replace(" ", "")) 
+                lsID = "";
+                lsSQL =   "  SELECT "       
+                        + "   a.sBrBankID "  
+                        + " , a.sBankIDxx " 
+                        + " , a.sBrBankNm "    
+                        + " , a.cRecdStat "    
+                        + " , b.sBankName "    
+                        + "  FROM banks_branches a"
+                        + " LEFT JOIN banks b ON b.sBankIDxx = a.sBankIDxx" ;
+                
+                lsSQL = MiscUtil.addCondition(lsSQL, " a.sBankIDxx = " + SQLUtil.toSQL(poModel.getBankID()) 
+                                                        + " AND REPLACE(b.sBankName, ' ','') <> " + SQLUtil.toSQL(poModel.getBankName().replace(" ", ""))  
                                                         //+ " AND a.cRecdStat = '1'"
                                                         ) ;
-                System.out.println("EXISTING USAGE OF VEHICLE COLOR: " + lsSQL);
+                System.out.println("BANK BRANCH: EXISTING USAGE OF BANK: " + lsSQL);
                 loRS = poGRider.executeQuery(lsSQL);
 
                 if (MiscUtil.RecordCount(loRS) > 0){
                         while(loRS.next()){
-                            lsVehicleID = loRS.getString("sVhclIDxx");
+                            lsID = loRS.getString("sBrBankID");
                         }
 
                         MiscUtil.close(loRS);
-
+                        
                         jObj.put("result", "error");
-                        jObj.put("message", "Existing Vehicle Color Usage.\n\nVehicle ID: " + lsVehicleID + "\nChanging of color description aborted.");
+                        jObj.put("message", "Existing Bank Usage.\n\nBank Branch ID: " + lsID + "\nChanging of bank name aborted.");
                         return jObj;
                 }
+                
             }
         
         } catch (SQLException ex) {
-            Logger.getLogger(Vehicle_Color_Master.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Bank_Master.class.getName()).log(Level.SEVERE, null, ex);
         }
         jObj.put("result", "success");
         jObj.put("message", "Valid Entry");

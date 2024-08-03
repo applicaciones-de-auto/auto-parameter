@@ -1,6 +1,14 @@
+VehicleModelFramePatternTest.class
+Test_Vehicle_Color.class
 VehicleColorTest.class
+BankBranchTest.class
+BankTest.class
 VehicleDescriptionTest.class
 VehicleModelTest.class
 VehicleTypeTest.class
-Test_Vehicle_Color.class
+VehicleModelEnginePatternTest.class
 VehicleMakeTest.class
+ActivitySourceTest.class
+InsuranceTest.class
+VehicleMakeFramePatternTest.class
+InsuranceBranchTest.class

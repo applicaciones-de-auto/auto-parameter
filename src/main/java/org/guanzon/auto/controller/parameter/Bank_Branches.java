@@ -16,15 +16,14 @@ import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.iface.GRecord;
-import org.guanzon.auto.model.parameter.Model_Insurance_Branches;
-import org.guanzon.auto.model.parameter.Model_Insurance_Branches;
+import org.guanzon.auto.model.parameter.Model_Bank_Branches;
 import org.json.simple.JSONObject;
 
 /**
  *
  * @author Arsiela
  */
-public class Insurance_Branches implements GRecord {
+public class Bank_Branches implements GRecord {
 
     GRider poGRider;
     boolean pbWtParent;
@@ -32,15 +31,15 @@ public class Insurance_Branches implements GRecord {
     String psBranchCd;
     String psRecdStat;
 
-    Model_Insurance_Branches poModel;
+    Model_Bank_Branches poModel;
     JSONObject poJSON;
-
-    public Insurance_Branches(GRider foGRider, boolean fbWthParent, String fsBranchCd) {
+    
+    public Bank_Branches(GRider foGRider, boolean fbWthParent, String fsBranchCd) {
         poGRider = foGRider;
         pbWtParent = fbWthParent;
         psBranchCd = fsBranchCd.isEmpty() ? foGRider.getBranchCode() : fsBranchCd;
 
-        poModel = new Model_Insurance_Branches(foGRider);
+        poModel = new Model_Bank_Branches(foGRider);
         pnEditMode = EditMode.UNKNOWN;
     }
 
@@ -81,10 +80,10 @@ public class Insurance_Branches implements GRecord {
             pnEditMode = EditMode.ADDNEW;
             org.json.simple.JSONObject obj;
 
-            poModel = new Model_Insurance_Branches(poGRider);
+            poModel = new Model_Bank_Branches(poGRider);
             Connection loConn = null;
             loConn = setConnection();
-            poModel.setBrInsID(MiscUtil.getNextCode(poModel.getTable(), "sBrInsIDx", true, loConn, psBranchCd+"IN"));
+            poModel.setBrBankID(MiscUtil.getNextCode(poModel.getTable(), "sBrBankID", true, loConn, psBranchCd+"BK"));
             poModel.newRecord();
             
             if (poModel == null){
@@ -110,7 +109,7 @@ public class Insurance_Branches implements GRecord {
         pnEditMode = EditMode.READY;
         poJSON = new JSONObject();
         
-        poModel = new Model_Insurance_Branches(poGRider);
+        poModel = new Model_Bank_Branches(poGRider);
         poJSON = poModel.openRecord(fsValue);
         
         if("error".equals(poJSON.get("result"))){
@@ -154,8 +153,8 @@ public class Insurance_Branches implements GRecord {
     }
 
     @Override
-    public JSONObject deleteRecord(String fsValue) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public JSONObject deleteRecord(String string) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
@@ -223,41 +222,38 @@ public class Insurance_Branches implements GRecord {
 
     @Override
     public JSONObject searchRecord(String fsValue, boolean fbByActive) {
-        String lsSQL =    " SELECT "                                                    
-                        + "    a.sBrInsIDx "                                            
-                        + "  , a.sBrInsNme "                                            
-                        + "  , a.sBrInsCde "                                            
-                        + "  , a.sCompnyTp "                                            
-                        + "  , a.sInsurIDx "                                            
-                        + "  , a.sContactP "                                            
-                        + "  , a.sAddressx "                                            
-                        + "  , a.sTownIDxx "                                            
-                        + "  , a.sZippCode "                                             
-                        + "  , a.cRecdStat "                                            
-                        + "  , b.sInsurNme "                                            
-                        + "  , c.sTownName "                                            
-                        + "  , d.sProvName "   
-                        + "  , UPPER(CONCAT(a.sAddressx,' ', c.sTownName, ', ', d.sProvName)) xAddressx "                                         
-                        + " FROM insurance_company_branches a "                         
-                        + " LEFT JOIN insurance_company b ON b.sInsurIDx = a.sInsurIDx "
-                        + " LEFT JOIN towncity c ON c.sTownIDxx = a.sTownIDxx "         
+        String lsSQL =    "   SELECT "                                           
+                        + "   a.sBrBankID "                                    
+                        + " , a.sBrBankNm "                                    
+                        + " , a.sBrBankCd "                                    
+                        + " , a.sBankIDxx "                                    
+                        + " , a.sContactP "                                    
+                        + " , a.sAddressx "                                     
+                        + " , a.sZippCode "                                    
+                        + " , a.cRecdStat "                                    
+                        + " , b.sBankName "                                   
+                        + " , c.sTownName "                                  
+                        + " , d.sProvName "     
+                        + " , UPPER(CONCAT(a.sAddressx,' ', c.sTownName, ', ', d.sProvName)) xAddressx "
+                        + " FROM banks_branches a "                           
+                        + " LEFT JOIN banks b ON b.sBankIDxx = a.sBankIDxx "  
+                        + " LEFT JOIN towncity c ON c.sTownIDxx = a.sTownIDxx "
                         + " LEFT JOIN province d ON d.sProvIDxx = c.sProvIDxx " ;
-                
         
         if(fbByActive){
-            lsSQL = MiscUtil.addCondition(lsSQL,  " b.sInsurNme LIKE " + SQLUtil.toSQL(fsValue + "%")
+            lsSQL = MiscUtil.addCondition(lsSQL,  " b.sBankName LIKE " + SQLUtil.toSQL(fsValue + "%")
                                                     + " AND a.cRecdStat = '1' ");
         } else {
-            lsSQL = MiscUtil.addCondition(lsSQL,  " b.sInsurNme LIKE " + SQLUtil.toSQL(fsValue + "%"));
+            lsSQL = MiscUtil.addCondition(lsSQL,  " b.sBankName LIKE " + SQLUtil.toSQL(fsValue + "%"));
         }
         
-        System.out.println("SEARCH INSURANCE BRANCHES: " + lsSQL);
+        System.out.println("SEARCH BANKS BRANCHES: " + lsSQL);
         poJSON = ShowDialogFX.Search(poGRider,
                 lsSQL,
                 fsValue,
-                "Insurance Branch ID»Insurance Name»Branch»Address",
-                "sBrInsIDx»sInsurNme»sBrInsNme»xAddressx",
-                "a.sBrInsIDx»b.sInsurNme»a.sBrInsNme»UPPER(CONCAT(a.sAddressx,' ', c.sTownName, ', ', d.sProvName))",
+                "Bank Branch ID»Bank Name»Branch»Address",
+                "sBrBankID»sBankName»sBrBankNm»xAddressx",
+                "a.sBrBankID»b.sBankName»a.sBrBankNm»UPPER(CONCAT(a.sAddressx,' ', c.sTownName, ', ', d.sProvName))",
                 1);
 
         if (poJSON != null) {
@@ -272,7 +268,7 @@ public class Insurance_Branches implements GRecord {
     }
 
     @Override
-    public Model_Insurance_Branches getModel() {
+    public Model_Bank_Branches getModel() {
         return poModel;
     }
     
@@ -291,50 +287,38 @@ public class Insurance_Branches implements GRecord {
         JSONObject jObj = new JSONObject();
         try {
             
-            if(poModel.getBrInsID()== null){
+            if(poModel.getBrBankID() == null){
                 jObj.put("result", "error");
-                jObj.put("message", "Insurance Branch ID cannot be Empty.");
+                jObj.put("message", "Bank Branch ID cannot be Empty.");
                 return jObj;
             } else {
-                if(poModel.getBrInsID().trim().isEmpty()){
+                if(poModel.getBrBankID().trim().isEmpty()){
                     jObj.put("result", "error");
-                    jObj.put("message", "Insurance Branch ID cannot be Empty.");
+                    jObj.put("message", "Bank Branch ID cannot be Empty.");
                     return jObj;
                 }
             }
             
-            if(poModel.getInsurID() == null){
+            if(poModel.getBankID() == null){
                 jObj.put("result", "error");
-                jObj.put("message", "Insurance ID cannot be Empty.");
+                jObj.put("message", "Bank ID cannot be Empty.");
                 return jObj;
             } else {
-                if(poModel.getInsurID().trim().isEmpty()){
+                if(poModel.getBankID().trim().isEmpty()){
                     jObj.put("result", "error");
-                    jObj.put("message", "Insurance ID cannot be Empty.");
+                    jObj.put("message", "Bank ID cannot be Empty.");
                     return jObj;
                 }
             }
             
-            if(poModel.getBrInsNme()== null){
+            if(poModel.getBrBankNm()== null){
                 jObj.put("result", "error");
-                jObj.put("message", "Insurance Branch Name  cannot be Empty.");
+                jObj.put("message", "Bank Branch Name cannot be Empty.");
                 return jObj;
             } else {
-                if(poModel.getBrInsNme().trim().isEmpty()){
+                if(poModel.getBrBankNm().trim().isEmpty()){
                     jObj.put("result", "error");
-                    jObj.put("message", "Insurance Branch Name  cannot be Empty.");
-                    return jObj;
-                }
-            }
-            
-            if(poModel.getCompnyTp()== null){
-                jObj.put("result", "error");
-                jObj.put("message", "Insurance Type cannot be Empty.");
-                return jObj;
-            } else {
-                if(poModel.getCompnyTp().trim().isEmpty()){
-                    jObj.put("result", "error");
-                    jObj.put("message", "Insurance Type cannot be Empty.");
+                    jObj.put("message", "Bank Branch Name cannot be Empty.");
                     return jObj;
                 }
             }
@@ -390,52 +374,80 @@ public class Insurance_Branches implements GRecord {
             String lsID = "";
             String lsDesc  = "";
             String lsSQL = poModel.getSQL();
-            lsSQL = MiscUtil.addCondition(lsSQL, "REPLACE(a.sBrInsNme,' ','') = " + SQLUtil.toSQL(poModel.getBrInsNme().replace(" ",""))) +
-                                                    " AND a.sInsurIDx = " + SQLUtil.toSQL(poModel.getInsurID()) +
-                                                    " AND a.sBrInsIDx <> " + SQLUtil.toSQL(poModel.getBrInsID()) ;
-            System.out.println("EXISTING INSURANCE BRANCH CHECK: " + lsSQL);
+            lsSQL = MiscUtil.addCondition(lsSQL, "REPLACE(a.sBrBankNm,' ','') = " + SQLUtil.toSQL(poModel.getBrBankNm().replace(" ",""))) +
+                                                    " AND a.sBankIDxx = " + SQLUtil.toSQL(poModel.getBankID()) +
+                                                    " AND a.sBrBankID <> " + SQLUtil.toSQL(poModel.getBrBankID()) ;
+            System.out.println("EXISTING BANKS BRANCH CHECK: " + lsSQL);
             ResultSet loRS = poGRider.executeQuery(lsSQL);
 
             if (MiscUtil.RecordCount(loRS) > 0){
                     while(loRS.next()){
-                        lsID = loRS.getString("sBrInsIDx");
-                        lsDesc = loRS.getString("sBrInsNme");
+                        lsID = loRS.getString("sBrBankID");
+                        lsDesc = loRS.getString("sBrBankNm");
                     }
                     
                     MiscUtil.close(loRS);
                     
                     jObj.put("result", "error");
-                    jObj.put("message", "Existing Insurance Branch Record.\n\nInsurance ID : " + lsID + "\nInsurance Branch : " + lsDesc.toUpperCase() );
+                    jObj.put("message", "Existing Bank Branch Record.\n\nBank ID: " + lsID + "\nBank Branch: " + lsDesc.toUpperCase() );
                     return jObj;
             }
             
             //Deactivation Validation
             if(poModel.getRecdStat().equals("0")){
-                //VSP
+                //BANK APPLICATION
                 lsID = "";
-                lsSQL =   " SELECT "         
-                        + "   sTransNox "    
-                        + " , dTransact "    
-                        + " , sVSPNOxxx "    
-                        + " , sInsTplCd "    
-                        + " , sInsCodex "    
-                        + " FROM vsp_master " ;
-                lsSQL = MiscUtil.addCondition(lsSQL,  " sInsTplCd = " + SQLUtil.toSQL(poModel.getBrInsID()) 
-                                                        + " OR sInsCodex = " + SQLUtil.toSQL(poModel.getBrInsID())
+                lsSQL =   " SELECT "               
+                        + "   sTransNox "          
+                        + " , sApplicNo "          
+                        + " , cPayModex "          
+                        + " , sBrBankID "          
+                        + " , cTranStat "          
+                        + " FROM bank_application " ;
+                lsSQL = MiscUtil.addCondition(lsSQL, " sBrBankID = " + SQLUtil.toSQL(poModel.getBrBankID())
                                                       //+ " cTranStat = 1"
                                                         ) ;
-                System.out.println("EXISTING USAGE OF INSURANCE BRANCH > VSP: " + lsSQL);
+                System.out.println("EXISTING USAGE OF BANK BRANCH > BANK APPLICATION: " + lsSQL);
                 loRS = poGRider.executeQuery(lsSQL);
 
                 if (MiscUtil.RecordCount(loRS) > 0){
                         while(loRS.next()){
-                            lsID = loRS.getString("sVSPNOxxx");
+                            lsID = loRS.getString("sApplicNo");
                         }
 
                         MiscUtil.close(loRS);
 
                         jObj.put("result", "error");
-                        jObj.put("message", "Existing Insurance Branch Usage in VSP.\n\nVSP No: " + lsID + "\nDeactivation aborted.");
+                        jObj.put("message", "Existing Bank Branch Usage in Bank Application.\n\nApplication No: " + lsID + "\nDeactivation aborted.");
+                        return jObj;
+                }
+                
+                //BANK ACCOUNT
+                lsID = "";
+                lsSQL =   "   SELECT "           
+                        + "   sBnAcctCD "        
+                        + " , sBrBankID "        
+                        + " , sAcctName "        
+                        + " , sAcctNoxx "        
+                        + " , sAcctType "        
+                        + " , sAcctStat "        
+                        + "FROM bank_accounts " ;
+
+                lsSQL = MiscUtil.addCondition(lsSQL, " sBrBankID = " + SQLUtil.toSQL(poModel.getBrBankID())
+                                                      //+ " sAcctStat = 1"
+                                                        ) ;
+                System.out.println("EXISTING USAGE OF BANK BRANCH > BANK ACCOUNT: " + lsSQL);
+                loRS = poGRider.executeQuery(lsSQL);
+
+                if (MiscUtil.RecordCount(loRS) > 0){
+                        while(loRS.next()){
+                            lsID = loRS.getString("sAcctNoxx");
+                        }
+
+                        MiscUtil.close(loRS);
+
+                        jObj.put("result", "error");
+                        jObj.put("message", "Existing Bank Branch Usage in Bank Account.\n\nAccount No: " + lsID + "\nDeactivation aborted.");
                         return jObj;
                 }
                 
@@ -446,33 +458,65 @@ public class Insurance_Branches implements GRecord {
             }
             
             if(pnEditMode == EditMode.UPDATE){
-                //VSP
+                //BANK APPLICATION
                 lsID = "";
-                lsSQL =   " SELECT "             
-                        + "   a.sTransNox "    
-                        + " , a.dTransact "    
-                        + " , a.sVSPNOxxx "    
-                        + " , a.sInsTplCd "    
-                        + " , a.sInsCodex "          
-                        + " , b.sBrInsNme "         
-                        + " FROM vsp_master a " 
-                        + " LEFT JOIN insurance_company_branches b ON b.sBrInsIDx = a.sInsTplCd OR b.sBrInsIDx = a.sInsCodex" ;
-                lsSQL = MiscUtil.addCondition(lsSQL, " b.sBrInsIDx = " + SQLUtil.toSQL(poModel.getBrInsID())
-                                                        + " AND REPLACE(b.sBrInsNme, ' ','') <> " + SQLUtil.toSQL(poModel.getBrInsNme().replace(" ", "")) 
+                lsSQL =   " SELECT "               
+                        + "   a.sTransNox "          
+                        + " , a.sApplicNo "          
+                        + " , a.cPayModex "          
+                        + " , a.sBrBankID "          
+                        + " , a.cTranStat "           
+                        + " , b.sBrBankNm "         
+                        + " FROM bank_application a " 
+                        + " LEFT JOIN banks_branches b ON b.sBrBankID = a.sBrBankID" ;
+                lsSQL = MiscUtil.addCondition(lsSQL, " a.sBrBankID = " + SQLUtil.toSQL(poModel.getBrBankID())
+                                                        + " AND REPLACE(b.sBrBankNm, ' ','') <> " + SQLUtil.toSQL(poModel.getBrBankNm().replace(" ", "")) 
                                                       //+ " cTranStat = 1"
                                                         ) ;
-                System.out.println("EXISTING USAGE OF INSURANCE BRANCH > VSP: " + lsSQL);
+                System.out.println("EXISTING USAGE OF BANK BRANCH > BANK APPLICATION: " + lsSQL);
                 loRS = poGRider.executeQuery(lsSQL);
 
                 if (MiscUtil.RecordCount(loRS) > 0){
                         while(loRS.next()){
-                            lsID = loRS.getString("sVSPNOxxx");
+                            lsID = loRS.getString("sApplicNo");
                         }
 
                         MiscUtil.close(loRS);
 
                         jObj.put("result", "error");
-                        jObj.put("message", "Existing Insurance Branch Usage in vsp.\n\nVSP No: " + lsID + "\nChanging of insurance branch name aborted.");
+                        jObj.put("message", "Existing Bank Branch Usage in Bank Application.\n\nApplication No: " + lsID + "\nChanging of bank branch name aborted.");
+                        return jObj;
+                }
+                
+                //BANK ACCOUNT
+                lsID = "";
+                lsSQL =   "   SELECT "           
+                        + "   a.sBnAcctCD "        
+                        + " , a.sBrBankID "        
+                        + " , a.sAcctName "        
+                        + " , a.sAcctNoxx "        
+                        + " , a.sAcctType "        
+                        + " , a.sAcctStat "               
+                        + " , b.sBrBankNm "    
+                        + " FROM bank_accounts a " 
+                        + " LEFT JOIN banks_branches b ON b.sBrBankID = a.sBrBankID" ;
+
+                lsSQL = MiscUtil.addCondition(lsSQL, " a.sBrBankID = " + SQLUtil.toSQL(poModel.getBrBankID())
+                                                        + " AND REPLACE(b.sBrBankNm, ' ','') <> " + SQLUtil.toSQL(poModel.getBrBankNm().replace(" ", "")) 
+                                                      //+ " sAcctStat = 1"
+                                                        ) ;
+                System.out.println("EXISTING USAGE OF BANK BRANCH > BANK ACCOUNT: " + lsSQL);
+                loRS = poGRider.executeQuery(lsSQL);
+
+                if (MiscUtil.RecordCount(loRS) > 0){
+                        while(loRS.next()){
+                            lsID = loRS.getString("sAcctNoxx");
+                        }
+
+                        MiscUtil.close(loRS);
+
+                        jObj.put("result", "error");
+                        jObj.put("message", "Existing Bank Branch Usage in Bank Account.\n\nAccount No: " + lsID + "\nChanging of bank branch name aborted.");
                         return jObj;
                 }
                 
@@ -484,7 +528,7 @@ public class Insurance_Branches implements GRecord {
             }
         
         } catch (SQLException ex) {
-            Logger.getLogger(Insurance_Branches.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Bank_Branches.class.getName()).log(Level.SEVERE, null, ex);
         }
         jObj.put("result", "success");
         jObj.put("message", "Valid Entry");
@@ -654,7 +698,4 @@ public class Insurance_Branches implements GRecord {
             
         return loJSON;
     }
-    
-
-    
 }

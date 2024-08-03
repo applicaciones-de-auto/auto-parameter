@@ -8,14 +8,15 @@ package org.guanzon.auto.main.parameter;
 import org.guanzon.appdriver.base.GRider;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.iface.GRecord;
-import org.guanzon.auto.controller.parameter.Activity_Source_Master;
+import org.guanzon.auto.controller.parameter.Bank_Branches;
+import org.guanzon.auto.controller.parameter.Bank_Master;
 import org.json.simple.JSONObject;
 
 /**
  *
  * @author Arsiela
  */
-public class Activity_Source implements GRecord{
+public class BankBranch  implements GRecord{
     GRider poGRider;
     boolean pbWthParent;
     String psBranchCd;
@@ -26,10 +27,12 @@ public class Activity_Source implements GRecord{
     
     public JSONObject poJSON;
     
-    Activity_Source_Master poController;
+    Bank_Branches poController;
+    Bank_Master poBank;
     
-    public Activity_Source(GRider foAppDrver, boolean fbWtParent, String fsBranchCd){
-        poController = new Activity_Source_Master(foAppDrver,fbWtParent,fsBranchCd);
+    public BankBranch(GRider foAppDrver, boolean fbWtParent, String fsBranchCd){
+        poController = new Bank_Branches(foAppDrver,fbWtParent,fsBranchCd);
+        poBank = new Bank_Master(foAppDrver,fbWtParent,fsBranchCd);
         
         poGRider = foAppDrver;
         pbWtParent = fbWtParent;
@@ -108,7 +111,7 @@ public class Activity_Source implements GRecord{
     }
 
     @Override
-    public JSONObject updateRecord() {
+    public JSONObject updateRecord(){
         poJSON = new JSONObject();  
         poJSON = poController.updateRecord();
         pnEditMode = poController.getEditMode();
@@ -141,15 +144,46 @@ public class Activity_Source implements GRecord{
         poJSON = new JSONObject();  
         poJSON = poController.searchRecord(fsValue, fbByActive);
         if(!"error".equals(poJSON.get("result"))){
-            poJSON = openRecord((String) poJSON.get("sActTypID"));
+            poJSON = openRecord((String) poJSON.get("sBrBankID"));
         }
         return poJSON;
     }
 
     @Override
-    public Activity_Source_Master getModel() {
+    public Bank_Branches getModel() {
         return poController;
     }
-
+    
+    public JSONObject searchBank(String fsValue, boolean fbByActive) {
+        poJSON = new JSONObject();  
+        poJSON = poBank.searchRecord(fsValue, fbByActive);
+        if(!"error".equals(poJSON.get("result"))){
+            poController.setMaster("sBankIDxx", poJSON.get("sBankIDxx"));
+            poController.setMaster("sBankName", poJSON.get("sBankName"));
+            poController.setMaster("sBankType", poJSON.get("sBankType"));
+        }
+        
+        return poJSON;
+    }
+    
+    /**
+     * Search Town
+     * @param fsValue searching for value
+     * @param fbByCode set fbByCode into TRUE if you're searching Town by CODE, otherwise set FALSE.
+     * @return 
+     */
+    public JSONObject searchTown(String fsValue, boolean fbByCode){
+        return poController.searchTown(fsValue, fbByCode);
+    }
+    
+    /**
+     * Search Province
+     * @param fsValue searching for value
+     * @param fbByCode set fbByCode into TRUE if you're searching Province by CODE, otherwise set FALSE.
+     * @return 
+     */
+    public JSONObject searchProvince(String fsValue, boolean fbByCode){
+        return poController.searchProvince(fsValue, fbByCode);
+    }
     
 }

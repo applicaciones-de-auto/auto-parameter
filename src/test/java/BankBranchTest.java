@@ -1,11 +1,8 @@
 
-import java.sql.SQLException;
 import org.guanzon.appdriver.base.GRider;
-import org.guanzon.auto.main.parameter.Vehicle_Make;
-import org.guanzon.auto.resultSet2XML.parameter.VehicleMake;
+import org.guanzon.auto.main.parameter.BankBranch;
 import org.json.simple.JSONObject;
 import org.junit.AfterClass;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.BeforeClass;
@@ -24,12 +21,14 @@ import org.junit.runners.MethodSorters;
  * @author Arsiela
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class VehicleMakeTest {
-    static Vehicle_Make model;
+public class BankBranchTest {
+    
+    
+    static BankBranch model;
     JSONObject json;
     boolean result;
     
-    public VehicleMakeTest(){}
+    public BankBranchTest(){}
     
     @BeforeClass
     public static void setUpClass() {   
@@ -55,7 +54,7 @@ public class VehicleMakeTest {
         JSONObject json;
         
         System.out.println("sBranch code = " + instance.getBranchCode());
-        model = new Vehicle_Make(instance,false, instance.getBranchCode());
+        model = new BankBranch(instance,false, instance.getBranchCode());
     }
     
     @AfterClass
@@ -70,32 +69,56 @@ public class VehicleMakeTest {
      */
     
 //    @Test
-//    public void test01NewRecord() throws SQLException{
+//    public void test01NewRecord() {
 //        System.out.println("--------------------------------------------------------------------");
 //        System.out.println("------------------------------NEW RECORD--------------------------------------");
 //        System.out.println("--------------------------------------------------------------------");
 //        
 //        json = model.newRecord();
 //        if ("success".equals((String) json.get("result"))){
-//            json = model.setMaster("sMakeDesc","LAMBO");
+//            json = model.setMaster("sBankIDxx","M00124000001");
 //            if ("error".equals((String) json.get("result"))){
 //                System.err.println((String) json.get("message"));
 //                System.exit(1);
 //            }
-//
-//            json = model.setMaster("sMakeCode","");
+//            
+//            json = model.setMaster("sBrBankNm","BDO - PEREZ");
 //            if ("error".equals((String) json.get("result"))){
 //                System.err.println((String) json.get("message"));
 //                System.exit(1);
 //            }
-//
-//            json = model.setMaster("sFormula1","");
+//            
+//            json = model.setMaster("sContactP","JUAN DELA CRUZ");
 //            if ("error".equals((String) json.get("result"))){
 //                System.err.println((String) json.get("message"));
 //                System.exit(1);
 //            }
-//
-//            json = model.setMaster("sFormula2","");
+//            
+//            json = model.setMaster("sAddressx","BOULIVARD");
+//            if ("error".equals((String) json.get("result"))){
+//                System.err.println((String) json.get("message"));
+//                System.exit(1);
+//            }
+//            
+//            json = model.setMaster("sTownIDxx","0335");
+//            if ("error".equals((String) json.get("result"))){
+//                System.err.println((String) json.get("message"));
+//                System.exit(1);
+//            }
+//            
+//            json = model.setMaster("sZippCode","2429");
+//            if ("error".equals((String) json.get("result"))){
+//                System.err.println((String) json.get("message"));
+//                System.exit(1);
+//            }
+//            
+//            json = model.setMaster("sTelNoxxx","5545154");
+//            if ("error".equals((String) json.get("result"))){
+//                System.err.println((String) json.get("message"));
+//                System.exit(1);
+//            }
+//            
+//            json = model.setMaster("sFaxNoxxx","5545155");
 //            if ("error".equals((String) json.get("result"))){
 //                System.err.println((String) json.get("message"));
 //                System.exit(1);
@@ -125,91 +148,88 @@ public class VehicleMakeTest {
 //            result = true;
 //        }
 //        assertTrue(result);
-//        //assertFalse(result);
+//        
 //    }
-//    
+    
 //    @Test
 //    public void test02OpenRecord(){
 //        System.out.println("--------------------------------------------------------------------");
 //        System.out.println("------------------------------RETRIEVAL--------------------------------------");
 //        System.out.println("--------------------------------------------------------------------");
 //        
-//        json = model.openRecord("M001MK000001");
+//        json = model.openRecord("M001BNK00001");
 //        
 //        if (!"success".equals((String) json.get("result"))){
 //            result = false;
 //        } else {
 //            System.out.println("--------------------------------------------------------------------");
-//            System.out.println("VEHICLE MAKE");
+//            System.out.println("BANK MASTER");
 //            System.out.println("--------------------------------------------------------------------");
-//            System.out.println("sMakeIDxx  :  " + model.getMaster("sMakeIDxx"));
-//            System.out.println("sMakeDesc  :  " + model.getMaster("sMakeDesc"));
-//            System.out.println("sMakeCode  :  " + model.getMaster("sMakeCode"));
-//            System.out.println("sFormula1  :  " + model.getMaster("sFormula1"));
-//            System.out.println("sFormula2  :  " + model.getMaster("sFormula2"));
+//            System.out.println("sBankIDxx  :  " + model.getMaster("sBankIDxx"));
+//            System.out.println("sBankName  :  " + model.getMaster("sBankName"));
+//            System.out.println("sBankCode  :  " + model.getMaster("sBankCode"));
 //            System.out.println("cRecdStat  :  " + model.getMaster("cRecdStat"));
-//            System.out.println("sEntryByx  :  " + model.getMaster("sEntryByx"));
-//            System.out.println("dEntryDte  :  " + model.getMaster("dEntryDte"));
 //            System.out.println("sModified  :  " + model.getMaster("sModified"));
 //            System.out.println("dModified  :  " + model.getMaster("dModified"));
 //            
 //            result = true;
 //        }
 //        assertTrue(result);
-//        //assertFalse(result);
 //    }
 //    
-//    @Test
-//    public void test03UpdateRecord(){
-//        System.out.println("--------------------------------------------------------------------");
-//        System.out.println("------------------------------UPDATE RECORD--------------------------------------");
-//        System.out.println("--------------------------------------------------------------------");
-//        
-//        json = model.updateRecord();
-//        System.err.println((String) json.get("message"));
-//        if ("error".equals((String) json.get("result"))){
-//            System.err.println((String) json.get("message"));
-//            result = false;
-//        } else {
-//            result = true;
-//        }
-//        
-//        json = model.setMaster("sMakeDesc","MAKING");
-//        if ("error".equals((String) json.get("result"))){
-//            System.err.println((String) json.get("message"));
-//            System.exit(1);
-//        }
-//        assertTrue(result);
-//        //assertFalse(result);
-//    }
 //    
-//    @Test
-//    public void test03UpdateRecordSave(){
-//        System.out.println("--------------------------------------------------------------------");
-//        System.out.println("------------------------------UPDATE RECORD SAVING--------------------------------------");
-//        System.out.println("--------------------------------------------------------------------");
-//        
-//        json = model.saveRecord();
-//        System.err.println((String) json.get("message"));
-//        
-//        if (!"success".equals((String) json.get("result"))){
-//            System.err.println((String) json.get("message"));
-//            result = false;
-//        } else {
-//            System.out.println((String) json.get("message"));
-//            result = true;
-//        }
-//        assertTrue(result);
-//        //assertFalse(result);
-//    }
-//    
+////    @Test
+////    public void test03UpdateRecord(){
+////        System.out.println("--------------------------------------------------------------------");
+////        System.out.println("------------------------------UPDATE RECORD--------------------------------------");
+////        System.out.println("--------------------------------------------------------------------");
+////        
+////        json = model.updateRecord();
+////        System.err.println((String) json.get("message"));
+////        if ("error".equals((String) json.get("result"))){
+////            System.err.println((String) json.get("message"));
+////            result = false;
+////        } else {
+////            result = true;
+////        }
+////        
+////        json = model.setMaster("sBankName","BANCO DE ORO");
+////        if ("error".equals((String) json.get("result"))){
+////            System.err.println((String) json.get("message"));
+////            System.exit(1);
+////        }
+////        
+////        assertTrue(result);
+////        //assertFalse(result);
+////    }
+////    
+////    @Test
+////    public void test03UpdateRecordSave(){
+////        System.out.println("--------------------------------------------------------------------");
+////        System.out.println("------------------------------UPDATE RECORD SAVING--------------------------------------");
+////        System.out.println("--------------------------------------------------------------------");
+////        
+////        json = model.saveRecord();
+////        System.err.println((String) json.get("message"));
+////        
+////        if (!"success".equals((String) json.get("result"))){
+////            System.err.println((String) json.get("message"));
+////            result = false;
+////        } else {
+////            System.out.println((String) json.get("message"));
+////            result = true;
+////        }
+////        assertTrue(result);
+////        //assertFalse(result);
+////    }
+////    
 //    @Test
 //    public void test04DeactivateRecord(){
 //        System.out.println("--------------------------------------------------------------------");
 //        System.out.println("------------------------------DEACTIVATE RECORD--------------------------------------");
 //        System.out.println("--------------------------------------------------------------------");
 //        
-//        json = model.deactivateRecord("M001MK000001");
+//        json = model.deactivateRecord("M001BNK00001");
 //        System.err.println((String) json.get("message"));
 //        
 //        if (!"success".equals((String) json.get("result"))){
@@ -225,12 +245,12 @@ public class VehicleMakeTest {
 //    }
 //    
 //    @Test
-//    public void test04ActivateRecord(){
+//    public void test05ActivateRecord(){
 //        System.out.println("--------------------------------------------------------------------");
 //        System.out.println("------------------------------ACTIVATE RECORD--------------------------------------");
 //        System.out.println("--------------------------------------------------------------------");
 //        
-//        json = model.activateRecord("M001MK000001");
+//        json = model.activateRecord("M001BNK00001");
 //        System.err.println((String) json.get("message"));
 //        
 //        if (!"success".equals((String) json.get("result"))){

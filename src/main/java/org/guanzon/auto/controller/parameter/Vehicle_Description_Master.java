@@ -344,9 +344,9 @@ public class Vehicle_Description_Master implements GRecord {
                 }
             }
             
-            if(poModel.getYearModl() == null || poModel.getYearModl() == 0){
+            if(poModel.getYearModl() == null || poModel.getYearModl() <= 1900){
                 jObj.put("result", "error");
-                jObj.put("message", "Year Model cannot be Empty.");
+                jObj.put("message", "Invalid Year Model.");
                 return jObj;
             }
             
