@@ -16,7 +16,6 @@ import org.guanzon.appdriver.base.MiscUtil;
  */
 public class VehicleColor {
     
-    
     public static void main (String [] args){
         String path;
         if(System.getProperty("os.name").toLowerCase().contains("win")){
