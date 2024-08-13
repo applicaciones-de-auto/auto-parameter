@@ -1,8 +1,7 @@
 
 import java.sql.SQLException;
 import org.guanzon.appdriver.base.GRider;
-import org.guanzon.auto.main.parameter.Parts_Bin;
-import org.guanzon.auto.main.parameter.Vehicle_Make;
+import org.guanzon.auto.main.parameter.Parts_Measure;
 import org.json.simple.JSONObject;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertTrue;
@@ -23,12 +22,12 @@ import org.junit.runners.MethodSorters;
  * @author Arsiela
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class PartsBinTest {
-    static Parts_Bin model;
+public class PartsMeasureTest {
+    static Parts_Measure model;
     JSONObject json;
     boolean result;
     
-    public PartsBinTest(){}
+    public PartsMeasureTest(){}
     
     
     @BeforeClass
@@ -55,7 +54,7 @@ public class PartsBinTest {
         JSONObject json;
         
         System.out.println("sBranch code = " + instance.getBranchCode());
-        model = new Parts_Bin(instance,false, instance.getBranchCode());
+        model = new Parts_Measure(instance,false, instance.getBranchCode());
     }
     
     @AfterClass
@@ -77,7 +76,13 @@ public class PartsBinTest {
 //        
 //        json = model.newRecord();
 //        if ("success".equals((String) json.get("result"))){
-//            json = model.setMaster("sBinNamex","TEST BIN");
+//            json = model.setMaster("sMeasurNm","TEST MEASURE");
+//            if ("error".equals((String) json.get("result"))){
+//                System.err.println((String) json.get("message"));
+//                System.exit(1);
+//            }
+//            
+//            json = model.setMaster("sShortDsc","TMSR");
 //            if ("error".equals((String) json.get("result"))){
 //                System.err.println((String) json.get("message"));
 //                System.exit(1);
@@ -122,10 +127,11 @@ public class PartsBinTest {
 //            result = false;
 //        } else {
 //            System.out.println("--------------------------------------------------------------------");
-//            System.out.println("PARTS BIN");
+//            System.out.println("PARTS MEASURE");
 //            System.out.println("--------------------------------------------------------------------");
-//            System.out.println("sBinIDxxx  :  " + model.getMaster("sBinIDxxx"));
-//            System.out.println("sBinNamex  :  " + model.getMaster("sBinNamex"));
+//            System.out.println("sMeasurID  :  " + model.getMaster("sMeasurID"));
+//            System.out.println("sMeasurNm  :  " + model.getMaster("sMeasurNm"));
+//            System.out.println("sShortDsc  :  " + model.getMaster("sShortDsc"));
 //            System.out.println("cRecdStat  :  " + model.getMaster("cRecdStat"));
 //            System.out.println("sModified  :  " + model.getMaster("sModified"));
 //            System.out.println("dModified  :  " + model.getMaster("dModified"));
@@ -135,7 +141,7 @@ public class PartsBinTest {
 //        assertTrue(result);
 //        //assertFalse(result);
 //    }
-    
+//    
 //    @Test
 //    public void test03UpdateRecord(){
 //        System.out.println("--------------------------------------------------------------------");
@@ -151,7 +157,7 @@ public class PartsBinTest {
 //            result = true;
 //        }
 //        
-//        json = model.setMaster("sBinNamex","TEST EDIT BIN");
+//        json = model.setMaster("sMeasurNm","EDIT MEASURE");
 //        if ("error".equals((String) json.get("result"))){
 //            System.err.println((String) json.get("message"));
 //            System.exit(1);

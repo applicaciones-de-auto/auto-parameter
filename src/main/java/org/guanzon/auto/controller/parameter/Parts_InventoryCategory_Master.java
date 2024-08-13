@@ -1,4 +1,3 @@
-
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -17,14 +16,14 @@ import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.iface.GRecord;
-import org.guanzon.auto.model.parameter.Model_Parts_Bin;
+import org.guanzon.auto.model.parameter.Model_Parts_Inventory_Category;
 import org.json.simple.JSONObject;
 
 /**
  *
  * @author Arsiela
  */
-public class Parts_Bin_Master implements GRecord {
+public class Parts_InventoryCategory_Master implements GRecord {
 
     GRider poGRider;
     boolean pbWtParent;
@@ -32,16 +31,16 @@ public class Parts_Bin_Master implements GRecord {
     String psBranchCd;
     String psRecdStat;
 
-    Model_Parts_Bin poModel;
+    Model_Parts_Inventory_Category poModel;
     JSONObject poJSON;
     
 
-    public Parts_Bin_Master(GRider foGRider, boolean fbWthParent, String fsBranchCd) {
+    public Parts_InventoryCategory_Master(GRider foGRider, boolean fbWthParent, String fsBranchCd) {
         poGRider = foGRider;
         pbWtParent = fbWthParent;
         psBranchCd = fsBranchCd.isEmpty() ? foGRider.getBranchCode() : fsBranchCd;
 
-        poModel = new Model_Parts_Bin(foGRider);
+        poModel = new Model_Parts_Inventory_Category(foGRider);
         pnEditMode = EditMode.UNKNOWN;
     }
 
@@ -82,11 +81,11 @@ public class Parts_Bin_Master implements GRecord {
             pnEditMode = EditMode.ADDNEW;
             org.json.simple.JSONObject obj;
 
-            poModel = new Model_Parts_Bin(poGRider);
+            poModel = new Model_Parts_Inventory_Category(poGRider);
             Connection loConn = null;
             loConn = setConnection();
             poModel.newRecord();
-            poModel.setBinID(MiscUtil.getNextCode(poModel.getTable(), "sBinIDxxx", false, loConn, psBranchCd));
+            poModel.setCategrCd(MiscUtil.getNextCode(poModel.getTable(), "sCategrCd", true, loConn, psBranchCd));
             
             if (poModel == null){
                 poJSON.put("result", "error");
@@ -122,7 +121,7 @@ public class Parts_Bin_Master implements GRecord {
         pnEditMode = EditMode.READY;
         poJSON = new JSONObject();
         
-        poModel = new Model_Parts_Bin(poGRider);
+        poModel = new Model_Parts_Inventory_Category(poGRider);
         poJSON = poModel.openRecord(fsValue);
         
         if("error".equals(poJSON.get("result"))){
@@ -237,25 +236,26 @@ public class Parts_Bin_Master implements GRecord {
     @Override
     public JSONObject searchRecord(String fsValue, boolean fbByActive) {
         String lsSQL =    " SELECT "        
-                        + "    sBinIDxxx "  
-                        + "  , sBinNamex "  
+                        + "    sCategrCd "  
+                        + "  , sInvTypCd "  
+                        + "  , sDescript "  
                         + "  , cRecdStat "  
-                        + " FROM bin "       ;
+                        + " FROM inventory_category "       ;
         
         if(fbByActive){
-            lsSQL = MiscUtil.addCondition(lsSQL,  " sBinNamex LIKE " + SQLUtil.toSQL(fsValue + "%")
+            lsSQL = MiscUtil.addCondition(lsSQL,  " sDescript LIKE " + SQLUtil.toSQL(fsValue + "%")
                                                     + " AND cRecdStat = '1' ");
         } else {
-            lsSQL = MiscUtil.addCondition(lsSQL,  " sBinNamex LIKE " + SQLUtil.toSQL(fsValue + "%"));
+            lsSQL = MiscUtil.addCondition(lsSQL,  " sDescript LIKE " + SQLUtil.toSQL(fsValue + "%"));
         }
         
-        System.out.println("SEARCH BIN: " + lsSQL);
+        System.out.println("SEARCH INVENTORY CATEGORY: " + lsSQL);
         poJSON = ShowDialogFX.Search(poGRider,
                 lsSQL,
                 fsValue,
                 "ID»Description",
-                "sBinIDxxx»sBinNamex",
-                "sBinIDxxx»sBinNamex",
+                "sCategrCd»sDescript",
+                "sCategrCd»sDescript",
                 1);
 
         if (poJSON != null) {
@@ -270,7 +270,7 @@ public class Parts_Bin_Master implements GRecord {
     }
 
     @Override
-    public Model_Parts_Bin getModel() {
+    public Model_Parts_Inventory_Category getModel() {
         return poModel;
     }
     
@@ -278,24 +278,24 @@ public class Parts_Bin_Master implements GRecord {
         JSONObject jObj = new JSONObject();
         try {
             
-            if(poModel.getBinID()== null){
+            if(poModel.getCategrCd()== null){
                 jObj.put("result", "error");
                 jObj.put("message", "ID cannot be Empty.");
                 return jObj;
             } else {
-                if(poModel.getBinID().trim().isEmpty()){
+                if(poModel.getCategrCd().trim().isEmpty()){
                     jObj.put("result", "error");
                     jObj.put("message", "ID cannot be Empty.");
                     return jObj;
                 }
             }
             
-            if(poModel.getBinName()== null){
+            if(poModel.getDescript()== null){
                 jObj.put("result", "error");
                 jObj.put("message", "Description cannot be Empty.");
                 return jObj;
             } else {
-                if(poModel.getBinName().trim().isEmpty()){
+                if(poModel.getDescript().trim().isEmpty()){
                     jObj.put("result", "error");
                     jObj.put("message", "Description cannot be Empty.");
                     return jObj;
@@ -305,50 +305,55 @@ public class Parts_Bin_Master implements GRecord {
             String lsID = "";
             String lsDesc  = "";
             String lsSQL = poModel.getSQL();
-            lsSQL = MiscUtil.addCondition(lsSQL, "REPLACE(sBinNamex,' ','') = " + SQLUtil.toSQL(poModel.getBinName().replace(" ",""))) +
-                                                    " AND sBinIDxxx <> " + SQLUtil.toSQL(poModel.getBinID()) ;
-            System.out.println("EXISTING BIN CHECK: " + lsSQL);
+            lsSQL = MiscUtil.addCondition(lsSQL, "REPLACE(a.sDescript,' ','') = " + SQLUtil.toSQL(poModel.getDescript().replace(" ",""))) +
+                                                    " AND a.sCategrCd <> " + SQLUtil.toSQL(poModel.getCategrCd()) ;
+            System.out.println("EXISTING INVENTORY CATEGORY CHECK: " + lsSQL);
             ResultSet loRS = poGRider.executeQuery(lsSQL);
 
             if (MiscUtil.RecordCount(loRS) > 0){
                     while(loRS.next()){
-                        lsID = loRS.getString("sBinIDxxx");
-                        lsDesc = loRS.getString("sBinNamex");
+                        lsID = loRS.getString("sCategrCd");
+                        lsDesc = loRS.getString("sDescript");
                     }
                     
                     MiscUtil.close(loRS);
                     
                     jObj.put("result", "error");
-                    jObj.put("message", "Existing Bin Description Record.\n\nBin ID: " + lsID + "\nDescription: " + lsDesc.toUpperCase() );
+                    jObj.put("message", "Existing Inventory Category Description Record.\n\nCategory ID: " + lsID + "\nDescription: " + lsDesc.toUpperCase() );
                     return jObj;
             }
             
             lsID = "";
             lsSQL =   " SELECT "                                      
-                    + "    a.sLocatnID "                              
-                    + "  , a.sLocatnDs "                              
-                    + "  , a.sWHouseID "                              
-                    + "  , a.sSectnIDx "                              
-                    + "  , a.sBinIDxxx "                              
-                    + "  , a.cRecdStat "                              
-                    + "  , b.sBinNamex "                              
-                    + " FROM item_location a "                        
-                    + " LEFT JOIN bin b ON b.sBinIDxxx = a.sBinIDxxx ";
+                    + "    a.sStockIDx "                              
+                    + "  , a.sBarCodex "                              
+                    + "  , a.sDescript "                              
+                    + "  , a.sCategCd1 "                               
+                    + "  , a.sCategCd2 "                              
+                    + "  , a.sCategCd3 "                              
+                    + "  , a.sCategCd4 "                             
+                    + "  , b.sDescript "                              
+                    + " FROM inventory a "                        
+                    + " LEFT JOIN inventory_category b ON (b.sCategrCd = a.sCategCd1 OR b.sCategrCd = a.sCategCd2 OR b.sCategrCd = a.sCategCd3 OR b.sCategrCd = a.sCategCd4) ";
             //Deactivation Validation
             if(poModel.getRecdStat().equals("0")){
-                lsSQL = MiscUtil.addCondition(lsSQL, " a.sBinIDxxx = " + SQLUtil.toSQL(poModel.getBinID())) ;
-                System.out.println("EXISTING USAGE OF BIN: " + lsSQL);
+                lsSQL = MiscUtil.addCondition(lsSQL, " (a.sCategCd1 = " + SQLUtil.toSQL(poModel.getCategrCd())
+                                                        + " OR a.sCategCd2 = " + SQLUtil.toSQL(poModel.getCategrCd())
+                                                        + " OR a.sCategCd3 = " + SQLUtil.toSQL(poModel.getCategrCd())
+                                                        + " OR a.sCategCd4 = " + SQLUtil.toSQL(poModel.getCategrCd())
+                                                        + " ) ") ;
+                System.out.println("EXISTING USAGE OF INVENTORY CAGTEGORY: " + lsSQL);
                 loRS = poGRider.executeQuery(lsSQL);
 
                 if (MiscUtil.RecordCount(loRS) > 0){
                         while(loRS.next()){
-                            lsID = loRS.getString("sLocatnID");
+                            lsID = loRS.getString("sBarCodex");
                         }
 
                         MiscUtil.close(loRS);
 
                         jObj.put("result", "error");
-                        jObj.put("message", "Existing Bin Usage.\n\nLocation ID: " + lsID + "\nDeactivation aborted.");
+                        jObj.put("message", "Existing Inventory Category Usage.\n\nBarcode: " + lsID + "\nDeactivation aborted.");
                         return jObj;
                 }
             }
@@ -356,42 +361,46 @@ public class Parts_Bin_Master implements GRecord {
             if(pnEditMode == EditMode.UPDATE){
                 lsID = "";
                 lsSQL =   " SELECT "                                      
-                        + "    a.sLocatnID "                              
-                        + "  , a.sLocatnDs "                              
-                        + "  , a.sWHouseID "                              
-                        + "  , a.sSectnIDx "                              
-                        + "  , a.sBinIDxxx "                              
-                        + "  , a.cRecdStat "                              
-                        + "  , b.sBinNamex "                              
-                        + " FROM item_location a "                        
-                        + " LEFT JOIN bin b ON b.sBinIDxxx = a.sBinIDxxx ";
-                
-                lsSQL = MiscUtil.addCondition(lsSQL, " a.sBinIDxxx = " + SQLUtil.toSQL(poModel.getBinID()) 
-                                                        + " AND REPLACE(b.sBinNamex, ' ','') <> " + SQLUtil.toSQL(poModel.getBinName().replace(" ", ""))  
+                        + "    a.sStockIDx "                              
+                        + "  , a.sBarCodex "                              
+                        + "  , a.sDescript "                              
+                        + "  , a.sCategCd1 "                               
+                        + "  , a.sCategCd2 "                              
+                        + "  , a.sCategCd3 "                              
+                        + "  , a.sCategCd4 "                             
+                        + "  , b.sDescript "                              
+                        + " FROM inventory a "                        
+                        + " LEFT JOIN inventory_category b ON (b.sCategrCd = a.sCategCd1 OR b.sCategrCd = a.sCategCd2 OR b.sCategrCd = a.sCategCd3 OR b.sCategrCd = a.sCategCd4) ";
+                lsSQL = MiscUtil.addCondition(lsSQL, " (a.sCategCd1 = " + SQLUtil.toSQL(poModel.getCategrCd())
+                                                        + " OR a.sCategCd2 = " + SQLUtil.toSQL(poModel.getCategrCd())
+                                                        + " OR a.sCategCd3 = " + SQLUtil.toSQL(poModel.getCategrCd())
+                                                        + " OR a.sCategCd4 = " + SQLUtil.toSQL(poModel.getCategrCd())
+                                                        + " ) AND REPLACE(b.sDescript, ' ','') <> " + SQLUtil.toSQL(poModel.getDescript().replace(" ", ""))  
                                                         //+ " AND a.cRecdStat = '1'"
                                                         ) ;
-                System.out.println("ITEM LOCATION: EXISTING USAGE OF BIN: " + lsSQL);
+                System.out.println("INVENTORY: EXISTING USAGE OF INVENTORY CATEGORY: " + lsSQL);
                 loRS = poGRider.executeQuery(lsSQL);
 
                 if (MiscUtil.RecordCount(loRS) > 0){
                         while(loRS.next()){
-                            lsID = loRS.getString("sLocatnID");
+                            lsID = loRS.getString("sBarCodex");
                         }
 
                         MiscUtil.close(loRS);
                         
                         jObj.put("result", "error");
-                        jObj.put("message", "Existing Bin Usage.\n\nLocation ID: " + lsID + "\nChanging of bin description aborted.");
+                        jObj.put("message", "Existing Inventory Category Usage.\n\nBarcode: " + lsID + "\nChanging of inventory category description aborted.");
                         return jObj;
                 }
             }
         
         } catch (SQLException ex) {
-            Logger.getLogger(Parts_Bin_Master.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Parts_InventoryCategory_Master.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         jObj.put("result", "success");
         jObj.put("message", "Valid Entry");
         return jObj;
     }
+    
 }

@@ -5,6 +5,11 @@
  */
 package org.guanzon.auto.controller.parameter;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.guanzon.appdriver.agent.ShowDialogFX;
 import org.guanzon.appdriver.base.GRider;
 import org.guanzon.appdriver.base.MiscUtil;
@@ -21,16 +26,19 @@ import org.json.simple.JSONObject;
 public class Parts_Brand_Master implements GRecord {
 
     GRider poGRider;
-    boolean pbWthParent;
+    boolean pbWtParent;
     int pnEditMode;
+    String psBranchCd;
     String psRecdStat;
 
     Model_Parts_Brand poModel;
     JSONObject poJSON;
+    
 
-    public Parts_Brand_Master(GRider foGRider, boolean fbWthParent) {
+    public Parts_Brand_Master(GRider foGRider, boolean fbWthParent, String fsBranchCd) {
         poGRider = foGRider;
-        pbWthParent = fbWthParent;
+        pbWtParent = fbWthParent;
+        psBranchCd = fsBranchCd.isEmpty() ? foGRider.getBranchCode() : fsBranchCd;
 
         poModel = new Model_Parts_Brand(foGRider);
         pnEditMode = EditMode.UNKNOWN;
@@ -68,45 +76,92 @@ public class Parts_Brand_Master implements GRecord {
 
     @Override
     public JSONObject newRecord() {
-        return poModel.newRecord();
+        poJSON = new JSONObject();
+        try{
+            pnEditMode = EditMode.ADDNEW;
+            org.json.simple.JSONObject obj;
+
+            poModel = new Model_Parts_Brand(poGRider);
+            Connection loConn = null;
+            loConn = setConnection();
+            poModel.newRecord();
+            poModel.setBrandCde(MiscUtil.getNextCode(poModel.getTable(), "sBrandCde", false, loConn, psBranchCd));
+            
+            if (poModel == null){
+                poJSON.put("result", "error");
+                poJSON.put("message", "initialized new record failed.");
+                return poJSON;
+            }else{
+                poJSON.put("result", "success");
+                poJSON.put("message", "initialized new record.");
+                pnEditMode = EditMode.ADDNEW;
+            }
+               
+        }catch(NullPointerException e){
+            poJSON.put("result", "error");
+            poJSON.put("message", e.getMessage());
+        }
+        
+        return poJSON;
+    }
+    
+    private Connection setConnection(){
+        Connection foConn;
+        
+        if (pbWtParent){
+            foConn = (Connection) poGRider.getConnection();
+            if (foConn == null) foConn = (Connection) poGRider.doConnect();
+        }else foConn = (Connection) poGRider.doConnect();
+        
+        return foConn;
     }
 
     @Override
     public JSONObject openRecord(String fsValue) {
-        return poModel.openRecord(fsValue);
+        pnEditMode = EditMode.READY;
+        poJSON = new JSONObject();
+        
+        poModel = new Model_Parts_Brand(poGRider);
+        poJSON = poModel.openRecord(fsValue);
+        
+        if("error".equals(poJSON.get("result"))){
+            return poJSON;
+        } 
+        return poJSON;
     }
 
     @Override
     public JSONObject updateRecord() {
-        JSONObject loJSON = new JSONObject();
-
-        if (poModel.getEditMode() == EditMode.UPDATE) {
-            loJSON.put("result", "success");
-            loJSON.put("message", "Edit mode has changed to update.");
-        } else {
-            loJSON.put("result", "error");
-            loJSON.put("message", "No record loaded to update.");
+        poJSON = new JSONObject();
+        if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE){
+            poJSON.put("result", "error");
+            poJSON.put("message", "Invalid edit mode.");
+            return poJSON;
         }
-        return loJSON;
+        pnEditMode = EditMode.UPDATE;
+        poJSON.put("result", "success");
+        poJSON.put("message", "Update mode success.");
+        return poJSON;
     }
 
     @Override
-    public JSONObject saveRecord() {
-        if (!pbWthParent) {
-            poGRider.beginTrans();
+    public JSONObject saveRecord(){
+        
+        poJSON = validateEntry();
+        if ("error".equals((String) poJSON.get("result"))) {
+            return poJSON;
         }
-
+        
+        if (!pbWtParent) poGRider.beginTrans();
+        
         poJSON = poModel.saveRecord();
 
         if ("success".equals((String) poJSON.get("result"))) {
-            if (!pbWthParent) {
-                poGRider.commitTrans();
-            }
+            if (!pbWtParent) {poGRider.commitTrans();}
         } else {
-            if (!pbWthParent) {
-                poGRider.rollbackTrans();
-            }
+            if (!pbWtParent) {poGRider.rollbackTrans();}
         }
+        
         return poJSON;
     }
 
@@ -125,8 +180,20 @@ public class Parts_Brand_Master implements GRecord {
             if ("error".equals((String) poJSON.get("result"))) {
                 return poJSON;
             }
+            
+            poJSON = validateEntry();
+            if ("error".equals((String) poJSON.get("result"))) {
+                return poJSON;
+            }
 
             poJSON = poModel.saveRecord();
+            if ("success".equals((String) poJSON.get("result"))) {
+                poJSON.put("result", "success");
+                poJSON.put("message", "Deactivation success.");
+            } else {
+                poJSON.put("result", "error");
+                poJSON.put("message", "Deactivation failed.");
+            }
         } else {
             poJSON = new JSONObject();
             poJSON.put("result", "error");
@@ -141,12 +208,23 @@ public class Parts_Brand_Master implements GRecord {
 
         if (poModel.getEditMode() == EditMode.UPDATE) {
             poJSON = poModel.setActive(true);
-
             if ("error".equals((String) poJSON.get("result"))) {
                 return poJSON;
             }
-
+            
+            poJSON = validateEntry();
+            if ("error".equals((String) poJSON.get("result"))) {
+                return poJSON;
+            }
+            
             poJSON = poModel.saveRecord();
+            if ("success".equals((String) poJSON.get("result"))) {
+                poJSON.put("result", "success");
+                poJSON.put("message", "Activation success.");
+            } else {
+                poJSON.put("result", "error");
+                poJSON.put("message", "Activation failed.");
+            }
         } else {
             poJSON = new JSONObject();
             poJSON.put("result", "error");
@@ -156,42 +234,160 @@ public class Parts_Brand_Master implements GRecord {
     }
 
     @Override
-    public JSONObject searchRecord(String fsValue, boolean fbByCode) {
-        String lsCondition = "";
-
-        if (psRecdStat.length() > 1) {
-            for (int lnCtr = 0; lnCtr <= psRecdStat.length() - 1; lnCtr++) {
-                lsCondition += ", " + SQLUtil.toSQL(Character.toString(psRecdStat.charAt(lnCtr)));
-            }
-
-            lsCondition = "cRecdStat IN (" + lsCondition.substring(2) + ")";
+    public JSONObject searchRecord(String fsValue, boolean fbByActive) {
+        String lsSQL =    " SELECT "        
+                        + "    sBrandCde "  
+                        + "  , sInvTypCd "  
+                        + "  , sDescript "  
+                        + "  , cRecdStat "  
+                        + " FROM brand "       ;
+        
+        if(fbByActive){
+            lsSQL = MiscUtil.addCondition(lsSQL,  " sDescript LIKE " + SQLUtil.toSQL(fsValue + "%")
+                                                    + " AND cRecdStat = '1' ");
         } else {
-            lsCondition = "cRecdStat = " + SQLUtil.toSQL(psRecdStat);
+            lsSQL = MiscUtil.addCondition(lsSQL,  " sDescript LIKE " + SQLUtil.toSQL(fsValue + "%"));
         }
-
-        String lsSQL = MiscUtil.addCondition(poModel.makeSelectSQL(), " sDescript LIKE "
-                + SQLUtil.toSQL(fsValue + "%") + " AND " + lsCondition);
-
+        
+        System.out.println("SEARCH BRAND: " + lsSQL);
         poJSON = ShowDialogFX.Search(poGRider,
                 lsSQL,
                 fsValue,
-                "ID»Name",
+                "ID»Description",
                 "sBrandCde»sDescript",
                 "sBrandCde»sDescript",
-                fbByCode ? 0 : 1);
+                1);
 
         if (poJSON != null) {
-            return poModel.openRecord((String) poJSON.get("sBrandCde"));
         } else {
+            poJSON = new JSONObject();
             poJSON.put("result", "error");
-            poJSON.put("message", "No record loaded to update.");
+            poJSON.put("message", "No record loaded.");
             return poJSON;
         }
+        
+        return poJSON;
     }
 
     @Override
     public Model_Parts_Brand getModel() {
         return poModel;
+    }
+    
+    private JSONObject validateEntry(){
+        JSONObject jObj = new JSONObject();
+        try {
+            
+            if(poModel.getBrandCde()== null){
+                jObj.put("result", "error");
+                jObj.put("message", "ID cannot be Empty.");
+                return jObj;
+            } else {
+                if(poModel.getBrandCde().trim().isEmpty()){
+                    jObj.put("result", "error");
+                    jObj.put("message", "ID cannot be Empty.");
+                    return jObj;
+                }
+            }
+            
+            if(poModel.getDescript()== null){
+                jObj.put("result", "error");
+                jObj.put("message", "Description cannot be Empty.");
+                return jObj;
+            } else {
+                if(poModel.getDescript().trim().isEmpty()){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Description cannot be Empty.");
+                    return jObj;
+                }
+            }
+
+            String lsID = "";
+            String lsDesc  = "";
+            String lsSQL = poModel.getSQL();
+            lsSQL = MiscUtil.addCondition(lsSQL, "REPLACE(a.sDescript,' ','') = " + SQLUtil.toSQL(poModel.getDescript().replace(" ",""))) +
+                                                    " AND a.sBrandCde <> " + SQLUtil.toSQL(poModel.getBrandCde()) ;
+            System.out.println("EXISTING BRAND CHECK: " + lsSQL);
+            ResultSet loRS = poGRider.executeQuery(lsSQL);
+
+            if (MiscUtil.RecordCount(loRS) > 0){
+                    while(loRS.next()){
+                        lsID = loRS.getString("sBrandCde");
+                        lsDesc = loRS.getString("sDescript");
+                    }
+                    
+                    MiscUtil.close(loRS);
+                    
+                    jObj.put("result", "error");
+                    jObj.put("message", "Existing Brand Description Record.\n\nBrand ID: " + lsID + "\nDescription: " + lsDesc.toUpperCase() );
+                    return jObj;
+            }
+            
+            lsID = "";
+            lsSQL =   " SELECT "                                      
+                    + "    a.sStockIDx "                              
+                    + "  , a.sBarCodex "                              
+                    + "  , a.sDescript "                              
+                    + "  , a.sBrandCde "                              
+                    + "  , b.sDescript "                              
+                    + " FROM inventory a "                        
+                    + " LEFT JOIN brand b ON b.sBrandCde = a.sBrandCde ";
+            //Deactivation Validation
+            if(poModel.getRecdStat().equals("0")){
+                lsSQL = MiscUtil.addCondition(lsSQL, " a.sBrandCde = " + SQLUtil.toSQL(poModel.getBrandCde())) ;
+                System.out.println("EXISTING USAGE OF BRAND: " + lsSQL);
+                loRS = poGRider.executeQuery(lsSQL);
+
+                if (MiscUtil.RecordCount(loRS) > 0){
+                        while(loRS.next()){
+                            lsID = loRS.getString("sBarCodex");
+                        }
+
+                        MiscUtil.close(loRS);
+
+                        jObj.put("result", "error");
+                        jObj.put("message", "Existing Brand Usage.\n\nBarcode: " + lsID + "\nDeactivation aborted.");
+                        return jObj;
+                }
+            }
+            
+            if(pnEditMode == EditMode.UPDATE){
+                lsID = "";
+                lsSQL =   " SELECT "                                      
+                        + "    a.sStockIDx "                              
+                        + "  , a.sBarCodex "                              
+                        + "  , a.sDescript "                              
+                        + "  , a.sBrandCde "                              
+                        + "  , b.sDescript "                              
+                        + " FROM inventory a "                        
+                        + " LEFT JOIN brand b ON b.sBrandCde = a.sBrandCde ";
+                lsSQL = MiscUtil.addCondition(lsSQL, " a.sBrandCde = " + SQLUtil.toSQL(poModel.getBrandCde()) 
+                                                        + " AND REPLACE(b.sDescript, ' ','') <> " + SQLUtil.toSQL(poModel.getDescript().replace(" ", ""))  
+                                                        //+ " AND a.cRecdStat = '1'"
+                                                        ) ;
+                System.out.println("ITEM LOCATION: EXISTING USAGE OF BRAND: " + lsSQL);
+                loRS = poGRider.executeQuery(lsSQL);
+
+                if (MiscUtil.RecordCount(loRS) > 0){
+                        while(loRS.next()){
+                            lsID = loRS.getString("sBarCodex");
+                        }
+
+                        MiscUtil.close(loRS);
+                        
+                        jObj.put("result", "error");
+                        jObj.put("message", "Existing Brand Usage.\n\nBarcode: " + lsID + "\nChanging of brand description aborted.");
+                        return jObj;
+                }
+            }
+        
+        } catch (SQLException ex) {
+            Logger.getLogger(Parts_Brand_Master.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        jObj.put("result", "success");
+        jObj.put("message", "Valid Entry");
+        return jObj;
     }
     
 }

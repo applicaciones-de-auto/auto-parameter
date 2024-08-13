@@ -8,14 +8,14 @@ package org.guanzon.auto.main.parameter;
 import org.guanzon.appdriver.base.GRider;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.iface.GRecord;
-import org.guanzon.auto.controller.parameter.Parts_Measure_Master;
+import org.guanzon.auto.controller.parameter.Parts_InventoryCategory_Master;
 import org.json.simple.JSONObject;
 
 /**
  *
  * @author Arsiela
  */
-public class Parts_Measure implements GRecord{
+public class Parts_InventoryCategory implements GRecord{
     GRider poGRider;
     boolean pbWthParent;
     String psBranchCd;
@@ -26,10 +26,10 @@ public class Parts_Measure implements GRecord{
     
     public JSONObject poJSON;
     
-    Parts_Measure_Master poController;
+    Parts_InventoryCategory_Master poController;
     
-    public Parts_Measure(GRider foAppDrver, boolean fbWtParent, String fsBranchCd){
-        poController = new Parts_Measure_Master(foAppDrver,fbWtParent,fsBranchCd);
+    public Parts_InventoryCategory(GRider foAppDrver, boolean fbWtParent, String fsBranchCd){
+        poController = new Parts_InventoryCategory_Master(foAppDrver,fbWtParent,fsBranchCd);
         
         poGRider = foAppDrver;
         pbWtParent = fbWtParent;
@@ -141,13 +141,13 @@ public class Parts_Measure implements GRecord{
         poJSON = new JSONObject();  
         poJSON = poController.searchRecord(fsValue, fbByActive);
         if(!"error".equals(poJSON.get("result"))){
-            poJSON = openRecord((String) poJSON.get("sMeasurID"));
+            poJSON = openRecord((String) poJSON.get("sCategrCd"));
         }
         return poJSON;
     }
 
     @Override
-    public Parts_Measure_Master getModel() {
+    public Parts_InventoryCategory_Master getModel() {
         return poController;
     }
     

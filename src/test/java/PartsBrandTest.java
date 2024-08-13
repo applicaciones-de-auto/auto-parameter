@@ -1,8 +1,7 @@
 
 import java.sql.SQLException;
 import org.guanzon.appdriver.base.GRider;
-import org.guanzon.auto.main.parameter.Parts_Bin;
-import org.guanzon.auto.main.parameter.Vehicle_Make;
+import org.guanzon.auto.main.parameter.Parts_Brand;
 import org.json.simple.JSONObject;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertTrue;
@@ -23,13 +22,12 @@ import org.junit.runners.MethodSorters;
  * @author Arsiela
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class PartsBinTest {
-    static Parts_Bin model;
+public class PartsBrandTest {
+    static Parts_Brand model;
     JSONObject json;
     boolean result;
     
-    public PartsBinTest(){}
-    
+    public PartsBrandTest(){}
     
     @BeforeClass
     public static void setUpClass() {   
@@ -55,7 +53,7 @@ public class PartsBinTest {
         JSONObject json;
         
         System.out.println("sBranch code = " + instance.getBranchCode());
-        model = new Parts_Bin(instance,false, instance.getBranchCode());
+        model = new Parts_Brand(instance,false, instance.getBranchCode());
     }
     
     @AfterClass
@@ -77,7 +75,7 @@ public class PartsBinTest {
 //        
 //        json = model.newRecord();
 //        if ("success".equals((String) json.get("result"))){
-//            json = model.setMaster("sBinNamex","TEST BIN");
+//            json = model.setMaster("sDescript","TEST BRAND");
 //            if ("error".equals((String) json.get("result"))){
 //                System.err.println((String) json.get("message"));
 //                System.exit(1);
@@ -116,19 +114,21 @@ public class PartsBinTest {
 //        System.out.println("------------------------------RETRIEVAL--------------------------------------");
 //        System.out.println("--------------------------------------------------------------------");
 //        
-//        json = model.openRecord("M001001");
+//        json = model.openRecord("M0010001");
 //        
 //        if (!"success".equals((String) json.get("result"))){
 //            result = false;
 //        } else {
 //            System.out.println("--------------------------------------------------------------------");
-//            System.out.println("PARTS BIN");
+//            System.out.println("PARTS BRAND");
 //            System.out.println("--------------------------------------------------------------------");
-//            System.out.println("sBinIDxxx  :  " + model.getMaster("sBinIDxxx"));
-//            System.out.println("sBinNamex  :  " + model.getMaster("sBinNamex"));
+//            System.out.println("sBrandCde  :  " + model.getMaster("sBrandCde"));
+//            System.out.println("sInvTypCd  :  " + model.getMaster("sInvTypCd"));
+//            System.out.println("sDescript  :  " + model.getMaster("sDescript"));
 //            System.out.println("cRecdStat  :  " + model.getMaster("cRecdStat"));
 //            System.out.println("sModified  :  " + model.getMaster("sModified"));
 //            System.out.println("dModified  :  " + model.getMaster("dModified"));
+//            System.out.println("sInvTypDs  :  " + model.getMaster("sInvTypDs"));
 //            
 //            result = true;
 //        }
@@ -151,7 +151,7 @@ public class PartsBinTest {
 //            result = true;
 //        }
 //        
-//        json = model.setMaster("sBinNamex","TEST EDIT BIN");
+//        json = model.setMaster("sInvTypCd","0001");
 //        if ("error".equals((String) json.get("result"))){
 //            System.err.println((String) json.get("message"));
 //            System.exit(1);
@@ -186,7 +186,7 @@ public class PartsBinTest {
 //        System.out.println("------------------------------DEACTIVATE RECORD--------------------------------------");
 //        System.out.println("--------------------------------------------------------------------");
 //        
-//        json = model.deactivateRecord("M001001");
+//        json = model.deactivateRecord("M0010001");
 //        System.err.println((String) json.get("message"));
 //        
 //        if (!"success".equals((String) json.get("result"))){
@@ -207,7 +207,7 @@ public class PartsBinTest {
 //        System.out.println("------------------------------ACTIVATE RECORD--------------------------------------");
 //        System.out.println("--------------------------------------------------------------------");
 //        
-//        json = model.activateRecord("M001001");
+//        json = model.activateRecord("M0010001");
 //        System.err.println((String) json.get("message"));
 //        
 //        if (!"success".equals((String) json.get("result"))){
