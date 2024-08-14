@@ -9,6 +9,7 @@ import org.guanzon.appdriver.base.GRider;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.iface.GRecord;
 import org.guanzon.auto.controller.parameter.Parts_InventoryCategory_Master;
+import org.guanzon.auto.controller.parameter.Parts_InventoryType_Master;
 import org.json.simple.JSONObject;
 
 /**
@@ -27,9 +28,11 @@ public class Parts_InventoryCategory implements GRecord{
     public JSONObject poJSON;
     
     Parts_InventoryCategory_Master poController;
+    Parts_InventoryType_Master poInvType;
     
     public Parts_InventoryCategory(GRider foAppDrver, boolean fbWtParent, String fsBranchCd){
         poController = new Parts_InventoryCategory_Master(foAppDrver,fbWtParent,fsBranchCd);
+        poInvType = new Parts_InventoryType_Master(foAppDrver,fbWtParent,fsBranchCd);
         
         poGRider = foAppDrver;
         pbWtParent = fbWtParent;
@@ -149,6 +152,17 @@ public class Parts_InventoryCategory implements GRecord{
     @Override
     public Parts_InventoryCategory_Master getModel() {
         return poController;
+    }
+    
+    public JSONObject searchInvType(String fsValue, boolean fbByActive) {
+        poJSON = new JSONObject();  
+        poJSON = poInvType.searchRecord(fsValue, fbByActive);
+        if(!"error".equals(poJSON.get("result"))){
+            poController.setMaster("sInvTypCd", poJSON.get("sInvTypCd"));
+            poController.setMaster("sInvTypDs", poJSON.get("sDescript"));
+        }
+        
+        return poJSON;
     }
     
 }

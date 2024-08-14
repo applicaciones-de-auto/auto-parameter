@@ -234,7 +234,7 @@ public class Bank_Branches implements GRecord {
                         + " , b.sBankName "                                   
                         + " , c.sTownName "                                  
                         + " , d.sProvName "     
-                        + " , UPPER(CONCAT(a.sAddressx,' ', c.sTownName, ', ', d.sProvName)) sAddressx "                             
+                        + " , UPPER(CONCAT(a.sAddressx,' ', c.sTownName, ', ', d.sProvName)) xAddressx "                             
                         + " , b.sBankType "     
                         + " FROM banks_branches a "                           
                         + " LEFT JOIN banks b ON b.sBankIDxx = a.sBankIDxx "  
@@ -253,7 +253,7 @@ public class Bank_Branches implements GRecord {
                 lsSQL,
                 fsValue,
                 "Bank Branch ID»Bank Name»Branch»Address",
-                "sBrBankID»sBankName»sBrBankNm»sAddressx",
+                "sBrBankID»sBankName»sBrBankNm»xAddressx",
                 "a.sBrBankID»b.sBankName»a.sBrBankNm»UPPER(CONCAT(a.sAddressx,' ', c.sTownName, ', ', d.sProvName))",
                 1);
 
