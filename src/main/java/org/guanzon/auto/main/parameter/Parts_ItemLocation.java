@@ -150,7 +150,7 @@ public class Parts_ItemLocation implements GRecord{
         poJSON = new JSONObject();  
         poJSON = poController.searchRecord(fsValue, fbByActive);
         if(!"error".equals(poJSON.get("result"))){
-            poJSON = openRecord((String) poJSON.get("sBrandCde"));
+            poJSON = openRecord((String) poJSON.get("sLocatnID"));
         }
         return poJSON;
     }

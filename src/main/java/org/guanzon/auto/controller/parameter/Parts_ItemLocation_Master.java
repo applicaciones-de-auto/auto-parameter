@@ -295,36 +295,12 @@ public class Parts_ItemLocation_Master implements GRecord {
             
             if(poModel.getLocatnDs()== null){
                 jObj.put("result", "error");
-                jObj.put("message", "Description cannot be Empty.");
+                jObj.put("message", "Location Description cannot be Empty.");
                 return jObj;
             } else {
                 if(poModel.getLocatnDs().trim().isEmpty()){
                     jObj.put("result", "error");
-                    jObj.put("message", "Description cannot be Empty.");
-                    return jObj;
-                }
-            }
-            
-            if(poModel.getBinID()== null){
-                jObj.put("result", "error");
-                jObj.put("message", "Bin cannot be Empty.");
-                return jObj;
-            } else {
-                if(poModel.getBinID().trim().isEmpty()){
-                    jObj.put("result", "error");
-                    jObj.put("message", "Bin cannot be Empty.");
-                    return jObj;
-                }
-            }
-            
-            if(poModel.getSectnID()== null){
-                jObj.put("result", "error");
-                jObj.put("message", "Section cannot be Empty.");
-                return jObj;
-            } else {
-                if(poModel.getSectnID().trim().isEmpty()){
-                    jObj.put("result", "error");
-                    jObj.put("message", "Section cannot be Empty.");
+                    jObj.put("message", "Location Description cannot be Empty.");
                     return jObj;
                 }
             }
@@ -340,7 +316,31 @@ public class Parts_ItemLocation_Master implements GRecord {
                     return jObj;
                 }
             }
-
+            
+//            if(poModel.getSectnID()== null){
+//                jObj.put("result", "error");
+//                jObj.put("message", "Section cannot be Empty.");
+//                return jObj;
+//            } else {
+//                if(poModel.getSectnID().trim().isEmpty()){
+//                    jObj.put("result", "error");
+//                    jObj.put("message", "Section cannot be Empty.");
+//                    return jObj;
+//                }
+//            }
+//            
+//            if(poModel.getBinID()== null){
+//                jObj.put("result", "error");
+//                jObj.put("message", "Bin cannot be Empty.");
+//                return jObj;
+//            } else {
+//                if(poModel.getBinID().trim().isEmpty()){
+//                    jObj.put("result", "error");
+//                    jObj.put("message", "Bin cannot be Empty.");
+//                    return jObj;
+//                }
+//            }
+            
             String lsID = "";
             String lsDesc  = "";
             String lsSQL = poModel.getSQL();

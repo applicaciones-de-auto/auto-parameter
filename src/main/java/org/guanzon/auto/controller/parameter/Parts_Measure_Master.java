@@ -241,7 +241,7 @@ public class Parts_Measure_Master implements GRecord {
                         + "  , sMeasurNm "  
                         + "  , sShortDsc "  
                         + "  , cRecdStat "  
-                        + " FROM bin "       ;
+                        + " FROM measure "       ;
         
         if(fbByActive){
             lsSQL = MiscUtil.addCondition(lsSQL,  " sMeasurNm LIKE " + SQLUtil.toSQL(fsValue + "%")
@@ -299,6 +299,18 @@ public class Parts_Measure_Master implements GRecord {
                 if(poModel.getMeasurNm().trim().isEmpty()){
                     jObj.put("result", "error");
                     jObj.put("message", "Description cannot be Empty.");
+                    return jObj;
+                }
+            }
+            
+            if(poModel.getShortDsc() == null){
+                jObj.put("result", "error");
+                jObj.put("message", "Measurement Abbrev cannot be Empty.");
+                return jObj;
+            } else {
+                if(poModel.getShortDsc().trim().isEmpty()){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Measurement Abbrev cannot be Empty.");
                     return jObj;
                 }
             }
