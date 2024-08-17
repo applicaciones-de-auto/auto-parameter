@@ -7,6 +7,7 @@ VehicleDescriptionTest.class
 VehicleModelTest.class
 VehicleTypeTest.class
 VehicleModelEnginePatternTest.class
+PartsBinTest.class
 VehicleMakeTest.class
 ActivitySourceTest.class
 InsuranceTest.class

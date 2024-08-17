@@ -12,6 +12,7 @@ org\guanzon\auto\resultSet2XML\parameter\VehicleMake.class
 org\guanzon\auto\controller\parameter\Bank_Branches.class
 org\guanzon\auto\resultSet2XML\parameter\VehicleModelEnginePattern.class
 org\guanzon\auto\controller\parameter\Insurance_Branches.class
+org\guanzon\auto\resultSet2XML\parameter\PartsBin.class
 org\guanzon\auto\main\parameter\InsuranceBranch.class
 org\guanzon\auto\main\parameter\Parts_Warehouse.class
 org\guanzon\auto\main\parameter\Parts_ItemType.class

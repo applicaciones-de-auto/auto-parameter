@@ -14,7 +14,7 @@ import org.guanzon.appdriver.base.MiscUtil;
  *
  * @author Arsiela
  */
-public class VehicleColor {
+public class PartsSection {
     
     public static void main (String [] args){
         String path;
@@ -35,29 +35,27 @@ public class VehicleColor {
 
         System.out.println("Connected");
         
-        System.setProperty("sys.default.path.metadata", "D:/GGC_Maven_Systems/config/metadata/Model_Vehicle_Color.xml");
+        System.setProperty("sys.default.path.metadata", "D:/GGC_Maven_Systems/config/metadata/Model_Parts_Section.xml");
         
-        String lsSQL =    "  SELECT "          
-                        + "  sColorIDx "       
-                        + ", sColorDsc "       
-                        + ", sColorCde "       
-                        + ", cRecdStat "       
-                        + ", sEntryByx "       
-                        + ", dEntryDte "       
-                        + ", sModified "       
-                        + ", dModified "       
-                        + "FROM vehicle_color "      
-                        + "WHERE 0=1 ";
+        String lsSQL =    " SELECT "       
+                        + "    sSectnIDx " 
+                        + "  , sSectnNme " 
+                        + "  , cRecdStat " 
+                        + "  , sModified " 
+                        + "  , dModified " 
+                        + " FROM section "       
+                        + " WHERE 0=1 ";
         
         //System.out.println(lsSQL);
         ResultSet loRS = instance.executeQuery(lsSQL);
         try {
-            if (MiscUtil.resultSet2XML(instance, loRS, System.getProperty("sys.default.path.metadata"), "vehicle_color", "")){
+            if (MiscUtil.resultSet2XML(instance, loRS, System.getProperty("sys.default.path.metadata"), "section", "")){
                 System.out.println("ResultSet exported.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+    
     
 }

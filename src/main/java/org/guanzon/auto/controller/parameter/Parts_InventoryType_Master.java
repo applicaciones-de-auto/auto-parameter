@@ -16,15 +16,14 @@ import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.iface.GRecord;
-import org.guanzon.auto.model.parameter.Model_Parts_Warehouse;
-import org.guanzon.auto.model.parameter.Model_Parts_Warehouse;
+import org.guanzon.auto.model.parameter.Model_Parts_Inventory_Type;
 import org.json.simple.JSONObject;
 
 /**
  *
  * @author Arsiela
  */
-public class Parts_Warehouse_Master implements GRecord {
+public class Parts_InventoryType_Master implements GRecord {
 
     GRider poGRider;
     boolean pbWtParent;
@@ -32,16 +31,16 @@ public class Parts_Warehouse_Master implements GRecord {
     String psBranchCd;
     String psRecdStat;
 
-    Model_Parts_Warehouse poModel;
+    Model_Parts_Inventory_Type poModel;
     JSONObject poJSON;
     
 
-    public Parts_Warehouse_Master(GRider foGRider, boolean fbWthParent, String fsBranchCd) {
+    public Parts_InventoryType_Master(GRider foGRider, boolean fbWthParent, String fsBranchCd) {
         poGRider = foGRider;
         pbWtParent = fbWthParent;
         psBranchCd = fsBranchCd.isEmpty() ? foGRider.getBranchCode() : fsBranchCd;
 
-        poModel = new Model_Parts_Warehouse(foGRider);
+        poModel = new Model_Parts_Inventory_Type(foGRider);
         pnEditMode = EditMode.UNKNOWN;
     }
 
@@ -82,11 +81,11 @@ public class Parts_Warehouse_Master implements GRecord {
             pnEditMode = EditMode.ADDNEW;
             org.json.simple.JSONObject obj;
 
-            poModel = new Model_Parts_Warehouse(poGRider);
+            poModel = new Model_Parts_Inventory_Type(poGRider);
             Connection loConn = null;
             loConn = setConnection();
             poModel.newRecord();
-            poModel.setWHouseID(MiscUtil.getNextCode(poModel.getTable(), "sWHouseID", false, loConn, psBranchCd));
+            poModel.setInvTypCd(MiscUtil.getNextCode(poModel.getTable(), "sInvTypCd", false, loConn, ""));
             
             if (poModel == null){
                 poJSON.put("result", "error");
@@ -122,7 +121,7 @@ public class Parts_Warehouse_Master implements GRecord {
         pnEditMode = EditMode.READY;
         poJSON = new JSONObject();
         
-        poModel = new Model_Parts_Warehouse(poGRider);
+        poModel = new Model_Parts_Inventory_Type(poGRider);
         poJSON = poModel.openRecord(fsValue);
         
         if("error".equals(poJSON.get("result"))){
@@ -156,7 +155,6 @@ public class Parts_Warehouse_Master implements GRecord {
         if (!pbWtParent) poGRider.beginTrans();
         
         poJSON = poModel.saveRecord();
-
         if ("success".equals((String) poJSON.get("result"))) {
             if (!pbWtParent) {poGRider.commitTrans();}
         } else {
@@ -237,25 +235,26 @@ public class Parts_Warehouse_Master implements GRecord {
     @Override
     public JSONObject searchRecord(String fsValue, boolean fbByActive) {
         String lsSQL =    " SELECT "        
-                        + "    sWHouseID "  
-                        + "  , sWHouseNm "  
+                        + "    sInvTypCd "  
+                        + "  , sDescript "  
+                        + "  , sItemType "  
                         + "  , cRecdStat "  
-                        + " FROM warehouse "       ;
+                        + " FROM inv_type "   ;
         
         if(fbByActive){
-            lsSQL = MiscUtil.addCondition(lsSQL,  " sWHouseNm LIKE " + SQLUtil.toSQL(fsValue + "%")
+            lsSQL = MiscUtil.addCondition(lsSQL,  " sDescript LIKE " + SQLUtil.toSQL(fsValue + "%")
                                                     + " AND cRecdStat = '1' ");
         } else {
-            lsSQL = MiscUtil.addCondition(lsSQL,  " sWHouseNm LIKE " + SQLUtil.toSQL(fsValue + "%"));
+            lsSQL = MiscUtil.addCondition(lsSQL,  " sDescript LIKE " + SQLUtil.toSQL(fsValue + "%"));
         }
         
-        System.out.println("SEARCH WAREHOUSE: " + lsSQL);
+        System.out.println("SEARCH INVENTORY TYPE: " + lsSQL);
         poJSON = ShowDialogFX.Search(poGRider,
                 lsSQL,
                 fsValue,
                 "ID»Description",
-                "sWHouseID»sWHouseNm",
-                "sWHouseID»sWHouseNm",
+                "sInvTypCd»sDescript",
+                "sInvTypCd»sDescript",
                 1);
 
         if (poJSON != null) {
@@ -270,7 +269,7 @@ public class Parts_Warehouse_Master implements GRecord {
     }
 
     @Override
-    public Model_Parts_Warehouse getModel() {
+    public Model_Parts_Inventory_Type getModel() {
         return poModel;
     }
     
@@ -278,24 +277,24 @@ public class Parts_Warehouse_Master implements GRecord {
         JSONObject jObj = new JSONObject();
         try {
             
-            if(poModel.getWHouseID()== null){
+            if(poModel.getInvTypCd()== null){
                 jObj.put("result", "error");
                 jObj.put("message", "ID cannot be Empty.");
                 return jObj;
             } else {
-                if(poModel.getWHouseID().trim().isEmpty()){
+                if(poModel.getInvTypCd().trim().isEmpty()){
                     jObj.put("result", "error");
                     jObj.put("message", "ID cannot be Empty.");
                     return jObj;
                 }
             }
             
-            if(poModel.getWHouseNm()== null){
+            if(poModel.getDescript()== null){
                 jObj.put("result", "error");
                 jObj.put("message", "Description cannot be Empty.");
                 return jObj;
             } else {
-                if(poModel.getWHouseNm().trim().isEmpty()){
+                if(poModel.getDescript().trim().isEmpty()){
                     jObj.put("result", "error");
                     jObj.put("message", "Description cannot be Empty.");
                     return jObj;
@@ -305,50 +304,71 @@ public class Parts_Warehouse_Master implements GRecord {
             String lsID = "";
             String lsDesc  = "";
             String lsSQL = poModel.getSQL();
-            lsSQL = MiscUtil.addCondition(lsSQL, "REPLACE(sWHouseNm,' ','') = " + SQLUtil.toSQL(poModel.getWHouseNm().replace(" ",""))) +
-                                                    " AND sWHouseID <> " + SQLUtil.toSQL(poModel.getWHouseID()) ;
-            System.out.println("EXISTING WAREHOUSE CHECK: " + lsSQL);
+            lsSQL = MiscUtil.addCondition(lsSQL, "REPLACE(sDescript,' ','') = " + SQLUtil.toSQL(poModel.getDescript().replace(" ",""))) +
+                                                    " AND sInvTypCd <> " + SQLUtil.toSQL(poModel.getInvTypCd()) ;
+            System.out.println("EXISTING INVENTORY TYPE CHECK: " + lsSQL);
             ResultSet loRS = poGRider.executeQuery(lsSQL);
 
             if (MiscUtil.RecordCount(loRS) > 0){
                     while(loRS.next()){
-                        lsID = loRS.getString("sWHouseID");
-                        lsDesc = loRS.getString("sWHouseNm");
+                        lsID = loRS.getString("sInvTypCd");
+                        lsDesc = loRS.getString("sDescript");
                     }
                     
                     MiscUtil.close(loRS);
                     
                     jObj.put("result", "error");
-                    jObj.put("message", "Existing Warehouse Description Record.\n\nWarehouse ID: " + lsID + "\nDescription: " + lsDesc.toUpperCase() );
+                    jObj.put("message", "Existing Inventory Type Description Record.\n\nID: " + lsID + "\nDescription: " + lsDesc.toUpperCase() );
                     return jObj;
             }
             
             lsID = "";
-            lsSQL =   " SELECT "                                      
-                    + "    a.sLocatnID "                              
-                    + "  , a.sLocatnDs "                              
-                    + "  , a.sWHouseID "                              
-                    + "  , a.sSectnIDx "                              
-                    + "  , a.sBinIDxxx "                              
-                    + "  , a.cRecdStat "                              
-                    + "  , b.sWHouseNm "                              
-                    + " FROM item_location a "                        
-                    + " LEFT JOIN warehouse b ON b.sWHouseID = a.sWHouseID ";
             //Deactivation Validation
             if(poModel.getRecdStat().equals("0")){
-                lsSQL = MiscUtil.addCondition(lsSQL, " a.sWHouseID = " + SQLUtil.toSQL(poModel.getWHouseID())) ;
-                System.out.println("EXISTING USAGE OF WAREHOUSE: " + lsSQL);
+                lsSQL =   " SELECT "                                      
+                        + "    a.sBrandCde "                              
+                        + "  , a.sDescript "                              
+                        + "  , a.sInvTypCd "                              
+                        + "  , b.sDescript "                              
+                        + " FROM brand a "                        
+                        + " LEFT JOIN inv_type b ON b.sInvTypCd = a.sInvTypCd ";
+                lsSQL = MiscUtil.addCondition(lsSQL, " a.sInvTypCd = " + SQLUtil.toSQL(poModel.getInvTypCd())) ;
+                System.out.println("EXISTING USAGE OF INVENTORY TYPE IN BRAND: " + lsSQL);
                 loRS = poGRider.executeQuery(lsSQL);
 
                 if (MiscUtil.RecordCount(loRS) > 0){
                         while(loRS.next()){
-                            lsID = loRS.getString("sLocatnID");
+                            lsID = loRS.getString("sBrandCde");
                         }
 
                         MiscUtil.close(loRS);
 
                         jObj.put("result", "error");
-                        jObj.put("message", "Existing Warehouse Usage.\n\nLocation ID: " + lsID + "\nDeactivation aborted.");
+                        jObj.put("message", "Existing Inventory Type Usage.\n\nBrand ID: " + lsID + "\nDeactivation aborted.");
+                        return jObj;
+                }
+                
+                lsSQL =   " SELECT "                                      
+                        + "    a.sStockIDx "                              
+                        + "  , a.sBarCodex "                              
+                        + "  , a.sDescript "                              
+                        + "  , a.sInvTypCd "                             
+                        + "  , b.sDescript "                              
+                        + " FROM inventory a "                        
+                        + " LEFT JOIN inv_type b ON b.sInvTypCd = a.sInvTypCd ";
+                lsSQL = MiscUtil.addCondition(lsSQL, " a.sInvTypCd = " + SQLUtil.toSQL(poModel.getInvTypCd())) ;
+                System.out.println("EXISTING USAGE OF INVENTORY TYPE IN INVENTORY: " + lsSQL);
+                loRS = poGRider.executeQuery(lsSQL);
+
+                if (MiscUtil.RecordCount(loRS) > 0){
+                        while(loRS.next()){
+                            lsID = loRS.getString("sBarCodex");
+                        }
+
+                        MiscUtil.close(loRS);
+
+                        jObj.put("result", "error");
+                        jObj.put("message", "Existing Inventory Type Usage.\n\nBarcode : " + lsID + "\nDeactivation aborted.");
                         return jObj;
                 }
             }
@@ -356,38 +376,62 @@ public class Parts_Warehouse_Master implements GRecord {
             if(pnEditMode == EditMode.UPDATE){
                 lsID = "";
                 lsSQL =   " SELECT "                                      
-                        + "    a.sLocatnID "                              
-                        + "  , a.sLocatnDs "                              
-                        + "  , a.sWHouseID "                              
-                        + "  , a.sSectnIDx "                              
-                        + "  , a.sBinIDxxx "                              
-                        + "  , a.cRecdStat "                              
-                        + "  , b.sWHouseNm "                              
-                        + " FROM item_location a "                        
-                        + " LEFT JOIN warehouse b ON b.sWHouseID = a.sWHouseID ";
-                
-                lsSQL = MiscUtil.addCondition(lsSQL, " a.sWHouseID = " + SQLUtil.toSQL(poModel.getWHouseID()) 
-                                                        + " AND REPLACE(b.sWHouseNm, ' ','') <> " + SQLUtil.toSQL(poModel.getWHouseNm().replace(" ", ""))  
+                        + "    a.sBrandCde "                              
+                        + "  , a.sDescript "                              
+                        + "  , a.sInvTypCd "                              
+                        + "  , b.sDescript "                              
+                        + " FROM brand a "                        
+                        + " LEFT JOIN inv_type b ON b.sInvTypCd = a.sInvTypCd ";
+                lsSQL = MiscUtil.addCondition(lsSQL, " a.sInvTypCd = " + SQLUtil.toSQL(poModel.getInvTypCd()) 
+                                                        + " AND REPLACE(b.sDescript, ' ','') <> " + SQLUtil.toSQL(poModel.getDescript().replace(" ", ""))  
                                                         //+ " AND a.cRecdStat = '1'"
                                                         ) ;
-                System.out.println("ITEM LOCATION: EXISTING USAGE OF WAREHOUSE: " + lsSQL);
+                System.out.println("BRAND: EXISTING USAGE OF INVENTORY TYPE: " + lsSQL);
                 loRS = poGRider.executeQuery(lsSQL);
 
                 if (MiscUtil.RecordCount(loRS) > 0){
                         while(loRS.next()){
-                            lsID = loRS.getString("sLocatnID");
+                            lsID = loRS.getString("sBrandCde");
                         }
 
                         MiscUtil.close(loRS);
                         
                         jObj.put("result", "error");
-                        jObj.put("message", "Existing Warehouse Usage.\n\nLocation ID: " + lsID + "\nChanging of warehouse description aborted.");
+                        jObj.put("message", "Existing Inventory Type Usage.\n\nBrand ID : " + lsID + "\nChanging of inventory type description aborted.");
+                        return jObj;
+                }
+                
+                lsID = "";
+                lsSQL =   " SELECT "                                      
+                        + "    a.sStockIDx "                              
+                        + "  , a.sBarCodex "                              
+                        + "  , a.sDescript "                              
+                        + "  , a.sInvTypCd "                             
+                        + "  , b.sDescript "                              
+                        + " FROM inventory a "                        
+                        + " LEFT JOIN inv_type b ON b.sInvTypCd = a.sInvTypCd ";
+                lsSQL = MiscUtil.addCondition(lsSQL, " a.sInvTypCd = " + SQLUtil.toSQL(poModel.getInvTypCd()) 
+                                                        + " AND REPLACE(b.sDescript, ' ','') <> " + SQLUtil.toSQL(poModel.getDescript().replace(" ", ""))  
+                                                        //+ " AND a.cRecdStat = '1'"
+                                                        ) ;
+                System.out.println("INVENTORY: EXISTING USAGE OF INVENTORY TYPE: " + lsSQL);
+                loRS = poGRider.executeQuery(lsSQL);
+
+                if (MiscUtil.RecordCount(loRS) > 0){
+                        while(loRS.next()){
+                            lsID = loRS.getString("sBarCodex");
+                        }
+
+                        MiscUtil.close(loRS);
+                        
+                        jObj.put("result", "error");
+                        jObj.put("message", "Existing Inventory Type Usage.\n\nBarcode : " + lsID + "\nChanging of inventory type description aborted.");
                         return jObj;
                 }
             }
         
         } catch (SQLException ex) {
-            Logger.getLogger(Parts_Warehouse_Master.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Parts_InventoryType_Master.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         jObj.put("result", "success");
