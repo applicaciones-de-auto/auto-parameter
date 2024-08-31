@@ -75,7 +75,7 @@ public class PartsBrandTest {
 //        
 //        json = model.newRecord();
 //        if ("success".equals((String) json.get("result"))){
-//            json = model.setMaster("sDescript","TEST BRAND");
+//            json = model.getModel().getModel().setDescript("TEST BRAND");
 //            if ("error".equals((String) json.get("result"))){
 //                System.err.println((String) json.get("message"));
 //                System.exit(1);
@@ -87,7 +87,7 @@ public class PartsBrandTest {
 //        }
 //        
 //    }
-//    
+    
 //    @Test
 //    public void test01NewRecordSave(){
 //        System.out.println("--------------------------------------------------------------------");
@@ -122,13 +122,13 @@ public class PartsBrandTest {
 //            System.out.println("--------------------------------------------------------------------");
 //            System.out.println("PARTS BRAND");
 //            System.out.println("--------------------------------------------------------------------");
-//            System.out.println("sBrandCde  :  " + model.getMaster("sBrandCde"));
-//            System.out.println("sInvTypCd  :  " + model.getMaster("sInvTypCd"));
-//            System.out.println("sDescript  :  " + model.getMaster("sDescript"));
-//            System.out.println("cRecdStat  :  " + model.getMaster("cRecdStat"));
-//            System.out.println("sModified  :  " + model.getMaster("sModified"));
-//            System.out.println("dModified  :  " + model.getMaster("dModified"));
-//            System.out.println("sInvTypDs  :  " + model.getMaster("sInvTypDs"));
+//            System.out.println("sBrandCde  :  " + model.getModel().getModel().getBrandCde());
+//            System.out.println("sInvTypCd  :  " + model.getModel().getModel().getInvTypCd()); //("sInvTypCd"));
+//            System.out.println("sDescript  :  " + model.getModel().getModel().getDescript()); //("sDescript"));
+//            System.out.println("cRecdStat  :  " + model.getModel().getModel().getRecdStat()); //("cRecdStat"));
+//            System.out.println("sModified  :  " + model.getModel().getModel().getModified()); //("sModified"));
+//            System.out.println("dModified  :  " + model.getModel().getModel().getModifiedDte()); //("dModified"));
+//            System.out.println("sInvTypDs  :  " + model.getModel().getModel().getInvTypDs()); //("sInvTypDs"));
 //            
 //            result = true;
 //        }
@@ -151,7 +151,7 @@ public class PartsBrandTest {
 //            result = true;
 //        }
 //        
-//        json = model.setMaster("sInvTypCd","0001");
+//        json = model.getModel().getModel().setInvTypDs("0001"); //model.setMaster("sInvTypCd","0001");
 //        if ("error".equals((String) json.get("result"))){
 //            System.err.println((String) json.get("message"));
 //            System.exit(1);
