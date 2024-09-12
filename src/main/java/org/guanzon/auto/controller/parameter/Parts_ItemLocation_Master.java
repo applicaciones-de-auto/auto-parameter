@@ -317,29 +317,29 @@ public class Parts_ItemLocation_Master implements GRecord {
                 }
             }
             
-//            if(poModel.getSectnID()== null){
-//                jObj.put("result", "error");
-//                jObj.put("message", "Section cannot be Empty.");
-//                return jObj;
-//            } else {
-//                if(poModel.getSectnID().trim().isEmpty()){
-//                    jObj.put("result", "error");
-//                    jObj.put("message", "Section cannot be Empty.");
-//                    return jObj;
-//                }
-//            }
-//            
-//            if(poModel.getBinID()== null){
-//                jObj.put("result", "error");
-//                jObj.put("message", "Bin cannot be Empty.");
-//                return jObj;
-//            } else {
-//                if(poModel.getBinID().trim().isEmpty()){
-//                    jObj.put("result", "error");
-//                    jObj.put("message", "Bin cannot be Empty.");
-//                    return jObj;
-//                }
-//            }
+            if(poModel.getSectnID()== null){
+                jObj.put("result", "error");
+                jObj.put("message", "Section cannot be Empty.");
+                return jObj;
+            } else {
+                if(poModel.getSectnID().trim().isEmpty()){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Section cannot be Empty.");
+                    return jObj;
+                }
+            }
+            
+            if(poModel.getBinID()== null){
+                jObj.put("result", "error");
+                jObj.put("message", "Bin cannot be Empty.");
+                return jObj;
+            } else {
+                if(poModel.getBinID().trim().isEmpty()){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Bin cannot be Empty.");
+                    return jObj;
+                }
+            }
             
             String lsID = "";
             String lsDesc  = "";

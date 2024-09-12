@@ -301,6 +301,18 @@ public class Parts_InventoryCategory_Master implements GRecord {
                     return jObj;
                 }
             }
+            
+            if(poModel.getInvTypCd()== null){
+                jObj.put("result", "error");
+                jObj.put("message", "Inventory Type cannot be Empty.");
+                return jObj;
+            } else {
+                if(poModel.getInvTypCd().trim().isEmpty()){
+                    jObj.put("result", "error");
+                    jObj.put("message", "Inventory Type cannot be Empty.");
+                    return jObj;
+                }
+            }
 
             String lsID = "";
             String lsDesc  = "";
