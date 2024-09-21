@@ -35,7 +35,7 @@ public class PartsBrand {
 
         System.out.println("Connected");
         
-        System.setProperty("sys.default.path.metadata", "D:/GGC_Maven_Systems/config/metadata/Model_Parts_Brands.xml");
+        System.setProperty("sys.default.path.metadata", "D:/GGC_Maven_Systems/config/metadata/Model_Parts_Brand.xml");
         
         String lsSQL =    " SELECT "       
                         + "    a.sBrandCde " 
