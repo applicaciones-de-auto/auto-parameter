@@ -86,7 +86,7 @@ public class Address_Province_Master implements GRecord {
             Connection loConn = null;
             loConn = setConnection();
             poModel.newRecord();
-            poModel.setProvID(MiscUtil.getNextCode(poModel.getTable(), "sProvIDxx", false, loConn, ""));
+            poModel.setProvID(MiscUtil.getNextCode(poModel.getTable(), "LPAD(sProvIDxx, 4,'0')", false, loConn, ""));
             
             if (poModel == null){
                 poJSON.put("result", "error");

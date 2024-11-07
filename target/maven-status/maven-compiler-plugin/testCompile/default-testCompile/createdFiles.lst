@@ -3,6 +3,7 @@ VehicleModelFramePatternTest.class
 Test_Vehicle_Color.class
 PartsSectionTest.class
 VehicleColorTest.class
+AddressProvinceTest.class
 BankBranchTest.class
 BankTest.class
 PartsInventoryTypeTest.class
@@ -17,6 +18,7 @@ PartsBrandTest.class
 ActivitySourceTest.class
 InsuranceTest.class
 PartsWarehouseTest.class
+ServiceLaborTest.class
 VehicleMakeFramePatternTest.class
 PartsMeasureTest.class
 InsuranceBranchTest.class

@@ -1,5 +1,6 @@
 
 import org.guanzon.appdriver.base.GRider;
+import org.guanzon.auto.main.parameter.Address_Barangay;
 import org.guanzon.auto.main.parameter.Bank;
 import org.json.simple.JSONObject;
 import org.junit.AfterClass;
@@ -21,13 +22,13 @@ import org.junit.runners.MethodSorters;
  * @author Arsiela
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class BankTest {
+public class AddressBarangayTest {
     
-    static Bank model;
+    static Address_Barangay model;
     JSONObject json;
     boolean result;
     
-    public BankTest(){}
+    public AddressBarangayTest(){}
     
     @BeforeClass
     public static void setUpClass() {   
@@ -53,7 +54,7 @@ public class BankTest {
         JSONObject json;
         
         System.out.println("sBranch code = " + instance.getBranchCode());
-        model = new Bank(instance,false, instance.getBranchCode());
+        model = new Address_Barangay(instance,false, instance.getBranchCode());
     }
     
     @AfterClass
@@ -64,7 +65,7 @@ public class BankTest {
     /**
      * COMMENTED TESTING TO CLEAN AND BUILD PROPERLY
      * WHEN YOU WANT TO CHECK KINDLY UNCOMMENT THE TESTING CASES (@Test).
-     * ARSIELA 07-29-2024
+     * ARSIELA 
      */
     
 //    @Test
@@ -75,7 +76,22 @@ public class BankTest {
 //        
 //        json = model.newRecord();
 //        if ("success".equals((String) json.get("result"))){
-//            json = model.setMaster("sBankName","BANCO DE ORO");
+//            json = model.getModel().getModel().setProvID("0105");
+//            if ("error".equals((String) json.get("result"))){
+//                System.err.println((String) json.get("message"));
+//                System.exit(1);
+//            }
+//            json = model.getModel().getModel().setTownID("1640");
+//            if ("error".equals((String) json.get("result"))){
+//                System.err.println((String) json.get("message"));
+//                System.exit(1);
+//            }
+//            json = model.getModel().getModel().setZippCode("9991");
+//            if ("error".equals((String) json.get("result"))){
+//                System.err.println((String) json.get("message"));
+//                System.exit(1);
+//            }
+//            json = model.getModel().getModel().setBrgyName("TEST CASE BRGY");
 //            if ("error".equals((String) json.get("result"))){
 //                System.err.println((String) json.get("message"));
 //                System.exit(1);
@@ -114,28 +130,32 @@ public class BankTest {
 //        System.out.println("------------------------------RETRIEVAL--------------------------------------");
 //        System.out.println("--------------------------------------------------------------------");
 //        
-//        json = model.openRecord("M00124000001");
+//        json = model.openRecord("2400004");
 //        
 //        if (!"success".equals((String) json.get("result"))){
 //            result = false;
 //        } else {
 //            System.out.println("--------------------------------------------------------------------");
-//            System.out.println("BANK MASTER");
+//            System.out.println("ADDRESS BARANGAY");
 //            System.out.println("--------------------------------------------------------------------");
-//            System.out.println("sBankIDxx  :  " + model.getMaster("sBankIDxx"));
-//            System.out.println("sBankName  :  " + model.getMaster("sBankName"));
-//            System.out.println("sBankCode  :  " + model.getMaster("sBankCode"));
-//            System.out.println("sBankType  :  " + model.getMaster("sBankType"));
-//            System.out.println("cRecdStat  :  " + model.getMaster("cRecdStat"));
-//            System.out.println("sModified  :  " + model.getMaster("sModified"));
-//            System.out.println("dModified  :  " + model.getMaster("dModified"));
+//            System.out.println("sBrgyIDxx  :  " + model.getModel().getModel().getBrgyID());
+//            System.out.println("sBrgyName  :  " + model.getModel().getModel().getBrgyName());
+//            System.out.println("sTownIDxx  :  " + model.getModel().getModel().getTownID());
+//            System.out.println("sTownName  :  " + model.getModel().getModel().getTownName());
+//            System.out.println("sZippCode  :  " + model.getModel().getModel().getZippCode());
+//            System.out.println("sProvIDxx  :  " + model.getModel().getModel().getProvID());
+//            System.out.println("cHasRoute  :  " + model.getModel().getModel().getHasRoute());
+//            System.out.println("cBlackLst  :  " + model.getModel().getModel().getBlackLst());
+//            System.out.println("cRecdStat  :  " + model.getModel().getModel().getRecdStat());
+//            System.out.println("sModified  :  " + model.getModel().getModel().getModified());
+//            System.out.println("dModified  :  " + model.getModel().getModel().getModifiedDte());
 //            
 //            result = true;
 //        }
 //        assertTrue(result);
 //    }
-//    
-//    
+    
+    
 //    @Test
 //    public void test03UpdateRecord(){
 //        System.out.println("--------------------------------------------------------------------");
@@ -151,7 +171,7 @@ public class BankTest {
 //            result = true;
 //        }
 //        
-//        json = model.setMaster("sBankType","bank");
+//        json = model.setMaster("sBrgyName","TEST CASE BRGY EDIT");
 //        if ("error".equals((String) json.get("result"))){
 //            System.err.println((String) json.get("message"));
 //            System.exit(1);
@@ -187,7 +207,7 @@ public class BankTest {
 //        System.out.println("------------------------------DEACTIVATE RECORD--------------------------------------");
 //        System.out.println("--------------------------------------------------------------------");
 //        
-//        json = model.deactivateRecord("M001BNK00001");
+//        json = model.deactivateRecord("2400004");
 //        System.err.println((String) json.get("message"));
 //        
 //        if (!"success".equals((String) json.get("result"))){
@@ -208,7 +228,7 @@ public class BankTest {
 //        System.out.println("------------------------------ACTIVATE RECORD--------------------------------------");
 //        System.out.println("--------------------------------------------------------------------");
 //        
-//        json = model.activateRecord("M001BNK00001");
+//        json = model.activateRecord("2400004");
 //        System.err.println((String) json.get("message"));
 //        
 //        if (!"success".equals((String) json.get("result"))){

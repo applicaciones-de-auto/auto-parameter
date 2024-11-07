@@ -88,7 +88,7 @@ public class Address_Barangay_Master implements GRecord {
             Connection loConn = null;
             loConn = setConnection();
             poModel.newRecord();
-            poModel.setBrgyID(MiscUtil.getNextCode(poModel.getTable(), "sBrgyIDxx", false, loConn, ""));
+            poModel.setBrgyID(MiscUtil.getNextCode(poModel.getTable(), "sBrgyIDxx", false, loConn, String.valueOf(poGRider.getServerDate().toLocalDateTime().getYear()).substring(2, 4) ));
             
             if (poModel == null){
                 poJSON.put("result", "error");
@@ -311,18 +311,6 @@ public class Address_Barangay_Master implements GRecord {
                 }
             }
             
-            if(poModel.getTownName()== null){
-                jObj.put("result", "error");
-                jObj.put("message", "Town Name cannot be Empty.");
-                return jObj;
-            } else {
-                if(poModel.getTownName().trim().isEmpty()){
-                    jObj.put("result", "error");
-                    jObj.put("message", "Town Name cannot be Empty.");
-                    return jObj;
-                }
-            }
-
             String lsID = "";
             String lsDesc  = "";
             String lsSQL = poModel.getSQL();

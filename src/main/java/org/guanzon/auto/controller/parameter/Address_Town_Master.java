@@ -312,9 +312,11 @@ public class Address_Town_Master implements GRecord {
 
             String lsID = "";
             String lsDesc  = "";
-            String lsSQL = poModel.getSQL();
-            lsSQL = MiscUtil.addCondition(lsSQL, "REPLACE(a.sTownName,' ','') = " + SQLUtil.toSQL(poModel.getTownName().replace(" ",""))) +
-                                                    " AND a.sTownIDxx <> " + SQLUtil.toSQL(poModel.getTownID()) ;
+            String lsAddDesc = "";
+            String lsSQL = poModel.makeSelectSQL();
+            lsSQL = MiscUtil.addCondition(lsSQL, "REPLACE(sTownName,' ','') = " + SQLUtil.toSQL(poModel.getTownName().replace(" ",""))) 
+                                                    + " AND sProvIDxx = " + SQLUtil.toSQL(poModel.getProvID()) 
+                                                    + " AND sTownIDxx <> " + SQLUtil.toSQL(poModel.getTownID()) ;
             System.out.println("EXISTING TOWN CHECK: " + lsSQL);
             ResultSet loRS = poGRider.executeQuery(lsSQL);
 
@@ -328,6 +330,26 @@ public class Address_Town_Master implements GRecord {
                     
                     jObj.put("result", "error");
                     jObj.put("message", "Existing Town Record.\n\nTown ID: " + lsID + "\nTown Name: " + lsDesc.toUpperCase() );
+                    return jObj;
+            }
+            //Validate exisiting zippcode
+            lsSQL = poModel.getSQL();
+            lsSQL = MiscUtil.addCondition(lsSQL, "a.sZippCode = " + SQLUtil.toSQL(poModel.getZippCode())) +
+                                                    " AND a.sTownIDxx <> " + SQLUtil.toSQL(poModel.getTownID()) ;
+            System.out.println("EXISTING ZIPPCODE CHECK: " + lsSQL);
+            loRS = poGRider.executeQuery(lsSQL);
+
+            if (MiscUtil.RecordCount(loRS) > 0){
+                    while(loRS.next()){
+                        lsID = loRS.getString("sTownIDxx");
+                        lsDesc = loRS.getString("sTownName");
+                        lsAddDesc = loRS.getString("sProvName");
+                    }
+                    
+                    MiscUtil.close(loRS);
+                    
+                    jObj.put("result", "error");
+                    jObj.put("message", "Existing Zippcode Record.\n\nTown ID: " + lsID + "\nTown Name: " + lsDesc.toUpperCase() + "\nProvince Name: " + lsAddDesc.toUpperCase() );
                     return jObj;
             }
             
