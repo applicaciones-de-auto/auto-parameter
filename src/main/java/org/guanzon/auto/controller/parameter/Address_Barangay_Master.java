@@ -88,7 +88,9 @@ public class Address_Barangay_Master implements GRecord {
             Connection loConn = null;
             loConn = setConnection();
             poModel.newRecord();
-            poModel.setBrgyID(MiscUtil.getNextCode(poModel.getTable(), "sBrgyIDxx", false, loConn, String.valueOf(poGRider.getServerDate().toLocalDateTime().getYear()).substring(2, 4) ));
+//            poModel.setBrgyID(MiscUtil.getNextCode(poModel.getTable(), "sBrgyIDxx", false, loConn, String.valueOf(poGRider.getServerDate().toLocalDateTime().getYear()).substring(2, 4) ));
+            
+            poModel.setBrgyID(MiscUtil.getNextCode(poModel.getTable(), "sBrgyIDxx", true, loConn, "" ));
             
             if (poModel == null){
                 poJSON.put("result", "error");
