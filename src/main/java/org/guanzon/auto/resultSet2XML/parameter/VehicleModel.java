@@ -43,7 +43,7 @@ public class VehicleModel {
                         + ", a.sMakeIDxx "                                          
                         + ", a.sUnitType "                                          
                         + ", a.sBodyType "                                          
-                        + ", a.cVhclSize "                                          
+//                        + ", a.cVhclSize "                                          
                         + ", a.sModelCde "                                          
                         + ", a.cRecdStat "                                          
                         + ", a.sEntryByx "                                          
