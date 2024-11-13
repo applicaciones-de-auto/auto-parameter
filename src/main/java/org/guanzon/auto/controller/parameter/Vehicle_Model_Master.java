@@ -230,7 +230,8 @@ public class Vehicle_Model_Master implements GRecord {
             lsSQL = MiscUtil.addCondition(lsSQL, " a.sModelDsc LIKE " + SQLUtil.toSQL(fsValue + "%") 
                                                 + " AND a.cRecdStat = '1' ");
         } else {
-            lsSQL = MiscUtil.addCondition(lsSQL, " a.sModelDsc LIKE " + SQLUtil.toSQL(fsValue + "%"));
+            lsSQL = MiscUtil.addCondition(lsSQL, " a.sModelDsc LIKE " + SQLUtil.toSQL(fsValue + "%")
+                                                + " AND a.sModelDsc <> 'COMMON' ");
         }
 
         System.out.println("SEARCH MODEL: " + lsSQL);
@@ -327,6 +328,25 @@ public class Vehicle_Model_Master implements GRecord {
                     
                     jObj.put("result", "error");
                     jObj.put("message", "Existing Model Description Record.\n\nModel ID: " + lsID + "\nDescription: " + lsDesc.toUpperCase() );
+                    return jObj;
+            }
+            
+            //Do not allow modification on COMMON vehicle model
+            lsSQL = MiscUtil.addCondition(poModel.makeSelectSQL(), " sModelIDx = " + SQLUtil.toSQL(poModel.getModelID())  
+                                                                    + " AND sModelDsc LIKE " + SQLUtil.toSQL("COMMON%")
+                                                    ) ;
+            System.out.println("'COMMON' VEHICLE MODEL: " + lsSQL);
+            loRS = poGRider.executeQuery(lsSQL);
+
+            if (MiscUtil.RecordCount(loRS) > 0){
+                    while(loRS.next()){
+                        lsDesc = loRS.getString("sModelDsc");
+                    }
+
+                    MiscUtil.close(loRS);
+                    
+                    jObj.put("result", "error");
+                    jObj.put("message", "Modifying of Vehicle Model `"+lsDesc+"` is not allowed.\nContact System Administrator.\n\nSaving aborted.");
                     return jObj;
             }
             
