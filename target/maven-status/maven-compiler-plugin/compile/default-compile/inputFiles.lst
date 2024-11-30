@@ -29,6 +29,7 @@ D:\Guanzon\GMC SEG Folder - Maven\auto-parameter\src\main\java\org\guanzon\auto\
 D:\Guanzon\GMC SEG Folder - Maven\auto-parameter\src\main\java\org\guanzon\auto\main\parameter\Vehicle_Type.java
 D:\Guanzon\GMC SEG Folder - Maven\auto-parameter\src\main\java\org\guanzon\auto\resultSet2XML\parameter\BankMaster.java
 D:\Guanzon\GMC SEG Folder - Maven\auto-parameter\src\main\java\org\guanzon\auto\resultSet2XML\parameter\VehicleModelEnginePattern.java
+D:\Guanzon\GMC SEG Folder - Maven\auto-parameter\src\main\java\org\guanzon\auto\main\parameter\DefaultReleasedItems_Checklist.java
 D:\Guanzon\GMC SEG Folder - Maven\auto-parameter\src\main\java\org\guanzon\auto\controller\parameter\Parts_Warehouse_Master.java
 D:\Guanzon\GMC SEG Folder - Maven\auto-parameter\src\main\java\org\guanzon\auto\controller\parameter\Bank_Branches.java
 D:\Guanzon\GMC SEG Folder - Maven\auto-parameter\src\main\java\org\guanzon\auto\main\parameter\Bank.java
@@ -58,6 +59,7 @@ D:\Guanzon\GMC SEG Folder - Maven\auto-parameter\src\main\java\org\guanzon\auto\
 D:\Guanzon\GMC SEG Folder - Maven\auto-parameter\src\main\java\org\guanzon\auto\resultSet2XML\parameter\BankBranches.java
 D:\Guanzon\GMC SEG Folder - Maven\auto-parameter\src\main\java\org\guanzon\auto\main\parameter\Parts_Bin.java
 D:\Guanzon\GMC SEG Folder - Maven\auto-parameter\src\main\java\org\guanzon\auto\main\parameter\Parts_Measure.java
+D:\Guanzon\GMC SEG Folder - Maven\auto-parameter\src\main\java\org\guanzon\auto\resultSet2XML\parameter\DefaultReleasedItemsChecklist.java
 D:\Guanzon\GMC SEG Folder - Maven\auto-parameter\src\main\java\org\guanzon\auto\resultSet2XML\parameter\VehicleMake.java
 D:\Guanzon\GMC SEG Folder - Maven\auto-parameter\src\main\java\org\guanzon\auto\controller\parameter\Vehicle_Model_Master.java
 D:\Guanzon\GMC SEG Folder - Maven\auto-parameter\src\main\java\org\guanzon\auto\resultSet2XML\parameter\VehicleColor.java
@@ -71,5 +73,6 @@ D:\Guanzon\GMC SEG Folder - Maven\auto-parameter\src\main\java\org\guanzon\auto\
 D:\Guanzon\GMC SEG Folder - Maven\auto-parameter\src\main\java\org\guanzon\auto\controller\parameter\Address_Town_Master.java
 D:\Guanzon\GMC SEG Folder - Maven\auto-parameter\src\main\java\org\guanzon\auto\controller\parameter\Parts_ItemLocation_Master.java
 D:\Guanzon\GMC SEG Folder - Maven\auto-parameter\src\main\java\org\guanzon\auto\resultSet2XML\parameter\AddressBarangay.java
+D:\Guanzon\GMC SEG Folder - Maven\auto-parameter\src\main\java\org\guanzon\auto\controller\parameter\Default_Released_Items_Checklist.java
 D:\Guanzon\GMC SEG Folder - Maven\auto-parameter\src\main\java\org\guanzon\auto\resultSet2XML\parameter\VehicleModelFramePattern.java
 D:\Guanzon\GMC SEG Folder - Maven\auto-parameter\src\main\java\org\guanzon\auto\main\parameter\InsuranceBranch.java

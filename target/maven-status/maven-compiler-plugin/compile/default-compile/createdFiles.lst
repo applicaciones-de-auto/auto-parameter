@@ -13,6 +13,7 @@ org\guanzon\auto\controller\parameter\Parts_Bin_Master.class
 org\guanzon\auto\main\parameter\Address_Barangay.class
 org\guanzon\auto\controller\parameter\Activity_Source_Master.class
 org\guanzon\auto\resultSet2XML\parameter\VehicleMake.class
+org\guanzon\auto\controller\parameter\Default_Released_Items_Checklist.class
 org\guanzon\auto\controller\parameter\Address_Province_Master.class
 org\guanzon\auto\main\parameter\Address_Province.class
 org\guanzon\auto\controller\parameter\Bank_Branches.class
@@ -20,6 +21,7 @@ org\guanzon\auto\resultSet2XML\parameter\VehicleModelEnginePattern.class
 org\guanzon\auto\controller\parameter\Insurance_Branches.class
 org\guanzon\auto\main\parameter\Parts_InventoryCategory.class
 org\guanzon\auto\resultSet2XML\parameter\PartsBin.class
+org\guanzon\auto\main\parameter\DefaultReleasedItems_Checklist.class
 org\guanzon\auto\controller\parameter\Service_Labor_Master.class
 org\guanzon\auto\resultSet2XML\parameter\PartsInventoryType.class
 org\guanzon\auto\main\parameter\InsuranceBranch.class
@@ -40,6 +42,7 @@ org\guanzon\auto\main\parameter\Vehicle_Make.class
 org\guanzon\auto\resultSet2XML\parameter\BankMaster.class
 org\guanzon\auto\controller\parameter\Address_Barangay_Master.class
 org\guanzon\auto\resultSet2XML\parameter\ActivitySource.class
+org\guanzon\auto\resultSet2XML\parameter\DefaultReleasedItemsChecklist.class
 org\guanzon\auto\controller\parameter\Parts_Section_Master.class
 org\guanzon\auto\main\parameter\Parts_InventoryType.class
 org\guanzon\auto\controller\parameter\Insurance_Master.class
