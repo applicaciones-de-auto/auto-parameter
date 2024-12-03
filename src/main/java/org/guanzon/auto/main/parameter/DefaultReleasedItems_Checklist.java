@@ -141,7 +141,7 @@ public class DefaultReleasedItems_Checklist implements GRecord {
         poJSON = new JSONObject();  
         poJSON = poController.searchRecord(fsValue, fbByActive);
         if(!"error".equals(poJSON.get("result"))){
-            poJSON = openRecord((String) poJSON.get("sDefaultReleasedItems_ChecklistIDxx"));
+            poJSON = openRecord((String) poJSON.get("sItemCode"));
         }
         return poJSON;
     }

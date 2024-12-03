@@ -227,7 +227,7 @@ public class Default_Released_Items_Checklist implements GRecord {
         
         if(fbByActive){
             lsSQL = MiscUtil.addCondition(lsSQL,  " sItemDesc LIKE " + SQLUtil.toSQL(fsValue + "%")
-                                                    + " AND cRecdStat = '1' ");
+                                                    + " AND cRecdStat = ") + SQLUtil.toSQL(RecordStatus.ACTIVE);
         } else {
             lsSQL = MiscUtil.addCondition(lsSQL,  " sItemDesc LIKE " + SQLUtil.toSQL(fsValue + "%"));
         }
