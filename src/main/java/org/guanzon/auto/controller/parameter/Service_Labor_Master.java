@@ -15,33 +15,33 @@ import org.guanzon.appdriver.base.GRider;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
+import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.appdriver.iface.GRecord;
-import org.guanzon.auto.model.parameter.Model_Vehicle_Model;
+import org.guanzon.auto.model.parameter.Model_Labor_Master;
+import org.guanzon.auto.model.sales.Model_VehicleSalesProposal_Labor;
+import org.guanzon.auto.model.service.Model_JobOrder_Labor;
 import org.json.simple.JSONObject;
 
 /**
  *
  * @author Arsiela
  */
-public class Vehicle_Model_Master implements GRecord {
-
+public class Service_Labor_Master implements GRecord {
     GRider poGRider;
     boolean pbWtParent;
     int pnEditMode;
     String psBranchCd;
     String psRecdStat;
 
-    Model_Vehicle_Model poModel;
-    
+    Model_Labor_Master poModel;
     JSONObject poJSON;
 
-    public Vehicle_Model_Master(GRider foGRider, boolean fbWthParent, String fsBranchCd) {
+    public Service_Labor_Master(GRider foGRider, boolean fbWthParent, String fsBranchCd) {
         poGRider = foGRider;
         pbWtParent = fbWthParent;
         psBranchCd = fsBranchCd.isEmpty() ? foGRider.getBranchCode() : fsBranchCd;
 
-
-        poModel = new Model_Vehicle_Model(foGRider);
+        poModel = new Model_Labor_Master(foGRider);
         pnEditMode = EditMode.UNKNOWN;
     }
 
@@ -82,10 +82,10 @@ public class Vehicle_Model_Master implements GRecord {
             pnEditMode = EditMode.ADDNEW;
             org.json.simple.JSONObject obj;
 
-            poModel = new Model_Vehicle_Model(poGRider);
+            poModel = new Model_Labor_Master(poGRider);
             Connection loConn = null;
             loConn = setConnection();
-            poModel.setModelID(MiscUtil.getNextCode(poModel.getTable(), "sModelIDx", false, loConn, psBranchCd+"MD"));
+            poModel.setLaborCde(MiscUtil.getNextCode(poModel.getTable(), "sLaborCde", true, loConn, psBranchCd));
             poModel.newRecord();
             
             if (poModel == null){
@@ -111,7 +111,7 @@ public class Vehicle_Model_Master implements GRecord {
         pnEditMode = EditMode.READY;
         poJSON = new JSONObject();
         
-        poModel = new Model_Vehicle_Model(poGRider);
+        poModel = new Model_Labor_Master(poGRider);
         poJSON = poModel.openRecord(fsValue);
         
         if("error".equals(poJSON.get("result"))){
@@ -136,6 +136,7 @@ public class Vehicle_Model_Master implements GRecord {
 
     @Override
     public JSONObject saveRecord() {
+        
         poJSON = validateEntry();
         if ("error".equals((String) poJSON.get("result"))) {
             return poJSON;
@@ -227,20 +228,19 @@ public class Vehicle_Model_Master implements GRecord {
         String lsSQL = poModel.getSQL();
         
         if(fbByActive){
-            lsSQL = MiscUtil.addCondition(lsSQL, " a.sModelDsc LIKE " + SQLUtil.toSQL(fsValue + "%") 
-                                                + " AND a.cRecdStat = '1' ");
+            lsSQL = MiscUtil.addCondition(lsSQL, " sLaborDsc LIKE " + SQLUtil.toSQL(fsValue + "%") 
+                                                + " AND cRecdStat = " + SQLUtil.toSQL(RecordStatus.ACTIVE));
         } else {
-            lsSQL = MiscUtil.addCondition(lsSQL, " a.sModelDsc LIKE " + SQLUtil.toSQL(fsValue + "%")
-                                                + " AND a.sModelDsc <> 'COMMON' ");
+            lsSQL = MiscUtil.addCondition(lsSQL, " sLaborDsc LIKE " + SQLUtil.toSQL(fsValue + "%"));
         }
-
-        System.out.println("SEARCH MODEL: " + lsSQL);
+        
+        System.out.println("SEARCH LABOR: " + lsSQL);
         poJSON = ShowDialogFX.Search(poGRider,
                 lsSQL,
                 fsValue,
-                "Model ID»Model Description»Make",
-                "sModelIDx»sModelDsc»sMakeDesc",
-                "a.sModelIDx»a.sModelDsc»b.sMakeDesc",
+                "ID»Description",
+                "sLaborCde»sLaborDsc",
+                "sLaborCde»sLaborDsc",
                 1);
 
         if (poJSON != null) {
@@ -255,7 +255,7 @@ public class Vehicle_Model_Master implements GRecord {
     }
 
     @Override
-    public Model_Vehicle_Model getModel() {
+    public Model_Labor_Master getModel() {
         return poModel;
     }
     
@@ -273,39 +273,20 @@ public class Vehicle_Model_Master implements GRecord {
     private JSONObject validateEntry(){
         JSONObject jObj = new JSONObject();
         try {
-            
-            if(poModel.getMakeID() == null){
+            if(poModel.getLaborCde().isEmpty()){
                 jObj.put("result", "error");
-                jObj.put("message", "Make cannot be Empty.");
+                jObj.put("message", "Labor ID cannot be Empty.");
                 return jObj;
-            } else {
-                if(poModel.getMakeID().trim().isEmpty()){
-                    jObj.put("result", "error");
-                    jObj.put("message", "Make cannot be Empty.");
-                    return jObj;
-                }
             }
             
-            if(poModel.getModelID() == null){
-                jObj.put("result", "error");
-                jObj.put("message", "Model cannot be Empty.");
-                return jObj;
-            } else {
-                if(poModel.getModelID().trim().isEmpty()){
+            if(poModel.getLaborDsc() == null){
                     jObj.put("result", "error");
-                    jObj.put("message", "Model cannot be Empty.");
+                    jObj.put("message", "Labor Description cannot be Empty.");
                     return jObj;
-                }
-            }
-            
-            if(poModel.getModelDsc() == null){
-                jObj.put("result", "error");
-                jObj.put("message", "Model Description cannot be Empty.");
-                return jObj;
             } else {
-                if(poModel.getModelDsc().trim().isEmpty()){
+                if(poModel.getLaborDsc().trim().isEmpty()){
                     jObj.put("result", "error");
-                    jObj.put("message", "Model Description cannot be Empty.");
+                    jObj.put("message", "Labor Description cannot be Empty.");
                     return jObj;
                 }
             }
@@ -313,108 +294,95 @@ public class Vehicle_Model_Master implements GRecord {
             String lsID = "";
             String lsDesc  = "";
             String lsSQL = poModel.getSQL();
-            lsSQL = MiscUtil.addCondition(lsSQL, " REPLACE(a.sModelDsc,' ','') = " + SQLUtil.toSQL(poModel.getModelDsc().replace(" ",""))) +
-                                                    " AND a.sModelIDx <> " + SQLUtil.toSQL(poModel.getModelID()) ;
-            System.out.println("EXISTING VEHICLE MODEL CHECK: " + lsSQL);
+            lsSQL = MiscUtil.addCondition(lsSQL, "REPLACE(sLaborDsc,' ','') = " + SQLUtil.toSQL(poModel.getLaborDsc().replace(" ",""))) +
+                                                    " AND sLaborCde <> " + SQLUtil.toSQL(poModel.getLaborCde()) ;
+            System.out.println("EXISTING LABOR CHECK: " + lsSQL);
             ResultSet loRS = poGRider.executeQuery(lsSQL);
 
             if (MiscUtil.RecordCount(loRS) > 0){
-                    while(loRS.next()){
-                        lsID = loRS.getString("sModelIDx");
-                        lsDesc = loRS.getString("sModelDsc");
-                    }
-                    
-                    MiscUtil.close(loRS);
-                    
-                    jObj.put("result", "error");
-                    jObj.put("message", "Existing Model Description Record.\n\nModel ID: " + lsID + "\nDescription: " + lsDesc.toUpperCase() );
-                    return jObj;
-            }
-            
-            //Do not allow modification on COMMON vehicle model
-            lsSQL = MiscUtil.addCondition(poModel.makeSelectSQL(), " sModelIDx = " + SQLUtil.toSQL(poModel.getModelID())  
-                                                                    + " AND sModelDsc LIKE " + SQLUtil.toSQL("COMMON%")
-                                                    ) ;
-            System.out.println("'COMMON' VEHICLE MODEL: " + lsSQL);
-            loRS = poGRider.executeQuery(lsSQL);
+                while(loRS.next()){
+                    lsID = loRS.getString("sLaborCde");
+                    lsDesc = loRS.getString("sLaborDsc");
+                }
 
-            if (MiscUtil.RecordCount(loRS) > 0){
-                    while(loRS.next()){
-                        lsDesc = loRS.getString("sModelDsc");
-                    }
+                MiscUtil.close(loRS);
 
-                    MiscUtil.close(loRS);
-                    
-                    jObj.put("result", "error");
-                    jObj.put("message", "Modifying of Vehicle Model `"+lsDesc+"` is not allowed.\nContact System Administrator.\n\nSaving aborted.");
-                    return jObj;
+                jObj.put("result", "error");
+                jObj.put("message", "Existing Labor Description Record.\n\nLabor ID: " + lsID + "\nDescription: " + lsDesc.toUpperCase() );
+                return jObj;
             }
             
             //Deactivation Validation
-            String lsVehicleID = "";
-            lsSQL =   "  SELECT "                                                
-                    + "  a.sModelIDx "                                           
-                    + ", b.sModelDsc "                                           
-                    + ", b.sModelCde "                                           
-                    + ", b.cRecdStat "                                           
-                    + ", a.sVhclIDxx "                                           
-                    + "FROM vehicle_master a "                                     
-                    + "LEFT JOIN vehicle_model b ON b.sModelIDx = a.sModelIDx ";
-            if(poModel.getRecdStat().equals("0")){
-                lsSQL = MiscUtil.addCondition(lsSQL, " a.sModelIDx = " + SQLUtil.toSQL(poModel.getModelID())  
-                                                        // + " AND a.cRecdStat = '1'"
-                                                        ) ;
-                System.out.println("EXISTING USAGE OF VEHICLE MODEL: " + lsSQL);
+            //Do not allow deactivation when already connected thru vehicle master that is active or inactive.
+            if(poModel.getRecdStat().equals(RecordStatus.INACTIVE) || pnEditMode == EditMode.UPDATE){
+                Model_JobOrder_Labor loJobOrder = new Model_JobOrder_Labor(poGRider);
+                lsSQL = MiscUtil.addCondition(loJobOrder.makeSelectSQL(), " sLaborCde = " + SQLUtil.toSQL(poModel.getLaborCde())) ;
+                System.out.println("EXISTING USAGE OF LABOR: " + lsSQL);
                 loRS = poGRider.executeQuery(lsSQL);
 
                 if (MiscUtil.RecordCount(loRS) > 0){
-                        while(loRS.next()){
-                            lsVehicleID = loRS.getString("sVhclIDxx");
-                        }
-
                         MiscUtil.close(loRS);
 
                         jObj.put("result", "error");
-                        jObj.put("message", "Existing Vehicle Model Usage.\n\nVehicle ID: " + lsVehicleID + "\nDeactivation aborted.");
+                        jObj.put("message", "Existing Labor Usage.\n\nDeactivation aborted.");
+                        return jObj;
+                }
+                
+                
+                Model_VehicleSalesProposal_Labor loVSPLabor = new Model_VehicleSalesProposal_Labor(poGRider);
+                lsSQL = MiscUtil.addCondition(loVSPLabor.makeSelectSQL(), " sLaborCde = " + SQLUtil.toSQL(poModel.getLaborCde())) ;
+                System.out.println("EXISTING USAGE OF LABOR: " + lsSQL);
+                loRS = poGRider.executeQuery(lsSQL);
+
+                if (MiscUtil.RecordCount(loRS) > 0){
+                        MiscUtil.close(loRS);
+
+                        jObj.put("result", "error");
+                        jObj.put("message", "Existing Labor Usage.\n\nDeactivation aborted.");
                         return jObj;
                 }
             }
             
-            lsSQL =   "  SELECT "                                                
-                    + "  a.sModelIDx "                                           
-                    + ", b.sModelDsc "                                           
-                    + ", b.sModelCde "                                           
-                    + ", b.cRecdStat "                                           
-                    + ", a.sVhclIDxx "                                           
-                    + "FROM vehicle_master a "                                     
-                    + "LEFT JOIN vehicle_model b ON b.sModelIDx = a.sModelIDx ";
+            
+            //Do not allow modification on description when already connected thru diagnostics and vsp labor that is active or inactive.
             if(pnEditMode == EditMode.UPDATE){
-                lsSQL = MiscUtil.addCondition(lsSQL, " a.sModelIDx = " + SQLUtil.toSQL(poModel.getModelID()) 
-                                                        + " AND REPLACE(b.sModelDsc, ' ','') <> " + SQLUtil.toSQL(poModel.getModelDsc().replace(" ", ""))   
-                                                        //+ " AND a.cRecdStat = '1' "
-                                                        ) ;
-                System.out.println("EXISTING USAGE OF VEHICLE MODEL: " + lsSQL);
-                loRS = poGRider.executeQuery(lsSQL);
+                Model_Labor_Master loOldEntity = new Model_Labor_Master(poGRider);
+                JSONObject loJSON = loOldEntity.openRecord(poModel.getLaborCde());
+                if(!"error".equals((String) loJSON.get("result"))){
+                    if(!loOldEntity.getLaborCde().equals(poModel.getLaborDsc())){
+                        Model_JobOrder_Labor loJobOrder = new Model_JobOrder_Labor(poGRider);
+                        lsSQL = MiscUtil.addCondition(loJobOrder.makeSelectSQL(), " sLaborCde = " + SQLUtil.toSQL(poModel.getLaborCde())) ;
+                        System.out.println("EXISTING USAGE OF LABOR: " + lsSQL);
+                        loRS = poGRider.executeQuery(lsSQL);
 
-                if (MiscUtil.RecordCount(loRS) > 0){
-                        while(loRS.next()){
-                            lsVehicleID = loRS.getString("sVhclIDxx");
+                        if (MiscUtil.RecordCount(loRS) > 0){
+                                MiscUtil.close(loRS);
+                                jObj.put("result", "error");
+                                jObj.put("message", "Existing Labor Usage.\n\nChanging of description aborted.");
+                                return jObj;
                         }
 
-                        MiscUtil.close(loRS);
-                        
-                        jObj.put("result", "error");
-                        jObj.put("message", "Existing Vehicle Model Usage.\n\nVehicle ID: " + lsVehicleID + "\nChanging of model description aborted.");
-                        return jObj;
+
+                        Model_VehicleSalesProposal_Labor loVSPLabor = new Model_VehicleSalesProposal_Labor(poGRider);
+                        lsSQL = MiscUtil.addCondition(loVSPLabor.makeSelectSQL(), " sLaborCde = " + SQLUtil.toSQL(poModel.getLaborCde())) ;
+                        System.out.println("EXISTING USAGE OF LABOR: " + lsSQL);
+                        loRS = poGRider.executeQuery(lsSQL);
+
+                        if (MiscUtil.RecordCount(loRS) > 0){
+                                MiscUtil.close(loRS);
+                                jObj.put("result", "error");
+                                jObj.put("message", "Existing Labor Usage.\n\nChanging of description aborted.");
+                                return jObj;
+                        }
+                    }
                 }
             }
         
         } catch (SQLException ex) {
-            Logger.getLogger(Vehicle_Model_Master.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Service_Labor_Master.class.getName()).log(Level.SEVERE, null, ex);
         }
         jObj.put("result", "success");
         jObj.put("message", "Valid Entry");
         return jObj;
     }
-    
 }

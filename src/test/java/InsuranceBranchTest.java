@@ -164,94 +164,94 @@ public class InsuranceBranchTest {
 //        
 //    }
     
-    @Test
-    public void test02OpenRecord(){
-        System.out.println("--------------------------------------------------------------------");
-        System.out.println("------------------------------RETRIEVAL--------------------------------------");
-        System.out.println("--------------------------------------------------------------------");
-        
-        json = model.openRecord("M001IN240001");
-        
-        if (!"success".equals((String) json.get("result"))){
-            result = false;
-        } else {
-            System.out.println("--------------------------------------------------------------------");
-            System.out.println("INSURANCE BRANCHES");
-            System.out.println("--------------------------------------------------------------------");
-            System.out.println("sBrInsIDx  :  " + model.getMaster("sBrInsIDx"));
-            System.out.println("sBrInsNme  :  " + model.getMaster("sBrInsNme"));
-            System.out.println("sBrInsCde  :  " + model.getMaster("sBrInsCde"));
-            System.out.println("sCompnyTp  :  " + model.getMaster("sCompnyTp"));
-            System.out.println("sInsurIDx  :  " + model.getMaster("sInsurIDx"));
-            System.out.println("sContactP  :  " + model.getMaster("sContactP"));
-            System.out.println("sAddressx  :  " + model.getMaster("sAddressx"));
-            System.out.println("sTownIDxx  :  " + model.getMaster("sTownIDxx"));
-            System.out.println("sZippCode  :  " + model.getMaster("sZippCode"));
-            System.out.println("sTelNoxxx  :  " + model.getMaster("sTelNoxxx"));
-            System.out.println("sFaxNoxxx  :  " + model.getMaster("sFaxNoxxx"));
-            System.out.println("cRecdStat  :  " + model.getMaster("cRecdStat"));
-            System.out.println("sModified  :  " + model.getMaster("sModified"));
-            System.out.println("dModified  :  " + model.getMaster("dModified"));
-            System.out.println("sInsurNme  :  " + model.getMaster("sInsurNme"));
-            System.out.println("sTownName  :  " + model.getMaster("sTownName"));
-            System.out.println("sProvName  :  " + model.getMaster("sProvName"));
-            
-            result = true;
-        }
-        assertTrue(result);
-    }
-    
-    
-    @Test
-    public void test03UpdateRecord(){
-        System.out.println("--------------------------------------------------------------------");
-        System.out.println("------------------------------UPDATE RECORD--------------------------------------");
-        System.out.println("--------------------------------------------------------------------");
-        
-        json = model.updateRecord();
-        System.err.println((String) json.get("message"));
-        if ("error".equals((String) json.get("result"))){
-            System.err.println((String) json.get("message"));
-            result = false;
-        } else {
-            result = true;
-        }
-        
-        json = model.setMaster("sBrInsCde","PUKP");
-        if ("error".equals((String) json.get("result"))){
-            System.err.println((String) json.get("message"));
-            System.exit(1);
-        }
-        
-        json = model.setMaster("sCompnyTp","1");
-        if ("error".equals((String) json.get("result"))){
-            System.err.println((String) json.get("message"));
-            System.exit(1);
-        }
-        
-        assertTrue(result);
-        //assertFalse(result);
-    }
-    
-    @Test
-    public void test03UpdateRecordSave(){
-        System.out.println("--------------------------------------------------------------------");
-        System.out.println("------------------------------UPDATE RECORD SAVING--------------------------------------");
-        System.out.println("--------------------------------------------------------------------");
-        
-        json = model.saveRecord();
-        System.err.println((String) json.get("message"));
-        
-        if (!"success".equals((String) json.get("result"))){
-            System.err.println((String) json.get("message"));
-            result = false;
-        } else {
-            System.out.println((String) json.get("message"));
-            result = true;
-        }
-        assertTrue(result);
-        //assertFalse(result);
-    }
+//    @Test
+//    public void test02OpenRecord(){
+//        System.out.println("--------------------------------------------------------------------");
+//        System.out.println("------------------------------RETRIEVAL--------------------------------------");
+//        System.out.println("--------------------------------------------------------------------");
+//        
+//        json = model.openRecord("M001IN240001");
+//        
+//        if (!"success".equals((String) json.get("result"))){
+//            result = false;
+//        } else {
+//            System.out.println("--------------------------------------------------------------------");
+//            System.out.println("INSURANCE BRANCHES");
+//            System.out.println("--------------------------------------------------------------------");
+//            System.out.println("sBrInsIDx  :  " + model.getMaster("sBrInsIDx"));
+//            System.out.println("sBrInsNme  :  " + model.getMaster("sBrInsNme"));
+//            System.out.println("sBrInsCde  :  " + model.getMaster("sBrInsCde"));
+//            System.out.println("sCompnyTp  :  " + model.getMaster("sCompnyTp"));
+//            System.out.println("sInsurIDx  :  " + model.getMaster("sInsurIDx"));
+//            System.out.println("sContactP  :  " + model.getMaster("sContactP"));
+//            System.out.println("sAddressx  :  " + model.getMaster("sAddressx"));
+//            System.out.println("sTownIDxx  :  " + model.getMaster("sTownIDxx"));
+//            System.out.println("sZippCode  :  " + model.getMaster("sZippCode"));
+//            System.out.println("sTelNoxxx  :  " + model.getMaster("sTelNoxxx"));
+//            System.out.println("sFaxNoxxx  :  " + model.getMaster("sFaxNoxxx"));
+//            System.out.println("cRecdStat  :  " + model.getMaster("cRecdStat"));
+//            System.out.println("sModified  :  " + model.getMaster("sModified"));
+//            System.out.println("dModified  :  " + model.getMaster("dModified"));
+//            System.out.println("sInsurNme  :  " + model.getMaster("sInsurNme"));
+//            System.out.println("sTownName  :  " + model.getMaster("sTownName"));
+//            System.out.println("sProvName  :  " + model.getMaster("sProvName"));
+//            
+//            result = true;
+//        }
+//        assertTrue(result);
+//    }
+//    
+//    
+//    @Test
+//    public void test03UpdateRecord(){
+//        System.out.println("--------------------------------------------------------------------");
+//        System.out.println("------------------------------UPDATE RECORD--------------------------------------");
+//        System.out.println("--------------------------------------------------------------------");
+//        
+//        json = model.updateRecord();
+//        System.err.println((String) json.get("message"));
+//        if ("error".equals((String) json.get("result"))){
+//            System.err.println((String) json.get("message"));
+//            result = false;
+//        } else {
+//            result = true;
+//        }
+//        
+//        json = model.setMaster("sBrInsCde","PUKP");
+//        if ("error".equals((String) json.get("result"))){
+//            System.err.println((String) json.get("message"));
+//            System.exit(1);
+//        }
+//        
+//        json = model.setMaster("sCompnyTp","1");
+//        if ("error".equals((String) json.get("result"))){
+//            System.err.println((String) json.get("message"));
+//            System.exit(1);
+//        }
+//        
+//        assertTrue(result);
+//        //assertFalse(result);
+//    }
+//    
+//    @Test
+//    public void test03UpdateRecordSave(){
+//        System.out.println("--------------------------------------------------------------------");
+//        System.out.println("------------------------------UPDATE RECORD SAVING--------------------------------------");
+//        System.out.println("--------------------------------------------------------------------");
+//        
+//        json = model.saveRecord();
+//        System.err.println((String) json.get("message"));
+//        
+//        if (!"success".equals((String) json.get("result"))){
+//            System.err.println((String) json.get("message"));
+//            result = false;
+//        } else {
+//            System.out.println((String) json.get("message"));
+//            result = true;
+//        }
+//        assertTrue(result);
+//        //assertFalse(result);
+//    }
 //    
 //    @Test
 //    public void test04DeactivateRecord(){

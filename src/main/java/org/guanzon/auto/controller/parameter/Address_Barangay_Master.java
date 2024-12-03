@@ -15,15 +15,19 @@ import org.guanzon.appdriver.base.GRider;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
+import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.appdriver.iface.GRecord;
-import org.guanzon.auto.model.parameter.Model_Vehicle_Model;
+import org.guanzon.auto.model.clients.Model_Addresses;
+import org.guanzon.auto.model.parameter.Model_Address_Barangay;
+import org.guanzon.auto.model.parameter.Model_Address_Province;
+import org.guanzon.auto.model.parameter.Model_Address_Town;
 import org.json.simple.JSONObject;
 
 /**
  *
  * @author Arsiela
  */
-public class Vehicle_Model_Master implements GRecord {
+public class Address_Barangay_Master implements GRecord {
 
     GRider poGRider;
     boolean pbWtParent;
@@ -31,17 +35,15 @@ public class Vehicle_Model_Master implements GRecord {
     String psBranchCd;
     String psRecdStat;
 
-    Model_Vehicle_Model poModel;
-    
+    Model_Address_Barangay poModel;
     JSONObject poJSON;
-
-    public Vehicle_Model_Master(GRider foGRider, boolean fbWthParent, String fsBranchCd) {
+    
+    public Address_Barangay_Master(GRider foGRider, boolean fbWthParent, String fsBranchCd) {
         poGRider = foGRider;
         pbWtParent = fbWthParent;
         psBranchCd = fsBranchCd.isEmpty() ? foGRider.getBranchCode() : fsBranchCd;
 
-
-        poModel = new Model_Vehicle_Model(foGRider);
+        poModel = new Model_Address_Barangay(foGRider);
         pnEditMode = EditMode.UNKNOWN;
     }
 
@@ -82,11 +84,13 @@ public class Vehicle_Model_Master implements GRecord {
             pnEditMode = EditMode.ADDNEW;
             org.json.simple.JSONObject obj;
 
-            poModel = new Model_Vehicle_Model(poGRider);
+            poModel = new Model_Address_Barangay(poGRider);
             Connection loConn = null;
             loConn = setConnection();
-            poModel.setModelID(MiscUtil.getNextCode(poModel.getTable(), "sModelIDx", false, loConn, psBranchCd+"MD"));
             poModel.newRecord();
+//            poModel.setBrgyID(MiscUtil.getNextCode(poModel.getTable(), "sBrgyIDxx", false, loConn, String.valueOf(poGRider.getServerDate().toLocalDateTime().getYear()).substring(2, 4) ));
+            
+            poModel.setBrgyID(MiscUtil.getNextCode(poModel.getTable(), "sBrgyIDxx", true, loConn, "" ));
             
             if (poModel == null){
                 poJSON.put("result", "error");
@@ -105,18 +109,29 @@ public class Vehicle_Model_Master implements GRecord {
         
         return poJSON;
     }
+    
+    private Connection setConnection(){
+        Connection foConn;
+        
+        if (pbWtParent){
+            foConn = (Connection) poGRider.getConnection();
+            if (foConn == null) foConn = (Connection) poGRider.doConnect();
+        }else foConn = (Connection) poGRider.doConnect();
+        
+        return foConn;
+    }
 
     @Override
     public JSONObject openRecord(String fsValue) {
         pnEditMode = EditMode.READY;
         poJSON = new JSONObject();
         
-        poModel = new Model_Vehicle_Model(poGRider);
+        poModel = new Model_Address_Barangay(poGRider);
         poJSON = poModel.openRecord(fsValue);
         
         if("error".equals(poJSON.get("result"))){
             return poJSON;
-        }
+        } 
         return poJSON;
     }
 
@@ -135,7 +150,8 @@ public class Vehicle_Model_Master implements GRecord {
     }
 
     @Override
-    public JSONObject saveRecord() {
+    public JSONObject saveRecord(){
+        
         poJSON = validateEntry();
         if ("error".equals((String) poJSON.get("result"))) {
             return poJSON;
@@ -227,20 +243,19 @@ public class Vehicle_Model_Master implements GRecord {
         String lsSQL = poModel.getSQL();
         
         if(fbByActive){
-            lsSQL = MiscUtil.addCondition(lsSQL, " a.sModelDsc LIKE " + SQLUtil.toSQL(fsValue + "%") 
-                                                + " AND a.cRecdStat = '1' ");
+            lsSQL = MiscUtil.addCondition(lsSQL,  " a.sBrgyName LIKE " + SQLUtil.toSQL(fsValue + "%")
+                                                    + " AND a.cRecdStat = " + SQLUtil.toSQL(RecordStatus.ACTIVE));
         } else {
-            lsSQL = MiscUtil.addCondition(lsSQL, " a.sModelDsc LIKE " + SQLUtil.toSQL(fsValue + "%")
-                                                + " AND a.sModelDsc <> 'COMMON' ");
+            lsSQL = MiscUtil.addCondition(lsSQL,  " a.sBrgyName LIKE " + SQLUtil.toSQL(fsValue + "%"));
         }
-
-        System.out.println("SEARCH MODEL: " + lsSQL);
+        
+        System.out.println("SEARCH BARANGAY: " + lsSQL);
         poJSON = ShowDialogFX.Search(poGRider,
                 lsSQL,
                 fsValue,
-                "Model ID»Model Description»Make",
-                "sModelIDx»sModelDsc»sMakeDesc",
-                "a.sModelIDx»a.sModelDsc»b.sMakeDesc",
+                "ID»Barangay Name»Town Name»Province Name",
+                "sBrgyIDxx»sBrgyName»sTownName»sProvName",
+                "sBrgyIDxx»sBrgyName»sTownName»sProvName",
                 1);
 
         if (poJSON != null) {
@@ -255,166 +270,181 @@ public class Vehicle_Model_Master implements GRecord {
     }
 
     @Override
-    public Model_Vehicle_Model getModel() {
+    public Model_Address_Barangay getModel() {
         return poModel;
-    }
-    
-    private Connection setConnection(){
-        Connection foConn;
-        
-        if (pbWtParent){
-            foConn = (Connection) poGRider.getConnection();
-            if (foConn == null) foConn = (Connection) poGRider.doConnect();
-        }else foConn = (Connection) poGRider.doConnect();
-        
-        return foConn;
     }
     
     private JSONObject validateEntry(){
         JSONObject jObj = new JSONObject();
         try {
-            
-            if(poModel.getMakeID() == null){
+            if(poModel.getBrgyID()== null){
                 jObj.put("result", "error");
-                jObj.put("message", "Make cannot be Empty.");
+                jObj.put("message", "Barangay ID cannot be Empty.");
                 return jObj;
             } else {
-                if(poModel.getMakeID().trim().isEmpty()){
+                if(poModel.getBrgyID().trim().isEmpty()){
                     jObj.put("result", "error");
-                    jObj.put("message", "Make cannot be Empty.");
+                    jObj.put("message", "Barangay ID cannot be Empty.");
                     return jObj;
                 }
             }
             
-            if(poModel.getModelID() == null){
+            if(poModel.getTownID()== null){
                 jObj.put("result", "error");
-                jObj.put("message", "Model cannot be Empty.");
+                jObj.put("message", "Town cannot be Empty.");
                 return jObj;
             } else {
-                if(poModel.getModelID().trim().isEmpty()){
+                if(poModel.getTownID().trim().isEmpty()){
                     jObj.put("result", "error");
-                    jObj.put("message", "Model cannot be Empty.");
+                    jObj.put("message", "Town cannot be Empty.");
                     return jObj;
                 }
             }
             
-            if(poModel.getModelDsc() == null){
+            if(poModel.getProvID()== null){
                 jObj.put("result", "error");
-                jObj.put("message", "Model Description cannot be Empty.");
+                jObj.put("message", "Province cannot be Empty.");
                 return jObj;
             } else {
-                if(poModel.getModelDsc().trim().isEmpty()){
+                if(poModel.getProvID().trim().isEmpty()){
                     jObj.put("result", "error");
-                    jObj.put("message", "Model Description cannot be Empty.");
+                    jObj.put("message", "Province cannot be Empty.");
                     return jObj;
                 }
             }
-
+            
             String lsID = "";
             String lsDesc  = "";
             String lsSQL = poModel.getSQL();
-            lsSQL = MiscUtil.addCondition(lsSQL, " REPLACE(a.sModelDsc,' ','') = " + SQLUtil.toSQL(poModel.getModelDsc().replace(" ",""))) +
-                                                    " AND a.sModelIDx <> " + SQLUtil.toSQL(poModel.getModelID()) ;
-            System.out.println("EXISTING VEHICLE MODEL CHECK: " + lsSQL);
+            lsSQL = MiscUtil.addCondition(lsSQL, "REPLACE(a.sBrgyName,' ','') = " + SQLUtil.toSQL(poModel.getTownName().replace(" ",""))) 
+                                                    + " AND a.sTownIDxx = " + SQLUtil.toSQL(poModel.getTownID())
+                                                    + " AND a.sBrgyIDxx <> " + SQLUtil.toSQL(poModel.getBrgyID()) ;
+            System.out.println("EXISTING BARANGAY CHECK: " + lsSQL);
             ResultSet loRS = poGRider.executeQuery(lsSQL);
 
             if (MiscUtil.RecordCount(loRS) > 0){
                     while(loRS.next()){
-                        lsID = loRS.getString("sModelIDx");
-                        lsDesc = loRS.getString("sModelDsc");
+                        lsID = loRS.getString("sBrgyIDxx");
+                        lsDesc = loRS.getString("sBrgyName");
                     }
                     
                     MiscUtil.close(loRS);
                     
                     jObj.put("result", "error");
-                    jObj.put("message", "Existing Model Description Record.\n\nModel ID: " + lsID + "\nDescription: " + lsDesc.toUpperCase() );
+                    jObj.put("message", "Existing Barangay Record.\n\nBarangay ID: " + lsID + "\nBarangay Name: " + lsDesc.toUpperCase() );
                     return jObj;
             }
             
-            //Do not allow modification on COMMON vehicle model
-            lsSQL = MiscUtil.addCondition(poModel.makeSelectSQL(), " sModelIDx = " + SQLUtil.toSQL(poModel.getModelID())  
-                                                                    + " AND sModelDsc LIKE " + SQLUtil.toSQL("COMMON%")
-                                                    ) ;
-            System.out.println("'COMMON' VEHICLE MODEL: " + lsSQL);
-            loRS = poGRider.executeQuery(lsSQL);
-
-            if (MiscUtil.RecordCount(loRS) > 0){
-                    while(loRS.next()){
-                        lsDesc = loRS.getString("sModelDsc");
-                    }
-
-                    MiscUtil.close(loRS);
-                    
-                    jObj.put("result", "error");
-                    jObj.put("message", "Modifying of Vehicle Model `"+lsDesc+"` is not allowed.\nContact System Administrator.\n\nSaving aborted.");
-                    return jObj;
-            }
-            
-            //Deactivation Validation
-            String lsVehicleID = "";
-            lsSQL =   "  SELECT "                                                
-                    + "  a.sModelIDx "                                           
-                    + ", b.sModelDsc "                                           
-                    + ", b.sModelCde "                                           
-                    + ", b.cRecdStat "                                           
-                    + ", a.sVhclIDxx "                                           
-                    + "FROM vehicle_master a "                                     
-                    + "LEFT JOIN vehicle_model b ON b.sModelIDx = a.sModelIDx ";
+            lsID = "";
+            Model_Addresses loEntity = new Model_Addresses(poGRider);
+            lsSQL =  loEntity.makeSelectSQL();
+//            Deactivation Validation TODO
             if(poModel.getRecdStat().equals("0")){
-                lsSQL = MiscUtil.addCondition(lsSQL, " a.sModelIDx = " + SQLUtil.toSQL(poModel.getModelID())  
-                                                        // + " AND a.cRecdStat = '1'"
-                                                        ) ;
-                System.out.println("EXISTING USAGE OF VEHICLE MODEL: " + lsSQL);
+                lsSQL = MiscUtil.addCondition(lsSQL, " sBrgyIDxx = " + SQLUtil.toSQL(poModel.getBrgyID())) ;
+                System.out.println("EXISTING USAGE OF BARANGAY: " + lsSQL);
                 loRS = poGRider.executeQuery(lsSQL);
 
                 if (MiscUtil.RecordCount(loRS) > 0){
                         while(loRS.next()){
-                            lsVehicleID = loRS.getString("sVhclIDxx");
+                            lsID = loRS.getString("sAddrssID");
                         }
 
                         MiscUtil.close(loRS);
 
                         jObj.put("result", "error");
-                        jObj.put("message", "Existing Vehicle Model Usage.\n\nVehicle ID: " + lsVehicleID + "\nDeactivation aborted.");
+                        jObj.put("message", "Existing Barangay Usage.\n\nAddress ID: " + lsID + "\nDeactivation aborted.");
                         return jObj;
                 }
             }
             
-            lsSQL =   "  SELECT "                                                
-                    + "  a.sModelIDx "                                           
-                    + ", b.sModelDsc "                                           
-                    + ", b.sModelCde "                                           
-                    + ", b.cRecdStat "                                           
-                    + ", a.sVhclIDxx "                                           
-                    + "FROM vehicle_master a "                                     
-                    + "LEFT JOIN vehicle_model b ON b.sModelIDx = a.sModelIDx ";
             if(pnEditMode == EditMode.UPDATE){
-                lsSQL = MiscUtil.addCondition(lsSQL, " a.sModelIDx = " + SQLUtil.toSQL(poModel.getModelID()) 
-                                                        + " AND REPLACE(b.sModelDsc, ' ','') <> " + SQLUtil.toSQL(poModel.getModelDsc().replace(" ", ""))   
-                                                        //+ " AND a.cRecdStat = '1' "
+                lsID = "";
+                lsSQL =  loEntity.getSQL();
+                
+                lsSQL = MiscUtil.addCondition(lsSQL, " a.sBrgyIDxx = " + SQLUtil.toSQL(poModel.getBrgyID()) 
+                                                        + " AND REPLACE(c.sBrgyName, ' ','') <> " + SQLUtil.toSQL(poModel.getBrgyName().replace(" ", ""))  
+                                                        //+ " AND a.cRecdStat = '1'"
                                                         ) ;
-                System.out.println("EXISTING USAGE OF VEHICLE MODEL: " + lsSQL);
+                System.out.println("ADDRESSES: EXISTING USAGE OF BARANGAY: " + lsSQL);
                 loRS = poGRider.executeQuery(lsSQL);
 
                 if (MiscUtil.RecordCount(loRS) > 0){
                         while(loRS.next()){
-                            lsVehicleID = loRS.getString("sVhclIDxx");
+                            lsID = loRS.getString("sAddrssID");
                         }
 
                         MiscUtil.close(loRS);
                         
                         jObj.put("result", "error");
-                        jObj.put("message", "Existing Vehicle Model Usage.\n\nVehicle ID: " + lsVehicleID + "\nChanging of model description aborted.");
+                        jObj.put("message", "Existing Barangay Usage.\n\nAddresses ID: " + lsID + "\nChanging of barangay name aborted.");
                         return jObj;
                 }
             }
         
         } catch (SQLException ex) {
-            Logger.getLogger(Vehicle_Model_Master.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Address_Barangay_Master.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
         jObj.put("result", "success");
         jObj.put("message", "Valid Entry");
         return jObj;
+    }
+    
+    public JSONObject searchProvince(String fsValue) {
+        JSONObject loJSON = new JSONObject();
+        Model_Address_Province loEntitiy = new Model_Address_Province(poGRider);
+        String lsSQL = loEntitiy.getSQL();
+        lsSQL = MiscUtil.addCondition(lsSQL,  " a.sProvName LIKE " + SQLUtil.toSQL(fsValue + "%")
+                                                + " AND a.cRecdStat = " + SQLUtil.toSQL(RecordStatus.ACTIVE));
+        
+        
+        System.out.println("SEARCH PROVINCE: " + lsSQL);
+        loJSON = ShowDialogFX.Search(poGRider,
+                lsSQL,
+                fsValue,
+                "ID»Province Name",
+                "sProvIDxx»sProvName",
+                "sProvIDxx»sProvName",
+                1);
+
+        if (loJSON != null) {
+        } else {
+            loJSON = new JSONObject();
+            loJSON.put("result", "error");
+            loJSON.put("message", "No record loaded.");
+            return loJSON;
+        }
+        
+        return loJSON;
+    }
+    
+    public JSONObject searchTown(String fsValue) {
+        JSONObject loJSON = new JSONObject();
+        Model_Address_Town loEntitiy = new Model_Address_Town(poGRider);
+        String lsSQL = loEntitiy.getSQL();
+        lsSQL = MiscUtil.addCondition(lsSQL,  " a.sTownName LIKE " + SQLUtil.toSQL(fsValue + "%")
+                                                + " AND a.sProvIDxx = " + SQLUtil.toSQL(poModel.getProvID())
+                                                + " AND a.cRecdStat = " + SQLUtil.toSQL(RecordStatus.ACTIVE));
+        
+        
+        System.out.println("SEARCH TOWN: " + lsSQL);
+        loJSON = ShowDialogFX.Search(poGRider,
+                lsSQL,
+                fsValue,
+                "ID»Town Name",
+                "sTownIDxx»sTownName",
+                "sTownIDxx»sTownName",
+                1);
+
+        if (loJSON != null) {
+        } else {
+            loJSON = new JSONObject();
+            loJSON.put("result", "error");
+            loJSON.put("message", "No record loaded.");
+            return loJSON;
+        }
+        
+        return loJSON;
     }
     
 }

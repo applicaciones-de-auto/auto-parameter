@@ -8,6 +8,7 @@ package org.guanzon.auto.controller.parameter;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.guanzon.appdriver.agent.ShowDialogFX;
@@ -15,33 +16,32 @@ import org.guanzon.appdriver.base.GRider;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
+import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.appdriver.iface.GRecord;
-import org.guanzon.auto.model.parameter.Model_Vehicle_Model;
+import org.guanzon.auto.model.parameter.Model_Default_Released_Items_Checklist;
 import org.json.simple.JSONObject;
 
 /**
  *
  * @author Arsiela
  */
-public class Vehicle_Model_Master implements GRecord {
-
+public class Default_Released_Items_Checklist implements GRecord {
     GRider poGRider;
     boolean pbWtParent;
     int pnEditMode;
     String psBranchCd;
     String psRecdStat;
 
-    Model_Vehicle_Model poModel;
-    
+    Model_Default_Released_Items_Checklist poModel;
+    ArrayList<Model_Default_Released_Items_Checklist> paDetail;
     JSONObject poJSON;
 
-    public Vehicle_Model_Master(GRider foGRider, boolean fbWthParent, String fsBranchCd) {
+    public Default_Released_Items_Checklist(GRider foGRider, boolean fbWthParent, String fsBranchCd) {
         poGRider = foGRider;
         pbWtParent = fbWthParent;
         psBranchCd = fsBranchCd.isEmpty() ? foGRider.getBranchCode() : fsBranchCd;
 
-
-        poModel = new Model_Vehicle_Model(foGRider);
+        poModel = new Model_Default_Released_Items_Checklist(foGRider);
         pnEditMode = EditMode.UNKNOWN;
     }
 
@@ -82,10 +82,9 @@ public class Vehicle_Model_Master implements GRecord {
             pnEditMode = EditMode.ADDNEW;
             org.json.simple.JSONObject obj;
 
-            poModel = new Model_Vehicle_Model(poGRider);
+            poModel = new Model_Default_Released_Items_Checklist(poGRider);
             Connection loConn = null;
             loConn = setConnection();
-            poModel.setModelID(MiscUtil.getNextCode(poModel.getTable(), "sModelIDx", false, loConn, psBranchCd+"MD"));
             poModel.newRecord();
             
             if (poModel == null){
@@ -111,12 +110,12 @@ public class Vehicle_Model_Master implements GRecord {
         pnEditMode = EditMode.READY;
         poJSON = new JSONObject();
         
-        poModel = new Model_Vehicle_Model(poGRider);
+        poModel = new Model_Default_Released_Items_Checklist(poGRider);
         poJSON = poModel.openRecord(fsValue);
         
         if("error".equals(poJSON.get("result"))){
             return poJSON;
-        }
+        } 
         return poJSON;
     }
 
@@ -224,24 +223,23 @@ public class Vehicle_Model_Master implements GRecord {
 
     @Override
     public JSONObject searchRecord(String fsValue, boolean fbByActive) {
-        String lsSQL = poModel.getSQL();
+        String lsSQL =   poModel.makeSelectSQL() ;
         
         if(fbByActive){
-            lsSQL = MiscUtil.addCondition(lsSQL, " a.sModelDsc LIKE " + SQLUtil.toSQL(fsValue + "%") 
-                                                + " AND a.cRecdStat = '1' ");
+            lsSQL = MiscUtil.addCondition(lsSQL,  " sItemDesc LIKE " + SQLUtil.toSQL(fsValue + "%")
+                                                    + " AND cRecdStat = '1' ");
         } else {
-            lsSQL = MiscUtil.addCondition(lsSQL, " a.sModelDsc LIKE " + SQLUtil.toSQL(fsValue + "%")
-                                                + " AND a.sModelDsc <> 'COMMON' ");
+            lsSQL = MiscUtil.addCondition(lsSQL,  " sItemDesc LIKE " + SQLUtil.toSQL(fsValue + "%"));
         }
-
-        System.out.println("SEARCH MODEL: " + lsSQL);
+        
+        System.out.println("SEARCH DEFAULT RELEASE ITEM: " + lsSQL);
         poJSON = ShowDialogFX.Search(poGRider,
                 lsSQL,
                 fsValue,
-                "Model ID»Model Description»Make",
-                "sModelIDx»sModelDsc»sMakeDesc",
-                "a.sModelIDx»a.sModelDsc»b.sMakeDesc",
-                1);
+                "Item Code»Item Description",
+                "sItemCode»sItemDesc",
+                "sItemCode»sItemDesc",
+                 1);
 
         if (poJSON != null) {
         } else {
@@ -255,10 +253,10 @@ public class Vehicle_Model_Master implements GRecord {
     }
 
     @Override
-    public Model_Vehicle_Model getModel() {
+    public Model_Default_Released_Items_Checklist getModel() {
         return poModel;
     }
-    
+
     private Connection setConnection(){
         Connection foConn;
         
@@ -274,147 +272,135 @@ public class Vehicle_Model_Master implements GRecord {
         JSONObject jObj = new JSONObject();
         try {
             
-            if(poModel.getMakeID() == null){
+            if(poModel.getItemCode()== null){
                 jObj.put("result", "error");
-                jObj.put("message", "Make cannot be Empty.");
+                jObj.put("message", "Item Code cannot be Empty.");
                 return jObj;
             } else {
-                if(poModel.getMakeID().trim().isEmpty()){
+                if(poModel.getItemCode().trim().isEmpty()){
                     jObj.put("result", "error");
-                    jObj.put("message", "Make cannot be Empty.");
+                    jObj.put("message", "Item Code cannot be Empty.");
                     return jObj;
                 }
             }
             
-            if(poModel.getModelID() == null){
+            if(poModel.getItemDesc()== null){
                 jObj.put("result", "error");
-                jObj.put("message", "Model cannot be Empty.");
+                jObj.put("message", "Item Description cannot be Empty.");
                 return jObj;
             } else {
-                if(poModel.getModelID().trim().isEmpty()){
+                if(poModel.getItemDesc().trim().isEmpty()){
                     jObj.put("result", "error");
-                    jObj.put("message", "Model cannot be Empty.");
+                    jObj.put("message", "Item Description cannot be Empty.");
                     return jObj;
                 }
             }
             
-            if(poModel.getModelDsc() == null){
-                jObj.put("result", "error");
-                jObj.put("message", "Model Description cannot be Empty.");
-                return jObj;
-            } else {
-                if(poModel.getModelDsc().trim().isEmpty()){
-                    jObj.put("result", "error");
-                    jObj.put("message", "Model Description cannot be Empty.");
-                    return jObj;
-                }
-            }
-
             String lsID = "";
             String lsDesc  = "";
             String lsSQL = poModel.getSQL();
-            lsSQL = MiscUtil.addCondition(lsSQL, " REPLACE(a.sModelDsc,' ','') = " + SQLUtil.toSQL(poModel.getModelDsc().replace(" ",""))) +
-                                                    " AND a.sModelIDx <> " + SQLUtil.toSQL(poModel.getModelID()) ;
-            System.out.println("EXISTING VEHICLE MODEL CHECK: " + lsSQL);
+            lsSQL = MiscUtil.addCondition(lsSQL, "REPLACE(sItemDesc,' ','') = " + SQLUtil.toSQL(poModel.getItemDesc().replace(" ",""))
+                                                    + " AND sItemCode <> " + SQLUtil.toSQL(poModel.getItemCode())
+                                                    ) ;
+            System.out.println("EXISTING DEFAULT ITEM CHECK: " + lsSQL);
             ResultSet loRS = poGRider.executeQuery(lsSQL);
 
             if (MiscUtil.RecordCount(loRS) > 0){
                     while(loRS.next()){
-                        lsID = loRS.getString("sModelIDx");
-                        lsDesc = loRS.getString("sModelDsc");
+                        lsID = loRS.getString("sItemCode");
+                        lsDesc = loRS.getString("sItemDesc");
                     }
                     
                     MiscUtil.close(loRS);
                     
                     jObj.put("result", "error");
-                    jObj.put("message", "Existing Model Description Record.\n\nModel ID: " + lsID + "\nDescription: " + lsDesc.toUpperCase() );
+                    jObj.put("message", "Existing Default Item Record.\n\nItem Code: " + lsID + "\nDescription: " + lsDesc.toUpperCase() );
                     return jObj;
             }
             
-            //Do not allow modification on COMMON vehicle model
-            lsSQL = MiscUtil.addCondition(poModel.makeSelectSQL(), " sModelIDx = " + SQLUtil.toSQL(poModel.getModelID())  
-                                                                    + " AND sModelDsc LIKE " + SQLUtil.toSQL("COMMON%")
-                                                    ) ;
-            System.out.println("'COMMON' VEHICLE MODEL: " + lsSQL);
-            loRS = poGRider.executeQuery(lsSQL);
-
-            if (MiscUtil.RecordCount(loRS) > 0){
-                    while(loRS.next()){
-                        lsDesc = loRS.getString("sModelDsc");
-                    }
-
-                    MiscUtil.close(loRS);
-                    
-                    jObj.put("result", "error");
-                    jObj.put("message", "Modifying of Vehicle Model `"+lsDesc+"` is not allowed.\nContact System Administrator.\n\nSaving aborted.");
-                    return jObj;
-            }
+//            lsID = "";
+//            lsSQL =   " SELECT "                                             
+//                + "    a.sTransNox "                                     
+//                + "  , a.sItemType "                                     
+//                + "  , a.sItemCode "                                        
+//                + "  , a.nQuantity "                                     
+//                + "  , a.nReleased "                                       
+//                + " FROM vehicle_released_items a "                      
+//                + " LEFT JOIN default_released_items_checklist b ON b.sItemCode = a.sItemCode " ;
+//            //Deactivation Validation
+//            if(poModel.getRecdStat().equals("0")){
+//                lsSQL = MiscUtil.addCondition(lsSQL, " a.sItemType = 'd' AND a.sItemCode = " + SQLUtil.toSQL(poModel.getItemCode())) ;
+//                System.out.println("EXISTING USAGE OF DEFAULT ITEM: " + lsSQL);
+//                loRS = poGRider.executeQuery(lsSQL);
+//
+//                if (MiscUtil.RecordCount(loRS) > 0){
+//                        while(loRS.next()){
+//                            lsID = loRS.getString("sBrInsIDx");
+//                        }
+//
+//                        MiscUtil.close(loRS);
+//
+//                        jObj.put("result", "error");
+//                        jObj.put("message", "Existing Insurance Usage.\n\nInsurance Branch ID: " + lsID + "\nDeactivation aborted.");
+//                        return jObj;
+//                }
+//            }
             
-            //Deactivation Validation
-            String lsVehicleID = "";
-            lsSQL =   "  SELECT "                                                
-                    + "  a.sModelIDx "                                           
-                    + ", b.sModelDsc "                                           
-                    + ", b.sModelCde "                                           
-                    + ", b.cRecdStat "                                           
-                    + ", a.sVhclIDxx "                                           
-                    + "FROM vehicle_master a "                                     
-                    + "LEFT JOIN vehicle_model b ON b.sModelIDx = a.sModelIDx ";
-            if(poModel.getRecdStat().equals("0")){
-                lsSQL = MiscUtil.addCondition(lsSQL, " a.sModelIDx = " + SQLUtil.toSQL(poModel.getModelID())  
-                                                        // + " AND a.cRecdStat = '1'"
-                                                        ) ;
-                System.out.println("EXISTING USAGE OF VEHICLE MODEL: " + lsSQL);
-                loRS = poGRider.executeQuery(lsSQL);
-
-                if (MiscUtil.RecordCount(loRS) > 0){
-                        while(loRS.next()){
-                            lsVehicleID = loRS.getString("sVhclIDxx");
-                        }
-
-                        MiscUtil.close(loRS);
-
-                        jObj.put("result", "error");
-                        jObj.put("message", "Existing Vehicle Model Usage.\n\nVehicle ID: " + lsVehicleID + "\nDeactivation aborted.");
-                        return jObj;
-                }
-            }
-            
-            lsSQL =   "  SELECT "                                                
-                    + "  a.sModelIDx "                                           
-                    + ", b.sModelDsc "                                           
-                    + ", b.sModelCde "                                           
-                    + ", b.cRecdStat "                                           
-                    + ", a.sVhclIDxx "                                           
-                    + "FROM vehicle_master a "                                     
-                    + "LEFT JOIN vehicle_model b ON b.sModelIDx = a.sModelIDx ";
-            if(pnEditMode == EditMode.UPDATE){
-                lsSQL = MiscUtil.addCondition(lsSQL, " a.sModelIDx = " + SQLUtil.toSQL(poModel.getModelID()) 
-                                                        + " AND REPLACE(b.sModelDsc, ' ','') <> " + SQLUtil.toSQL(poModel.getModelDsc().replace(" ", ""))   
-                                                        //+ " AND a.cRecdStat = '1' "
-                                                        ) ;
-                System.out.println("EXISTING USAGE OF VEHICLE MODEL: " + lsSQL);
-                loRS = poGRider.executeQuery(lsSQL);
-
-                if (MiscUtil.RecordCount(loRS) > 0){
-                        while(loRS.next()){
-                            lsVehicleID = loRS.getString("sVhclIDxx");
-                        }
-
-                        MiscUtil.close(loRS);
-                        
-                        jObj.put("result", "error");
-                        jObj.put("message", "Existing Vehicle Model Usage.\n\nVehicle ID: " + lsVehicleID + "\nChanging of model description aborted.");
-                        return jObj;
-                }
-            }
         
         } catch (SQLException ex) {
-            Logger.getLogger(Vehicle_Model_Master.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Default_Released_Items_Checklist.class.getName()).log(Level.SEVERE, null, ex);
         }
         jObj.put("result", "success");
         jObj.put("message", "Valid Entry");
         return jObj;
+    }
+    
+    
+    public Model_Default_Released_Items_Checklist getDetailModel(int fnRow) {
+        return paDetail.get(fnRow);
+    }
+    
+    public ArrayList<Model_Default_Released_Items_Checklist> getDetailList(){
+        if(paDetail == null){
+           paDetail = new ArrayList<>();
+        }
+        return paDetail;
+    }
+    
+    public void setDetailList(ArrayList<Model_Default_Released_Items_Checklist> foObj){this.paDetail = foObj;}
+   
+    public JSONObject loadDefaultItem(){
+        paDetail = new ArrayList<>();
+        poJSON = new JSONObject();
+        Model_Default_Released_Items_Checklist loEntity = new Model_Default_Released_Items_Checklist(poGRider);
+        String lsSQL =  loEntity.makeSelectSQL();
+        lsSQL = MiscUtil.addCondition(lsSQL, " cRecdStat = " + SQLUtil.toSQL(RecordStatus.ACTIVE)) ;
+        System.out.println(lsSQL);
+        ResultSet loRS = poGRider.executeQuery(lsSQL);
+        
+        try {
+            int lnctr = 0;
+            if (MiscUtil.RecordCount(loRS) > 0) {
+                while(loRS.next()){
+                        paDetail.add(new Model_Default_Released_Items_Checklist(poGRider));
+                        paDetail.get(paDetail.size() - 1).openRecord(loRS.getString("sItemCode"));
+                        pnEditMode = EditMode.UPDATE;
+                        lnctr++;
+                        poJSON.put("result", "success");
+                        poJSON.put("message", "Record loaded successfully.");
+                    } 
+                
+            }else{
+                poJSON.put("result", "error");
+                poJSON.put("continue", true);
+                poJSON.put("message", "No record selected.");
+            }
+            MiscUtil.close(loRS);
+        } catch (SQLException e) {
+            poJSON.put("result", "error");
+            poJSON.put("message", e.getMessage());
+        }
+        return poJSON;
     }
     
 }

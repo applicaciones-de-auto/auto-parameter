@@ -1,6 +1,6 @@
 
 import org.guanzon.appdriver.base.GRider;
-import org.guanzon.auto.main.parameter.Bank;
+import org.guanzon.auto.main.parameter.DefaultReleasedItems_Checklist;
 import org.json.simple.JSONObject;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertTrue;
@@ -21,13 +21,12 @@ import org.junit.runners.MethodSorters;
  * @author Arsiela
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class BankTest {
-    
-    static Bank model;
+public class DefaultReleaseItemChecklistTest {
+    static DefaultReleasedItems_Checklist model;
     JSONObject json;
     boolean result;
     
-    public BankTest(){}
+    public DefaultReleaseItemChecklistTest(){}
     
     @BeforeClass
     public static void setUpClass() {   
@@ -53,7 +52,7 @@ public class BankTest {
         JSONObject json;
         
         System.out.println("sBranch code = " + instance.getBranchCode());
-        model = new Bank(instance,false, instance.getBranchCode());
+        model = new DefaultReleasedItems_Checklist(instance,false, instance.getBranchCode());
     }
     
     @AfterClass
@@ -64,7 +63,6 @@ public class BankTest {
     /**
      * COMMENTED TESTING TO CLEAN AND BUILD PROPERLY
      * WHEN YOU WANT TO CHECK KINDLY UNCOMMENT THE TESTING CASES (@Test).
-     * ARSIELA 07-29-2024
      */
     
 //    @Test
@@ -75,7 +73,7 @@ public class BankTest {
 //        
 //        json = model.newRecord();
 //        if ("success".equals((String) json.get("result"))){
-//            json = model.setMaster("sBankName","BANCO DE ORO");
+//            json = model.setMaster("sItemDesc","VANITY PLATE");
 //            if ("error".equals((String) json.get("result"))){
 //                System.err.println((String) json.get("message"));
 //                System.exit(1);
@@ -114,28 +112,24 @@ public class BankTest {
 //        System.out.println("------------------------------RETRIEVAL--------------------------------------");
 //        System.out.println("--------------------------------------------------------------------");
 //        
-//        json = model.openRecord("M00124000001");
+//        json = model.openRecord("M00124000007");
 //        
 //        if (!"success".equals((String) json.get("result"))){
 //            result = false;
 //        } else {
 //            System.out.println("--------------------------------------------------------------------");
-//            System.out.println("BANK MASTER");
+//            System.out.println("DEFAULT RELEASE ITEM");
 //            System.out.println("--------------------------------------------------------------------");
-//            System.out.println("sBankIDxx  :  " + model.getMaster("sBankIDxx"));
-//            System.out.println("sBankName  :  " + model.getMaster("sBankName"));
-//            System.out.println("sBankCode  :  " + model.getMaster("sBankCode"));
-//            System.out.println("sBankType  :  " + model.getMaster("sBankType"));
-//            System.out.println("cRecdStat  :  " + model.getMaster("cRecdStat"));
-//            System.out.println("sModified  :  " + model.getMaster("sModified"));
-//            System.out.println("dModified  :  " + model.getMaster("dModified"));
+//            System.out.println("sItemCode  :  " + model.getModel().getModel().getItemCode());
+//            System.out.println("sItemDesc  :  " + model.getModel().getModel().getItemDesc());
+//            System.out.println("cRecdStat  :  " + model.getModel().getModel().getRecdStat());
 //            
 //            result = true;
 //        }
 //        assertTrue(result);
 //    }
-//    
-//    
+    
+    
 //    @Test
 //    public void test03UpdateRecord(){
 //        System.out.println("--------------------------------------------------------------------");
@@ -151,7 +145,7 @@ public class BankTest {
 //            result = true;
 //        }
 //        
-//        json = model.setMaster("sBankType","bank");
+//        json = model.getModel().getModel().setItemDesc("VANITY PLATE NUMBER");
 //        if ("error".equals((String) json.get("result"))){
 //            System.err.println((String) json.get("message"));
 //            System.exit(1);
@@ -187,7 +181,7 @@ public class BankTest {
 //        System.out.println("------------------------------DEACTIVATE RECORD--------------------------------------");
 //        System.out.println("--------------------------------------------------------------------");
 //        
-//        json = model.deactivateRecord("M001BNK00001");
+//        json = model.deactivateRecord("M00124000007");
 //        System.err.println((String) json.get("message"));
 //        
 //        if (!"success".equals((String) json.get("result"))){
@@ -208,7 +202,7 @@ public class BankTest {
 //        System.out.println("------------------------------ACTIVATE RECORD--------------------------------------");
 //        System.out.println("--------------------------------------------------------------------");
 //        
-//        json = model.activateRecord("M001BNK00001");
+//        json = model.activateRecord("M00124000007");
 //        System.err.println((String) json.get("message"));
 //        
 //        if (!"success".equals((String) json.get("result"))){
@@ -222,4 +216,5 @@ public class BankTest {
 //        assertTrue(result);
 //        //assertFalse(result);
 //    }
+    
 }

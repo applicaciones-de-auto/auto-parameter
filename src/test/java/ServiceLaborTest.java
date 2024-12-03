@@ -1,6 +1,6 @@
 
 import org.guanzon.appdriver.base.GRider;
-import org.guanzon.auto.main.parameter.Bank;
+import org.guanzon.auto.main.parameter.Service_Labor;
 import org.json.simple.JSONObject;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertTrue;
@@ -20,14 +20,14 @@ import org.junit.runners.MethodSorters;
  *
  * @author Arsiela
  */
+
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class BankTest {
-    
-    static Bank model;
+public class ServiceLaborTest {
+    static Service_Labor model;
     JSONObject json;
     boolean result;
     
-    public BankTest(){}
+    public ServiceLaborTest(){}
     
     @BeforeClass
     public static void setUpClass() {   
@@ -53,7 +53,7 @@ public class BankTest {
         JSONObject json;
         
         System.out.println("sBranch code = " + instance.getBranchCode());
-        model = new Bank(instance,false, instance.getBranchCode());
+        model = new Service_Labor(instance,false, instance.getBranchCode());
     }
     
     @AfterClass
@@ -64,7 +64,7 @@ public class BankTest {
     /**
      * COMMENTED TESTING TO CLEAN AND BUILD PROPERLY
      * WHEN YOU WANT TO CHECK KINDLY UNCOMMENT THE TESTING CASES (@Test).
-     * ARSIELA 07-29-2024
+     * ARSIELA 
      */
     
 //    @Test
@@ -75,7 +75,7 @@ public class BankTest {
 //        
 //        json = model.newRecord();
 //        if ("success".equals((String) json.get("result"))){
-//            json = model.setMaster("sBankName","BANCO DE ORO");
+//            json = model.getModel().getModel().setLaborDsc("INSTALL DASH CAM");
 //            if ("error".equals((String) json.get("result"))){
 //                System.err.println((String) json.get("message"));
 //                System.exit(1);
@@ -105,36 +105,39 @@ public class BankTest {
 //            result = true;
 //        }
 //        assertTrue(result);
-//        
 //    }
-    
+//    
 //    @Test
 //    public void test02OpenRecord(){
 //        System.out.println("--------------------------------------------------------------------");
 //        System.out.println("------------------------------RETRIEVAL--------------------------------------");
 //        System.out.println("--------------------------------------------------------------------");
 //        
-//        json = model.openRecord("M00124000001");
+//        json = model.openRecord("M00124000007");
 //        
 //        if (!"success".equals((String) json.get("result"))){
 //            result = false;
 //        } else {
 //            System.out.println("--------------------------------------------------------------------");
-//            System.out.println("BANK MASTER");
+//            System.out.println("SERVICE LABOR");
 //            System.out.println("--------------------------------------------------------------------");
-//            System.out.println("sBankIDxx  :  " + model.getMaster("sBankIDxx"));
-//            System.out.println("sBankName  :  " + model.getMaster("sBankName"));
-//            System.out.println("sBankCode  :  " + model.getMaster("sBankCode"));
-//            System.out.println("sBankType  :  " + model.getMaster("sBankType"));
-//            System.out.println("cRecdStat  :  " + model.getMaster("cRecdStat"));
-//            System.out.println("sModified  :  " + model.getMaster("sModified"));
-//            System.out.println("dModified  :  " + model.getMaster("dModified"));
-//            
+//            System.out.println("sLaborCde  :  " + model.getModel().getModel().getLaborCde()); 
+//            System.out.println("sLaborDsc  :  " + model.getModel().getModel().getLaborDsc()); 
+//            System.out.println("sWorkCtgy  :  " + model.getModel().getModel().getWorkCtgy()); 
+//            System.out.println("nFRTxxxxx  :  " + model.getModel().getModel().getFRT());      
+//            System.out.println("nLabrPrce  :  " + model.getModel().getModel().getLabrPrce()); 
+//            System.out.println("nDiscRte1  :  " + model.getModel().getModel().getDiscRte1()); 
+//            System.out.println("nDiscRte2  :  " + model.getModel().getModel().getDiscRte2()); 
+//            System.out.println("nDiscRte3  :  " + model.getModel().getModel().getDiscRte3()); 
+//            System.out.println("cAutoCrte  :  " + model.getModel().getModel().getAutoCrte()); 
+//            System.out.println("cRecdStat  :  " + model.getModel().getModel().getRecdStat()); 
+//            System.out.println("sEntryByx  :  " + model.getModel().getModel().getEntryBy());  
+//            System.out.println("dEntryDte  :  " + model.getModel().getModel().getEntryDte()); 
+//  
 //            result = true;
 //        }
 //        assertTrue(result);
 //    }
-//    
 //    
 //    @Test
 //    public void test03UpdateRecord(){
@@ -151,7 +154,13 @@ public class BankTest {
 //            result = true;
 //        }
 //        
-//        json = model.setMaster("sBankType","bank");
+//        json = model.getModel().getModel().setLaborDsc("INSTALL DASH CAMERA");
+//        if ("error".equals((String) json.get("result"))){
+//            System.err.println((String) json.get("message"));
+//            System.exit(1);
+//        }
+//        
+//        json = model.getModel().getModel().setWorkCtgy("1");
 //        if ("error".equals((String) json.get("result"))){
 //            System.err.println((String) json.get("message"));
 //            System.exit(1);
@@ -187,7 +196,7 @@ public class BankTest {
 //        System.out.println("------------------------------DEACTIVATE RECORD--------------------------------------");
 //        System.out.println("--------------------------------------------------------------------");
 //        
-//        json = model.deactivateRecord("M001BNK00001");
+//        json = model.deactivateRecord("M00124000007");
 //        System.err.println((String) json.get("message"));
 //        
 //        if (!"success".equals((String) json.get("result"))){
@@ -203,12 +212,12 @@ public class BankTest {
 //    }
 //    
 //    @Test
-//    public void test05ActivateRecord(){
+//    public void test04ActivateRecord(){
 //        System.out.println("--------------------------------------------------------------------");
 //        System.out.println("------------------------------ACTIVATE RECORD--------------------------------------");
 //        System.out.println("--------------------------------------------------------------------");
 //        
-//        json = model.activateRecord("M001BNK00001");
+//        json = model.activateRecord("M00124000007");
 //        System.err.println((String) json.get("message"));
 //        
 //        if (!"success".equals((String) json.get("result"))){
@@ -222,4 +231,5 @@ public class BankTest {
 //        assertTrue(result);
 //        //assertFalse(result);
 //    }
+    
 }
