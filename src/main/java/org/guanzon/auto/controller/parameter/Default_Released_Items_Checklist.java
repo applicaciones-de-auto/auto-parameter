@@ -318,34 +318,51 @@ public class Default_Released_Items_Checklist implements GRecord {
                     return jObj;
             }
             
-//            lsID = "";
-//            lsSQL =   " SELECT "                                             
-//                + "    a.sTransNox "                                     
-//                + "  , a.sItemType "                                     
-//                + "  , a.sItemCode "                                        
-//                + "  , a.nQuantity "                                     
-//                + "  , a.nReleased "                                       
-//                + " FROM vehicle_released_items a "                      
-//                + " LEFT JOIN default_released_items_checklist b ON b.sItemCode = a.sItemCode " ;
-//            //Deactivation Validation
-//            if(poModel.getRecdStat().equals("0")){
-//                lsSQL = MiscUtil.addCondition(lsSQL, " a.sItemType = 'd' AND a.sItemCode = " + SQLUtil.toSQL(poModel.getItemCode())) ;
-//                System.out.println("EXISTING USAGE OF DEFAULT ITEM: " + lsSQL);
-//                loRS = poGRider.executeQuery(lsSQL);
-//
-//                if (MiscUtil.RecordCount(loRS) > 0){
-//                        while(loRS.next()){
-//                            lsID = loRS.getString("sBrInsIDx");
-//                        }
-//
-//                        MiscUtil.close(loRS);
-//
-//                        jObj.put("result", "error");
-//                        jObj.put("message", "Existing Insurance Usage.\n\nInsurance Branch ID: " + lsID + "\nDeactivation aborted.");
-//                        return jObj;
-//                }
-//            }
+            lsID = "";
+            String lsSQLSelect =   " SELECT "                                             
+                + "    a.sTransNox "                                     
+                + "  , a.sItemType "                                     
+                + "  , a.sItemCode "                                        
+                + "  , a.nQuantity "                                     
+                + "  , a.nReleased "                                       
+                + " FROM vehicle_released_items a "                      
+                + " LEFT JOIN default_released_items_checklist b ON b.sItemCode = a.sItemCode " ;
+            //Deactivation Validation
+            if(poModel.getRecdStat().equals("0")){
+                lsSQL = MiscUtil.addCondition(lsSQLSelect, " a.sItemType = 'd' AND a.sItemCode = " + SQLUtil.toSQL(poModel.getItemCode())) ;
+                System.out.println("EXISTING USAGE OF DEFAULT ITEM: " + lsSQL);
+                loRS = poGRider.executeQuery(lsSQL);
+
+                if (MiscUtil.RecordCount(loRS) > 0){
+                        while(loRS.next()){
+                            lsID = loRS.getString("sTransNox");
+                        }
+
+                        MiscUtil.close(loRS);
+
+                        jObj.put("result", "error");
+                        jObj.put("message", "Existing Default Released Item Usage.\n\nVehicle Gatepass ID: " + lsID + "\nDeactivation aborted.");
+                        return jObj;
+                }
+            }
             
+            //Do not allow changing of Item Description when Item is already linked thru Vehicle Gatepass
+            lsSQL = MiscUtil.addCondition(lsSQLSelect, " a.sItemType = 'd' AND a.sItemCode = " + SQLUtil.toSQL(poModel.getItemCode())
+                                                        + " AND REPLACE(b.sItemDesc,' ','') <> " + SQLUtil.toSQL(poModel.getItemDesc().replace(" ",""))) ;
+            System.out.println("EXISTING USAGE OF DEFAULT ITEM: " + lsSQL);
+            loRS = poGRider.executeQuery(lsSQL);
+
+            if (MiscUtil.RecordCount(loRS) > 0){
+                    while(loRS.next()){
+                        lsID = loRS.getString("sTransNox");
+                    }
+
+                    MiscUtil.close(loRS);
+
+                    jObj.put("result", "error");
+                    jObj.put("message", "Existing Default Released Item Usage.\n\nVehicle Gatepass ID: " + lsID + "\nChanging of Item Description aborted.");
+                    return jObj;
+            }
         
         } catch (SQLException ex) {
             Logger.getLogger(Default_Released_Items_Checklist.class.getName()).log(Level.SEVERE, null, ex);
