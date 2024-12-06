@@ -256,6 +256,46 @@ public class Bank_Master implements GRecord {
         
         return poJSON;
     }
+    
+    public JSONObject searchRecord(String fsValue, boolean fbByActive, boolean fbByCode) {
+        String lsSQL =    "  SELECT "     
+                        + "   sBankIDxx " 
+                        + " , sBankName " 
+                        + " , sBankCode " 
+                        + " , sBankType " 
+                        + " , cRecdStat " 
+                        + "  FROM banks " ;
+        
+        if(fbByCode){
+            lsSQL = MiscUtil.addCondition(lsSQL,  " sBankIDxx = " + SQLUtil.toSQL(fsValue));
+        } else {
+            if(fbByActive){
+                lsSQL = MiscUtil.addCondition(lsSQL,  " sBankName LIKE " + SQLUtil.toSQL(fsValue + "%")
+                                                        + " AND cRecdStat = '1' ");
+            } else {
+                lsSQL = MiscUtil.addCondition(lsSQL,  " sBankName LIKE " + SQLUtil.toSQL(fsValue + "%"));
+            }
+        }
+        
+        System.out.println("SEARCH BANKS: " + lsSQL);
+        poJSON = ShowDialogFX.Search(poGRider,
+                lsSQL,
+                fsValue,
+                "ID»Bank Name",
+                "sBankIDxx»sBankName",
+                "sBankIDxx»sBankName",
+                fbByCode ? 0 : 1);
+
+        if (poJSON != null) {
+        } else {
+            poJSON = new JSONObject();
+            poJSON.put("result", "error");
+            poJSON.put("message", "No record loaded.");
+            return poJSON;
+        }
+        
+        return poJSON;
+    }
 
     @Override
     public Model_Bank_Master getModel() {
