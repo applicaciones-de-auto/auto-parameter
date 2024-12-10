@@ -253,6 +253,40 @@ public class Service_Labor_Master implements GRecord {
         
         return poJSON;
     }
+    
+    public JSONObject searchRecord(String fsValue, boolean fbByActive, boolean fbByCode) {
+        String lsSQL = poModel.getSQL();
+        
+        if(fbByCode){
+            lsSQL = MiscUtil.addCondition(lsSQL, " sLaborCde = " + SQLUtil.toSQL(fsValue));
+        } else {
+            if(fbByActive){
+                lsSQL = MiscUtil.addCondition(lsSQL, " sLaborDsc LIKE " + SQLUtil.toSQL(fsValue + "%") 
+                                                    + " AND cRecdStat = " + SQLUtil.toSQL(RecordStatus.ACTIVE));
+            } else {
+                lsSQL = MiscUtil.addCondition(lsSQL, " sLaborDsc LIKE " + SQLUtil.toSQL(fsValue + "%"));
+            }
+        }
+        
+        System.out.println("SEARCH LABOR: " + lsSQL);
+        poJSON = ShowDialogFX.Search(poGRider,
+                lsSQL,
+                fsValue,
+                "ID»Description",
+                "sLaborCde»sLaborDsc",
+                "sLaborCde»sLaborDsc",
+                fbByCode ? 0 : 1);
+
+        if (poJSON != null) {
+        } else {
+            poJSON = new JSONObject();
+            poJSON.put("result", "error");
+            poJSON.put("message", "No record loaded.");
+            return poJSON;
+        }
+        
+        return poJSON;
+    }
 
     @Override
     public Model_Labor_Master getModel() {

@@ -145,6 +145,15 @@ public class Service_Labor implements GRecord{
         }
         return poJSON;
     }
+    
+    public JSONObject searchRecord(String fsValue, boolean fbByActive, boolean fbByCode) {
+        poJSON = new JSONObject();  
+        poJSON = poController.searchRecord(fsValue, fbByActive, fbByCode);
+        if(!"error".equals(poJSON.get("result"))){
+            poJSON = openRecord((String) poJSON.get("sLaborCde"));
+        }
+        return poJSON;
+    }
 
     @Override
     public Service_Labor_Master getModel() {
